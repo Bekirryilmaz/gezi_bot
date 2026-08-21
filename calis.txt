@@ -1,0 +1,67 @@
+Samsun Gezi Platformu (Rotam) — Calistirma Rehberi
+==================================================
+
+Bu proje iki servisle ayaga kalkar: FastAPI (sunucu) + Next.js (site).
+Ikisi de PostgreSQL'e bagli calisir.
+
+ONKOSUL: PostgreSQL
+-------------------
+Bu makinede yerel PostgreSQL kullanilir (Docker yok).
+
+  # Durum kontrol
+  C:\PostgreSQL\bin\pg_ctl.exe status -D C:\PostgreSQL\data
+
+  # Baslat (gerekirse)
+  C:\PostgreSQL\bin\pg_ctl.exe start -D C:\PostgreSQL\data -l C:\PostgreSQL\data\startup.log -w
+
+  # Durdur
+  C:\PostgreSQL\bin\pg_ctl.exe stop -D C:\PostgreSQL\data -m fast
+
+Baglanti (sunucu/.env veya varsayilan):
+  postgresql+psycopg://gezi_kullanici:gezi_sifre@localhost:5432/gezi_veritabani
+
+  sunucu/.env yoksa:
+  copy sunucu\.env.example sunucu\.env
+
+
+1) API (FastAPI) — port 8125
+----------------------------
+Repo kokunden (gezi_bot\):
+
+  .\.venv_test\Scripts\python.exe -m uvicorn sunucu.api.uygulama:uygulama --host 127.0.0.1 --port 8125
+
+Swagger: http://127.0.0.1:8125/docs
+
+
+2) Site (Next.js) — port 3000
+-----------------------------
+Baska bir terminalde:
+
+  cd site
+  npm run dev -- --port 3000
+
+Tarayici: http://localhost:3000
+
+site\.env.local icinde API adresi olmali:
+  NEXT_PUBLIC_API_URL=http://127.0.0.1:8125
+
+
+Hizli kontrol
+-------------
+  # API saglik
+  curl http://127.0.0.1:8125/docs
+
+  # Site
+  curl http://localhost:3000
+
+
+Notlar
+------
+- Ilk kurulumda (bir kez) sunucu\ klasorunden migrasyon:
+    cd sunucu
+    ..\.venv_test\Scripts\python.exe -m alembic upgrade head
+  Sonra repo kokunden veri aktarimi:
+    .\.venv_test\Scripts\python.exe -m sunucu.veritabani.aktarim.calistir --sehir samsun
+- Ornek API: http://127.0.0.1:8125/sehirler
+- CORS icin sunucunun localhost:3000'e izin vermesi gerekir (API_IZINLI_ORIGINLER).
+- Port doluysa: netstat -ano | findstr ":8125 :3000 :5432"

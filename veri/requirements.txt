@@ -1,0 +1,31 @@
+# Veri katmani bagimliliklari (toplama, esleme, duygu analizi, kalite kontrolu)
+#
+# Kurulum:
+#   pip install -r requirements.txt
+#   playwright install chromium      (Google Maps ve TripAdvisor toplayicilari icin sart)
+
+# Ortak veri modelleri
+pydantic>=2.6
+
+# HTTP istekleri (OSM Overpass API, Eksi Sozluk statik sayfalar)
+requests>=2.31
+
+# HTML ayristirma (Eksi Sozluk, TripAdvisor icin gerekirse)
+beautifulsoup4>=4.12
+lxml>=5.0
+
+# JS ile yuklenen sayfalar icin tarayici otomasyonu (Google Maps, TripAdvisor)
+playwright>=1.42
+
+# Kaynaklar arasi isim benzerligi (bulanik eslesme / fuzzy matching)
+rapidfuzz>=3.6
+
+# Turkce duygu analizi modeli (HuggingFace transformers + PyTorch, CPU uzerinde calisir)
+transformers>=4.38
+torch>=2.2
+
+# .env dosyasindan ortam degiskeni okumak icin
+python-dotenv>=1.0
+
+# Ilerleme cubugu (uzun suren scraping/analiz islerinde konsol geri bildirimi)
+tqdm>=4.66

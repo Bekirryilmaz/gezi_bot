@@ -1,0 +1,17 @@
+# Sunucu (API + rota motoru) bagimliliklari
+
+# Web cercevesi (Faz 2'de api/ icinde kullanilacak)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+
+# Veritabani ORM ve migration
+sqlalchemy>=2.0.29
+alembic>=1.13
+psycopg[binary]>=3.1
+geoalchemy2>=0.14
+
+# .env dosyasindan ortam degiskeni okumak icin
+python-dotenv>=1.0
+
+# rota_motoru/ birim testleri icin (sunucu/rota_motoru/testler/)
+pytest>=8.0

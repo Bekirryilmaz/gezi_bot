@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.venv_test/
+venv/
+*.egg-info/
+
+# Ortam degiskenleri (sifre, anahtar iceren dosyalar asla paylasilmaz)
+.env
+*.env.local
+
+# Veri ciktilari (buyuk boyutlu, git ile takip edilmez)
+veri/cikti/ham/**/*.jsonl
+veri/cikti/islenmis/**/*.jsonl
+veri/cikti/islenmis/**/*.parquet
+veri/cikti/raporlar/*.md
+!veri/cikti/**/.gitkeep
+
+# Duygu analizi modelleri (HuggingFace onbellegi, buyuk boyutlu)
+.hf_onbellek/
+*.bin
+*.safetensors
+
+# Node / Next.js (site/ icin)
+site/node_modules/
+site/.next/
+site/out/
+
+# Playwright
+veri/**/.playwright-cache/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Veritabani yerel dosyalari
+*.sqlite3
+altyapi/postgres_veri/

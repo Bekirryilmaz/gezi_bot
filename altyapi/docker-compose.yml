@@ -1,0 +1,31 @@
+# Yerel gelistirme icin PostgreSQL + PostGIS.
+#
+# Calistirmak icin: (bu dosyanin oldugu klasorden) docker compose up -d
+# Durdurmak icin:   docker compose down
+# Veriyi de silmek icin: docker compose down -v
+#
+# Oracle sunucuya canlida cikarken bu dosyaya sunucu (backend) ve site
+# (frontend) servisleri de Faz 3'te eklenecek; su an sadece veritabani var
+# cunku Faz 1 (veri katmani) icin ihtiyacimiz olan tek sey bu.
+
+services:
+  veritabani:
+    image: postgis/postgis:16-3.4
+    container_name: gezi_veritabani
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gezi_kullanici
+      POSTGRES_PASSWORD: gezi_sifre
+      POSTGRES_DB: gezi_veritabani
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_veri:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gezi_kullanici -d gezi_veritabani"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_veri:
