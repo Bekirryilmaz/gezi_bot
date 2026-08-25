@@ -91,3 +91,29 @@ def test_kaynak_kalitesi_katkisi_esit_skorlari_ayirir():
     tercihler = RotaTercihleri()
 
     assert yer_uygunluk_puani(yuksek_puanli, tercihler).toplam_puan > yer_uygunluk_puani(dusuk_puanli, tercihler).toplam_puan
+
+
+def test_sponsorlu_mekan_bonus_ekler():
+    yer = _ornek_yer(ozellikler={"sponsorlu_mekan": True})
+    sonuc = yer_uygunluk_puani(yer, RotaTercihleri())
+
+    assert sonuc.kirilim["sponsorlu_bonusu"] == 30
+    assert sonuc.toplam_puan >= 30
+
+
+def test_sehrin_klasigi_bonus_ekler():
+    yer = _ornek_yer(ozellikler={"sehrin_klasigi": "evet"})
+    sonuc = yer_uygunluk_puani(yer, RotaTercihleri())
+
+    assert sonuc.kirilim["sehrin_klasigi_bonusu"] == 15
+
+
+def test_yol_yorgunlugu_skoru_yarilar():
+    yer = _ornek_yer(ortalama_ziyaret_suresi_dk=20, kaynakta_puan_ortalamasi=5.0)
+    tercihler = RotaTercihleri()
+    kisa_yol = yer_uygunluk_puani(yer, tercihler, yol_suresi_dk=10)
+    uzun_yol = yer_uygunluk_puani(yer, tercihler, yol_suresi_dk=40)
+
+    assert "yol_yorgunlugu_cezasi" not in kisa_yol.kirilim
+    assert "yol_yorgunlugu_cezasi" in uzun_yol.kirilim
+    assert uzun_yol.toplam_puan == round(kisa_yol.toplam_puan * 0.5, 2)

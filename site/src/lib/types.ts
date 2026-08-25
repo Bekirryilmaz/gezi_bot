@@ -21,6 +21,11 @@ export type YerOzet = {
   kapak_fotografi_url: string | null;
 };
 
+export type YerListeCevabi = {
+  yerler: YerOzet[];
+  toplam_sayi: number;
+};
+
 export type OrnekYorum = {
   yazar_takma_adi: string | null;
   yorum_metni: string;

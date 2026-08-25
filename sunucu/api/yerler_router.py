@@ -7,10 +7,10 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from sunucu.api.semalar import BolgeProfiliCevap, OrnekYorum, SehirCevap, YerDetay, YerOzet
+from sunucu.api.semalar import BolgeProfiliCevap, OrnekYorum, SehirCevap, YerDetay, YerListeCevabi, YerOzet
 from sunucu.veritabani.baglanti import oturum_al
 from sunucu.veritabani.modeller import BolgeProfili, Sehir, Yorum
-from sunucu.veritabani.sorgular import sehir_yerlerini_getir, yer_ve_koordinat_getir
+from sunucu.veritabani.sorgular import sehir_yerlerini_sayfa_getir, yer_ve_koordinat_getir
 from veri.ortak.sehir_ayarlari import SEHIRLER, sehir_anahtarini_isme_gore_bul, sehir_getir
 
 yonlendirici = APIRouter(tags=["yerler"])
@@ -79,24 +79,38 @@ def sehirleri_listele(oturum: Session = Depends(oturum_al)) -> list[SehirCevap]:
     return sonuc
 
 
-@yonlendirici.get("/sehirler/{sehir_anahtari}/yerler", response_model=list[YerOzet])
+@yonlendirici.get("/sehirler/{sehir_anahtari}/yerler", response_model=YerListeCevabi)
 def yerleri_listele(
     sehir_anahtari: str,
     ana_kategori: str | None = Query(default=None, description="Orn. 'gezilecek_yer', 'konaklama', 'yeme_icme'"),
     alt_kategori: str | None = Query(default=None, description="Orn. 'tarihi_kulturel', 'plaj_su'"),
+    sadece_kesif: bool = Query(
+        default=True,
+        description="True: vitrin (konaklama gizlenir, yeme-icme yalniz etiketli/yuksek duygulu). "
+        "False: rota motoru/test icin kisitlamasiz.",
+    ),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
     oturum: Session = Depends(oturum_al),
-) -> list[YerOzet]:
-    """Bir sehirdeki yerleri, opsiyonel kategori filtreleriyle sayfalayarak listeler."""
+) -> YerListeCevabi:
+    """Bir sehirdeki yerleri, opsiyonel kategori ve kesif filtresiyle sayfalar."""
     sehir = _sehri_veritabanindan_bul(oturum, sehir_anahtari)
 
     ana_kategoriler = [ana_kategori] if ana_kategori else None
     alt_kategoriler = [alt_kategori] if alt_kategori else None
-    yerler_ve_koordinatlar = sehir_yerlerini_getir(oturum, sehir.id, ana_kategoriler, alt_kategoriler)
-
-    sayfalanan = yerler_ve_koordinatlar[offset : offset + limit]
-    return [YerOzet.yerden_olustur(yer, enlem, boylam) for yer, enlem, boylam in sayfalanan]
+    yerler_ve_koordinatlar, toplam_sayi = sehir_yerlerini_sayfa_getir(
+        oturum,
+        sehir.id,
+        ana_kategoriler,
+        alt_kategoriler,
+        sadece_kesif=sadece_kesif,
+        limit=limit,
+        offset=offset,
+    )
+    return YerListeCevabi(
+        yerler=[YerOzet.yerden_olustur(yer, enlem, boylam) for yer, enlem, boylam in yerler_ve_koordinatlar],
+        toplam_sayi=toplam_sayi,
+    )
 
 
 @yonlendirici.get("/sehirler/{sehir_anahtari}/bolgeler", response_model=list[BolgeProfiliCevap])

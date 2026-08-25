@@ -22,13 +22,14 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
   const { anahtar } = await params;
   const { kategori } = await searchParams;
 
-  const [sehirler, yerler] = await Promise.all([
+  const [sehirler, liste] = await Promise.all([
     sehirleriGetir().catch(() => []),
     yerleriGetir(anahtar, {
       anaKategori: kategori,
       limit: 60,
-    }).catch(() => []),
+    }).catch(() => ({ yerler: [], toplam_sayi: 0 })),
   ]);
+  const yerler = liste.yerler;
 
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
   const baslik = sehir?.isim ?? anahtar;
@@ -58,7 +59,7 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
           >
             Tümü
           </Link>
-          {ANA_KATEGORILER.map((k) => (
+          {ANA_KATEGORILER.filter((k) => k.deger !== "konaklama").map((k) => (
             <Link
               key={k.deger}
               href={`/sehir/${anahtar}?kategori=${k.deger}`}
@@ -74,7 +75,7 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
         </div>
 
         <div className="mt-8">
-          <p className="mb-2 text-sm text-ink/50">{yerler.length} yer</p>
+          <p className="mb-2 text-sm text-ink/50">{liste.toplam_sayi} yer</p>
           {yerler.length === 0 ? (
             <p className="py-12 text-ink/60">
               Yer bulunamadı. API çalışıyor mu? ({process.env.NEXT_PUBLIC_API_URL})

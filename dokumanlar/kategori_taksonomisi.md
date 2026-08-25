@@ -2,18 +2,24 @@
 
 Bu doküman, sitede yer alacak her "yer" (gezilecek yer, konaklama, restoran, kafe vb.)
 için kullanılacak kategori ve etiket sistemini tanımlar. Buradaki her kategori/etiket,
-`veri/ortak/sabitler.py` dosyasında kod karşılığı olan bir sabit olarak bulunur —
+`ortak/sabitler.py` dosyasında kod karşılığı olan bir sabit olarak bulunur —
 yani bu doküman ile kod her zaman birebir eşleşir. Taksonomiyi değiştirdiğinde
 her iki dosyayı da güncelle.
 
-Tasarım mantığı üç katmanlıdır:
+Tasarım mantığı katmanlıdır:
 
 1. **Ana kategori + alt kategori**: Bir yerin "ne olduğu" (müze, plaj, kafe, otel vb.)
 2. **Özellik etiketleri**: Bir yerin "nasıl olduğu" (alkollü mü, öğrenci dostu mu,
    ücretsiz mi vb.) — bir yer birden fazla etiket taşıyabilir
-3. **Deneyim eksenleri**: Rota algoritmasının kullanıcı tercihleriyle eşleştirme
+3. **Ticari / kürasyon etiketleri**: Şehrin klasiği, sponsorlu mekan gibi ürün
+   ve gelir modeline ait işaretler (`OZEL_ETIKETLER`)
+4. **Deneyim eksenleri**: Rota algoritmasının kullanıcı tercihleriyle eşleştirme
    yaparken kullandığı 0-100 arası puanlar (bu yer ne kadar "tarihi", ne kadar
    "eğlence" ağırlıklı vb.)
+5. **Zaman dilimi uyumu**: Alt kategorinin günün hangi dilimlerinde doğal olduğu
+   (`KATEGORI_ZAMAN_DILIMLERI`)
+6. **Lojistik tampon süreleri**: Ziyaret süresine eklenen insan payı
+   (`MEKAN_BEKLEME_SURELERI_DK`)
 
 ---
 
@@ -89,6 +95,25 @@ JSONB alanında tutulur, bkz. `dokumanlar/veri_sozlugu.md`):
 | `fiyat_seviyesi` | 1-4 | 1=ucuz, 2=orta, 3=pahalı, 4=çok pahalı |
 | `en_iyi_ziyaret_mevsimi` | metin | Örn. "yaz", "ilkbahar-sonbahar", "tum_yil" |
 | `ortalama_ziyaret_suresi_dk` | sayı | Ortalama kaç dakika/saat sürdüğü (rota süresi hesaplamak için) |
+| `kahvalti_verir` | evet/hayir | Kahvaltı hizmeti sunar (alt kategori değil; kafe, otel, restoran vb. taşıyabilir) |
+| `sehrin_klasigi` | evet/hayir | Küratörlüğünü yaptığımız, şehrin simgesi / vazgeçilmezi (bkz. #2.1) |
+| `sponsorlu_mekan` | evet/hayir | Ticari anlaşmalı / öne çıkan mekan (bkz. #2.1) |
+
+### 2.1. Ticari ve kürasyon etiketleri (`OZEL_ETIKETLER`)
+
+Amenite niteliklerinden (wifi, otopark, alkol servisi) ayrı tutulan, ürün
+kurgusuna ait işaretler. Kod karşılığı: `ortak/sabitler.py::OzelEtiket` ve
+`OZEL_ETIKETLER`. Saklama yeri yine `ozellikler` JSONB alanıdır — yeni kolon
+açılmaz; rota/listeleme bu anahtarları okur.
+
+| Etiket | Açıklama |
+|---|---|
+| `sehrin_klasigi` | Editöryel kürasyon: yerlilerin ve gezginlerin "bu şehre gelince burası" dediği yer. Organik öne çıkarma; reklam değildir. |
+| `sponsorlu_mekan` | Ticari anlaşma ile listede/rotada görünürlük kazanmış yer. Kullanıcıya şeffaf işaretlenir. |
+| `kahvalti_verir` | Hizmet: mekan kahvaltı sunar. Ana tür değildir; `kafe`, `otel`, `restoran_lokanta` vb. ile birlikte gelir. |
+
+Bir yer birden fazla özel etiketi taşıyabilir. Hiçbiri yoksa alan yazılmaz /
+`hayir` kabul edilir.
 
 ---
 
@@ -101,7 +126,7 @@ yürüyüş, kano vb.) kullanılan etiketler. Bir yer birden fazla aktiviteyi de
 `fotografcilik`, `kus_gozlemciligi`, `tekne_turu`, `yamac_parasutu`, `kayak`
 (Karadeniz'in iç/yayla kesimlerine büyüyünce kış turizmi için)
 
-Bu liste büyüdükçe `veri/ortak/sabitler.py` içindeki `Aktivite` sabitine
+Bu liste büyüdükçe `ortak/sabitler.py` içindeki `Aktivite` sabitine
 eklenerek genişletilir.
 
 ---
@@ -207,3 +232,62 @@ bkz. `veri/README.md` "Bölge Profili" bölümü.
 Bu yapı şehirden bağımsızdır: `sehir_ayarlari.py::SehirAyari.ilceler` listesi
 doldurulan HER şehir için (Samsun dışında yeni eklenen şehirler için de) aynı
 kod hiçbir değişiklik gerektirmeden çalışır.
+
+---
+
+## 8. Kategori — zaman dilimi eşleştirmesi (`KATEGORI_ZAMAN_DILIMLERI`)
+
+Rota motorunun bir durağı günün *hangi diliminde* önereceğini belirler.
+İnsan gibi plan: kahvaltı sabah, fine dining akşam, gece hayatı gece.
+Kod: `ortak/sabitler.py::ZamanDilimi` ve `KATEGORI_ZAMAN_DILIMLERI`.
+
+Zaman dilimi anahtarları:
+
+| Dilim | Anlam (kaba aralık, ayarlanabilir) |
+|---|---|
+| `sabah` | sabah / erken öğleden önce |
+| `ogle` | öğle yemeği penceresi |
+| `ikindi` | öğleden sonra / çay-kahve arası |
+| `aksam` | akşam yemeği / gün batımı |
+| `gece` | gece hayatı / geç saat |
+
+Kod yardımcıları (`zaman_dilimi_uygun_mu`, `uygun_zaman_dilimleri`): sözlükte
+olmayan alt kategori kısıtsızdır (tüm dilimler). Kahvaltı bir alt kategori
+değildir; `kahvalti_verir` özelliği zaman eşlemesine girmez, rota motoru
+bunu ayrı bir hizmet sinyali olarak kullanır.
+
+Alt kategori → uyumlu dilimler (`kafe` ve konaklama alt kategorileri listede
+yoksa kısıt uygulanmaz):
+
+| Alt kategori | Zaman dilimleri |
+|---|---|
+| `kahve_uzmanlik` | `sabah`, `ikindi` |
+| `restoran_lokanta`, `kebap_izgara`, `deniz_mahsulleri`, `ev_yemekleri_esnaf`, `sokak_lezzeti` | `ogle`, `aksam` |
+| `fine_dining_romantik`, `meyhane_bar` | `aksam`, `gece` |
+| `gece_hayati` | `gece` |
+| `tarihi_kulturel`, `doga_manzara`, `dini_manevi`, `fotograf_noktasi`, `alisveris` | `sabah`, `ogle`, `ikindi` |
+| `plaj_su`, `eglence_aktivite`, `spor_doga_yuruyus` | `sabah`, `ogle`, `ikindi` |
+| `tatli_pastane`, `cay_bahcesi` | `ogle`, `ikindi`, `aksam` |
+
+Zorunlu duraklar zaman dilimi dışındaysa yine dahil edilebilir (skorlamadaki
+zorunlu-durak kuralıyla aynı ruh: kullanıcı isteği saati ezer).
+
+---
+
+## 9. Lojistik tampon süreleri (`MEKAN_BEKLEME_SURELERI_DK`)
+
+`ortalama_ziyaret_suresi_dk` mekanın *içinde* geçirilen süredir. Buna ek olarak
+park etme, kuyruk, garson bekleme, hesabı kapatma, tuvalet/dinlenme gibi insan
+payı ana kategori bazında eklenir. Kod: `ortak/sabitler.py::MEKAN_BEKLEME_SURELERI_DK` ve `bekleme_payi_dk`
+(sözlükte olmayan ana kategori için varsayılan 15 dk).
+
+Rota zaman bütçesi ≈ ziyaret süresi + tampon + duraklar arası ulaşım.
+
+| Ana kategori | Tampon (dk) | Örnek pay |
+|---|---|---|
+| `yeme_icme` | 30 | oturma, sipariş/garson, hesap |
+| `gezilecek_yer` | 15 | bilet/kuyruk, tuvalet, fotoğraf molası |
+| `konaklama` | 20 | check-in/out, park, odaya yerleşme |
+
+Bu dakikalar ilk tahmindir; gerçek kullanım geri bildirimiyle
+`zaman_butcesi.py` sabitleri gibi ayarlanması beklenir.

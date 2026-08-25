@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import {
   konaklamaBolgesiOner,
   rotaAlternatifleriOlustur,
@@ -112,7 +112,7 @@ export function RotaSihirbazi({
   const [alternatifler, setAlternatifler] = useState<RotaCevap[]>([]);
   const [rota, setRota] = useState<RotaCevap | null>(null);
   const [hata, setHata] = useState<string | null>(null);
-  const [bekliyor, startTransition] = useTransition();
+  const [bekliyor, setBekliyor] = useState(false);
 
   const bolgeSecenekleri = useMemo(() => {
     const adlar = new Set<string>();
@@ -149,60 +149,63 @@ export function RotaSihirbazi({
     };
   }
 
-  function senaryo1Olustur() {
+  async function senaryo1Olustur() {
     setHata(null);
-    startTransition(async () => {
-      try {
-        const talep = {
-          ...tercihGovdesi(),
-          konaklama_yer_id: baslangicKonaklamaYerId || undefined,
-          konaklama_bolge_adi:
-            !baslangicKonaklamaYerId && bolgeAdi ? bolgeAdi : undefined,
-        };
-        if (!talep.konaklama_yer_id && !talep.konaklama_bolge_adi) {
-          setHata("Konaklama bölgesi seç.");
-          return;
-        }
-        const sonuc = await rotaOlustur(talep);
-        setRota(sonuc);
-        setAdim("sonuc");
-      } catch (err) {
-        setRota(null);
-        setHata(err instanceof Error ? err.message : "Rota oluşturulamadı");
-      }
-    });
+    const talep = {
+      ...tercihGovdesi(),
+      konaklama_yer_id: baslangicKonaklamaYerId || undefined,
+      konaklama_bolge_adi:
+        !baslangicKonaklamaYerId && bolgeAdi ? bolgeAdi : undefined,
+    };
+    if (!talep.konaklama_yer_id && !talep.konaklama_bolge_adi) {
+      setHata("Konaklama bölgesi seç.");
+      return;
+    }
+    setBekliyor(true);
+    try {
+      const sonuc = await rotaOlustur(talep);
+      setRota(sonuc);
+      setAdim("sonuc");
+    } catch (err) {
+      setRota(null);
+      setHata(err instanceof Error ? err.message : "Rota oluşturulamadı");
+    } finally {
+      setBekliyor(false);
+    }
   }
 
-  function senaryo2Alternatifler() {
+  async function senaryo2Alternatifler() {
     setHata(null);
-    startTransition(async () => {
-      try {
-        const cevap = await rotaAlternatifleriOlustur({
-          ...tercihGovdesi(),
-          alternatif_sayisi: 3,
-        });
-        setAlternatifler(cevap.alternatifler);
-        setAdim("alternatifler");
-      } catch (err) {
-        setAlternatifler([]);
-        setHata(err instanceof Error ? err.message : "Alternatifler üretilemedi");
-      }
-    });
+    setBekliyor(true);
+    try {
+      const cevap = await rotaAlternatifleriOlustur({
+        ...tercihGovdesi(),
+        alternatif_sayisi: 3,
+      });
+      setAlternatifler(cevap.alternatifler);
+      setAdim("alternatifler");
+    } catch (err) {
+      setAlternatifler([]);
+      setHata(err instanceof Error ? err.message : "Alternatifler üretilemedi");
+    } finally {
+      setBekliyor(false);
+    }
   }
 
-  function alternatifSec(secilen: RotaCevap) {
+  async function alternatifSec(secilen: RotaCevap) {
     setHata(null);
-    startTransition(async () => {
-      try {
-        const zengin = await konaklamaBolgesiOner(secilen.id);
-        setRota(zengin);
-        setAdim("sonuc");
-      } catch (err) {
-        setRota(secilen);
-        setAdim("sonuc");
-        setHata(err instanceof Error ? err.message : "Bölge önerisi alınamadı");
-      }
-    });
+    setBekliyor(true);
+    try {
+      const zengin = await konaklamaBolgesiOner(secilen.id);
+      setRota(zengin);
+      setAdim("sonuc");
+    } catch (err) {
+      setRota(secilen);
+      setAdim("sonuc");
+      setHata(err instanceof Error ? err.message : "Bölge önerisi alınamadı");
+    } finally {
+      setBekliyor(false);
+    }
   }
 
   return (

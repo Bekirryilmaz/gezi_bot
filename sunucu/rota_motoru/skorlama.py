@@ -16,7 +16,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from ortak.sabitler import OzelEtiket
 from sunucu.rota_motoru.veri_tipleri import AdayYer, RotaTercihleri
+from sunucu.rota_motoru.zaman_butcesi import ziyaret_suresi_tahmini_dk
 
 _AKTIVITE_ESLESME_BONUSU = 15.0
 _ZORUNLU_DURAK_PUANI = 1_000.0  # skor siralamasinda her zaman en uste cikmasi icin
@@ -24,6 +26,10 @@ _FIYAT_TERCIH_BONUSU = 10.0
 _FIYAT_TERCIH_CEZASI = -10.0
 _SAKINLIK_CEZA_CARPANI = 15.0  # kalabalik zaman dilimi basina, ayrica asagida guvenle carpilir
 _KAYNAK_PUANI_AGIRLIGI = 2.0  # 0-5 arasi kaynak puanini kucuk bir katki olarak dahil eder (esit skorlarda ayirt edici)
+_SPONSORLU_BONUSU = 30.0
+_SEHRIN_KLASIGI_BONUSU = 15.0
+_YOL_YORGUNLUGU_ESIGI = 1.5
+_YOL_YORGUNLUGU_CARPANI = 0.5
 
 
 @dataclass
@@ -33,7 +39,11 @@ class SkorSonucu:
     zorunlu_mu: bool = False
 
 
-def yer_uygunluk_puani(yer: AdayYer, tercihler: RotaTercihleri) -> SkorSonucu:
+def yer_uygunluk_puani(
+    yer: AdayYer,
+    tercihler: RotaTercihleri,
+    yol_suresi_dk: float | None = None,
+) -> SkorSonucu:
     if yer.id in tercihler.zorunlu_duraklar:
         return SkorSonucu(
             toplam_puan=_ZORUNLU_DURAK_PUANI,
@@ -48,9 +58,42 @@ def yer_uygunluk_puani(yer: AdayYer, tercihler: RotaTercihleri) -> SkorSonucu:
     fiyat_katkisi = _fiyat_tercihi_katkisi_hesapla(yer, tercihler, kirilim)
     sakinlik_katkisi = _sakinlik_tercihi_katkisi_hesapla(yer, tercihler, kirilim)
     kalite_katkisi = _kaynak_kalitesi_katkisi_hesapla(yer, kirilim)
+    ticari_katki = _ticari_bonus_hesapla(yer, kirilim)
 
-    toplam = deneyim_puani + aktivite_bonusu + fiyat_katkisi + sakinlik_katkisi + kalite_katkisi
+    toplam = deneyim_puani + aktivite_bonusu + fiyat_katkisi + sakinlik_katkisi + kalite_katkisi + ticari_katki
+    toplam = _yol_yorgunlugu_uygula(yer, yol_suresi_dk, toplam, kirilim)
     return SkorSonucu(toplam_puan=round(toplam, 2), kirilim=kirilim)
+
+
+def _ticari_bonus_hesapla(yer: AdayYer, kirilim: dict[str, float]) -> float:
+    katki = 0.0
+    if yer.ozellik_isaretli(OzelEtiket.SPONSORLU_MEKAN.value):
+        kirilim["sponsorlu_bonusu"] = _SPONSORLU_BONUSU
+        katki += _SPONSORLU_BONUSU
+    if yer.ozellik_isaretli(OzelEtiket.SEHRIN_KLASIGI.value):
+        kirilim["sehrin_klasigi_bonusu"] = _SEHRIN_KLASIGI_BONUSU
+        katki += _SEHRIN_KLASIGI_BONUSU
+    return katki
+
+
+def _yol_yorgunlugu_uygula(
+    yer: AdayYer,
+    yol_suresi_dk: float | None,
+    toplam: float,
+    kirilim: dict[str, float],
+) -> float:
+    """ROI: yolda gecen sure ziyaret suresinin 1.5 katini asarsa skoru yarila."""
+    if yol_suresi_dk is None:
+        return toplam
+    ziyaret = ziyaret_suresi_tahmini_dk(yer) or 0
+    if ziyaret <= 0:
+        return toplam
+    if (yol_suresi_dk / ziyaret) <= _YOL_YORGUNLUGU_ESIGI:
+        return toplam
+    onceki = toplam
+    toplam = toplam * _YOL_YORGUNLUGU_CARPANI
+    kirilim["yol_yorgunlugu_cezasi"] = round(toplam - onceki, 2)
+    return toplam
 
 
 def _deneyim_ekseni_puani_hesapla(yer: AdayYer, tercihler: RotaTercihleri, kirilim: dict[str, float]) -> float:

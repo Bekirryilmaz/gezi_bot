@@ -1,8 +1,9 @@
 """
 Rota olusturma orkestratoru.
 
-skorlama.py -> kumeleme.py -> siralama.py zincirini birlestirip iki
-senaryoyu yonetir:
+skorlama.py -> kumeleme.py -> gunluk_slotlari_diz zincirini birlestirip iki
+senaryoyu yonetir. Gun ici sira TSP degil; sabah/ogle/ikindi/aksam slot
+sablonudur. Gecis maliyeti = yol + ziyaret + bekleme_payi_dk.
   - Senaryo 1 (konaklama belli): kullanici konaklama noktasini biliyor,
     algoritma o noktadan gunlere yayilan bir rota olusturur.
   - Senaryo 2 (konaklama belli degil): once en iyi adaylarin agirlik
@@ -19,13 +20,16 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from ortak.cografya_araclari import haversine_metre
-from ortak.sabitler import AnaKategori
+from ortak.sabitler import AnaKategori, OzelEtiket, ZamanDilimi, bekleme_payi_dk, zaman_dilimi_uygun_mu
 from sunucu.rota_motoru.kumeleme import SkorluYer, agirlik_merkezi_hesapla, gunlere_boluster
 from sunucu.rota_motoru.rota_anlatim import konaklama_bolgesi_gerekce_uret, rota_tavsiyesi_uret
-from sunucu.rota_motoru.siralama import gun_rotasini_sirala
 from sunucu.rota_motoru.skorlama import yer_uygunluk_puani
 from sunucu.rota_motoru.veri_tipleri import AdayYer, GunSonucu, RotaDuragiSonucu, RotaSonucu, RotaTercihleri
-from sunucu.rota_motoru.zaman_butcesi import ulasim_suresi_tahmini_dk, ziyaret_suresi_tahmini_dk
+from sunucu.rota_motoru.zaman_butcesi import (
+    GUNLUK_GEZI_DAKIKASI,
+    ulasim_suresi_tahmini_dk,
+    ziyaret_suresi_tahmini_dk,
+)
 from sunucu.veritabani.modeller import KullaniciRotasi, Yer
 from sunucu.veritabani.sorgular import sehir_yerlerini_getir
 from veri.ortak.sehir_ayarlari import bolge_merkezini_bul
@@ -38,9 +42,6 @@ _ADAY_HAVUZU_CARPANI = 3
 # Senaryo 2'de konaklama onerisi icin, agirlik merkezine en yakin kac
 # konaklamanin arasindan (kaliteye gore) secim yapilacagi.
 _KONAKLAMA_ADAY_SAYISI = 10
-# Bir gune yemek durak adayi secerken, gunun cografi merkezine en yakin
-# kac restoran arasindan (skora gore) secim yapilacagi.
-_YEMEK_ADAY_SAYISI = 5
 # Konaklama noktasindan bu mesafeden UZAK yerler aday havuzuna hic girmez.
 # Sebep: dokumanlar/kategori_taksonomisi.md'deki varsayilan deneyim puanlari
 # ALT KATEGORI bazinda (yer'e ozel degil) verildigi icin, sehrin cok uzak bir
@@ -48,6 +49,8 @@ _YEMEK_ADAY_SAYISI = 5
 # filtresi olmadan gunluk rota, tek bir sehir gezisi yerine yanlislikla
 # onlarca km'lik il-capinda bir geziye donusebilir.
 _MAKSIMUM_ADAY_MESAFESI_METRE = 40_000
+_OGLE_MAKSIMUM_MESAFE_METRE = 20_000
+_KAFE_ALT_KATEGORILER = frozenset({"kafe", "kahve_uzmanlik"})
 
 
 class RotaOlusturulamadiHatasi(ValueError):
@@ -72,6 +75,7 @@ def _yer_orm_den_aday_uret(yer: Yer, enlem: float, boylam: float) -> AdayYer:
         duygu_skoru_ortalama=yer.duygu_skoru_ortalama,
         kapak_fotografi_url=yer.fotograf_urlleri[0] if yer.fotograf_urlleri else None,
         ilce=yer.ilce,
+        ozellikler=ozellikler,
     )
 
 
@@ -98,33 +102,117 @@ def _en_iyi_n_adayi_sec(
             or haversine_metre(referans_nokta[0], referans_nokta[1], aday.enlem, aday.boylam) <= _MAKSIMUM_ADAY_MESAFESI_METRE
         ]
 
-    skorlanmis = [SkorluYer(yer=aday, skor=yer_uygunluk_puani(aday, tercihler)) for aday in adaylar]
+    skorlanmis = []
+    for aday in adaylar:
+        yol_dk = None
+        if referans_nokta is not None:
+            yol_dk = ulasim_suresi_tahmini_dk(referans_nokta, (aday.enlem, aday.boylam))
+        skorlanmis.append(SkorluYer(yer=aday, skor=yer_uygunluk_puani(aday, tercihler, yol_suresi_dk=yol_dk)))
     skorlanmis.sort(key=lambda sy: sy.skor.toplam_puan, reverse=True)
     return skorlanmis[:n]
 
 
-def _gune_yemek_yeri_sec(
-    gunluk_yerler: list[SkorluYer],
-    yeme_icme_adaylari: list[AdayYer],
+def _durak_maliyeti_dk(onceki_nokta: tuple[float, float], yer: AdayYer) -> tuple[int, int, int]:
+    """(yol, ziyaret, tampon) dakikalari."""
+    yol = ulasim_suresi_tahmini_dk(onceki_nokta, (yer.enlem, yer.boylam))
+    ziyaret = ziyaret_suresi_tahmini_dk(yer)
+    tampon = bekleme_payi_dk(yer.ana_kategori)
+    return yol, ziyaret, tampon
+
+
+def _slot_1_uygun(yer: AdayYer) -> bool:
+    """Sabah: gezilecek (zaman kurali) VEYA kahvalti_verir yeme-icme."""
+    if yer.ana_kategori == AnaKategori.GEZILECEK_YER.value:
+        return zaman_dilimi_uygun_mu(yer.alt_kategori, ZamanDilimi.SABAH.value)
+    if yer.ana_kategori == AnaKategori.YEME_ICME.value:
+        return yer.ozellik_isaretli(OzelEtiket.KAHVALTI_VERIR.value)
+    return False
+
+
+def _slot_2_uygun(yer: AdayYer) -> bool:
+    """Ogle: yeme-icme, ogle dilimine uygun."""
+    return yer.ana_kategori == AnaKategori.YEME_ICME.value and zaman_dilimi_uygun_mu(
+        yer.alt_kategori, ZamanDilimi.OGLE.value
+    )
+
+
+def _slot_3_uygun(yer: AdayYer) -> bool:
+    """Oleden sonra: gezilecek (ikindi) VEYA kafe."""
+    if yer.ana_kategori == AnaKategori.GEZILECEK_YER.value:
+        return zaman_dilimi_uygun_mu(yer.alt_kategori, ZamanDilimi.IKINDI.value)
+    return yer.alt_kategori in _KAFE_ALT_KATEGORILER
+
+
+def _slot_4_uygun(yer: AdayYer) -> bool:
+    """Aksam: yeme-icme, aksam dilimine uygun."""
+    return yer.ana_kategori == AnaKategori.YEME_ICME.value and zaman_dilimi_uygun_mu(
+        yer.alt_kategori, ZamanDilimi.AKSAM.value
+    )
+
+
+def _en_iyi_slot_adayi(
+    adaylar: list[AdayYer],
     tercihler: RotaTercihleri,
+    onceki_nokta: tuple[float, float],
+    mevcut_dakika: int,
+    uygun_mu,
     kullanilmis_idler: set[str],
-    varsayilan_merkez: tuple[float, float],
+    maks_mesafe_metre: float | None = None,
 ) -> SkorluYer | None:
-    """Gunun (gezilecek yer duraklarinin) cografi merkezine en yakin
-    restoran/kafe adaylari arasindan en yuksek skorluyu secer -- boylece
-    hem 'yakin' hem 'kaliteli/tercihe uygun' bir ogle/aksam yemegi durak
-    onerisi eklenmis olur. Aym restoran birden fazla gune eklenmez."""
-    uygun_adaylar = [aday for aday in yeme_icme_adaylari if aday.id not in kullanilmis_idler]
-    if not uygun_adaylar:
-        return None
+    en_iyi: SkorluYer | None = None
+    for aday in adaylar:
+        if aday.id in kullanilmis_idler:
+            continue
+        if not uygun_mu(aday):
+            continue
+        mesafe = haversine_metre(onceki_nokta[0], onceki_nokta[1], aday.enlem, aday.boylam)
+        if maks_mesafe_metre is not None and mesafe > maks_mesafe_metre:
+            continue
+        yol, ziyaret, tampon = _durak_maliyeti_dk(onceki_nokta, aday)
+        if mevcut_dakika + yol + ziyaret + tampon > GUNLUK_GEZI_DAKIKASI:
+            continue
+        skor = yer_uygunluk_puani(aday, tercihler, yol_suresi_dk=yol)
+        if en_iyi is None or skor.toplam_puan > en_iyi.skor.toplam_puan:
+            en_iyi = SkorluYer(yer=aday, skor=skor)
+    return en_iyi
 
-    gun_merkezi = agirlik_merkezi_hesapla([sy.yer for sy in gunluk_yerler]) if gunluk_yerler else varsayilan_merkez
-    uygun_adaylar.sort(key=lambda a: haversine_metre(gun_merkezi[0], gun_merkezi[1], a.enlem, a.boylam))
-    en_yakinlar = uygun_adaylar[:_YEMEK_ADAY_SAYISI]
 
-    skorlu_adaylar = [SkorluYer(yer=aday, skor=yer_uygunluk_puani(aday, tercihler)) for aday in en_yakinlar]
-    skorlu_adaylar.sort(key=lambda sy: sy.skor.toplam_puan, reverse=True)
-    return skorlu_adaylar[0] if skorlu_adaylar else None
+def gunluk_slotlari_diz(
+    gezilecek_adaylar: list[AdayYer],
+    yeme_icme_adaylar: list[AdayYer],
+    tercihler: RotaTercihleri,
+    baslangic_noktasi: tuple[float, float],
+    kullanilmis_idler: set[str],
+) -> list[SkorluYer]:
+    """Gunu sabah / ogle / ikindi / aksam slotlarina gore doldurur (TSP yok)."""
+    havuz = [*gezilecek_adaylar, *yeme_icme_adaylar]
+    secilenler: list[SkorluYer] = []
+    onceki_nokta = baslangic_noktasi
+    mevcut_dakika = 0
+    slotlar = (
+        (_slot_1_uygun, None),
+        (_slot_2_uygun, _OGLE_MAKSIMUM_MESAFE_METRE),
+        (_slot_3_uygun, None),
+        (_slot_4_uygun, None),
+    )
+    for uygun_mu, maks_mesafe in slotlar:
+        secim = _en_iyi_slot_adayi(
+            havuz,
+            tercihler,
+            onceki_nokta,
+            mevcut_dakika,
+            uygun_mu,
+            kullanilmis_idler,
+            maks_mesafe_metre=maks_mesafe,
+        )
+        if secim is None:
+            continue
+        yol, ziyaret, tampon = _durak_maliyeti_dk(onceki_nokta, secim.yer)
+        mevcut_dakika += yol + ziyaret + tampon
+        onceki_nokta = (secim.yer.enlem, secim.yer.boylam)
+        kullanilmis_idler.add(secim.yer.id)
+        secilenler.append(secim)
+    return secilenler
 
 
 def _gun_sonucu_olustur(gun_no: int, siralanmis: list[SkorluYer], baslangic_noktasi: tuple[float, float]) -> GunSonucu:
@@ -138,6 +226,7 @@ def _gun_sonucu_olustur(gun_no: int, siralanmis: list[SkorluYer], baslangic_nokt
         mesafe = haversine_metre(onceki_nokta[0], onceki_nokta[1], hedef_nokta[0], hedef_nokta[1])
         ziyaret_suresi = ziyaret_suresi_tahmini_dk(skorlu_yer.yer)
         ulasim_suresi = ulasim_suresi_tahmini_dk(onceki_nokta, hedef_nokta)
+        tampon = bekleme_payi_dk(skorlu_yer.yer.ana_kategori)
 
         duraklar.append(
             RotaDuragiSonucu(
@@ -149,7 +238,7 @@ def _gun_sonucu_olustur(gun_no: int, siralanmis: list[SkorluYer], baslangic_nokt
             )
         )
         toplam_mesafe += mesafe
-        toplam_sure += ziyaret_suresi + ulasim_suresi
+        toplam_sure += ziyaret_suresi + ulasim_suresi + tampon
         onceki_nokta = hedef_nokta
 
     return GunSonucu(gun_no=gun_no, duraklar=duraklar, toplam_mesafe_metre=round(toplam_mesafe, 1), toplam_sure_dakikasi=toplam_sure)
@@ -220,19 +309,23 @@ def senaryo_1_rota_olustur(
     en_iyi_adaylar = _en_iyi_n_adayi_sec(gezilecek_adaylar, tercihler, havuz_boyutu, referans_nokta=konaklama_noktasi)
     gunlere_bolunmus = gunlere_boluster(en_iyi_adaylar, gun_sayisi, konaklama_noktasi)
 
-    kullanilmis_yeme_icme_idleri: set[str] = set()
+    kullanilmis_idler: set[str] = set()
     gunler: list[GunSonucu] = []
     for gun_no in range(1, gun_sayisi + 1):
-        gunluk_yerler = gunlere_bolunmus.get(gun_no, [])
-
-        yemek_secimi = _gune_yemek_yeri_sec(
-            gunluk_yerler, yeme_icme_adaylari, tercihler, kullanilmis_yeme_icme_idleri, konaklama_noktasi
+        gunluk_gezilecek = [sy.yer for sy in gunlere_bolunmus.get(gun_no, [])]
+        yeme_havuz = [
+            aday
+            for aday in yeme_icme_adaylari
+            if haversine_metre(konaklama_noktasi[0], konaklama_noktasi[1], aday.enlem, aday.boylam)
+            <= _MAKSIMUM_ADAY_MESAFESI_METRE
+        ]
+        siralanmis = gunluk_slotlari_diz(
+            gunluk_gezilecek,
+            yeme_havuz,
+            tercihler,
+            konaklama_noktasi,
+            kullanilmis_idler,
         )
-        if yemek_secimi is not None:
-            gunluk_yerler = [*gunluk_yerler, yemek_secimi]
-            kullanilmis_yeme_icme_idleri.add(yemek_secimi.yer.id)
-
-        siralanmis = gun_rotasini_sirala(gunluk_yerler, konaklama_noktasi)
         gunler.append(_gun_sonucu_olustur(gun_no, siralanmis, konaklama_noktasi))
 
     rota_sonucu = RotaSonucu(gunler=gunler)

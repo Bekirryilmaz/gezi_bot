@@ -68,6 +68,13 @@ class YerOzet(BaseModel):
         )
 
 
+class YerListeCevabi(BaseModel):
+    """Keşif listesi: sayfa + filtre sonrasi toplam adet."""
+
+    yerler: list[YerOzet]
+    toplam_sayi: int
+
+
 class OrnekYorum(BaseModel):
     yazar_takma_adi: str | None = None
     yorum_metni: str

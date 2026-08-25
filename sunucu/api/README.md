@@ -30,7 +30,7 @@ tüm uç noktaları buradan, gerçek Samsun verisiyle deneyebilirsin.
 | Metod & Yol | Açıklama |
 |---|---|
 | `GET /sehirler` | Aktif şehirleri listeler |
-| `GET /sehirler/{sehir_anahtari}/yerler` | Bir şehirdeki yerleri listeler (kategori filtresi + sayfalama) |
+| `GET /sehirler/{sehir_anahtari}/yerler` | `{ yerler, toplam_sayi }`. Varsayılan `sadece_kesif=true`: konaklama gizlenir; yeme-içme yalnızca `sehrin_klasigi` / `sponsorlu_mekan` / `kahvalti_verir` veya duygu ≥ 80/100. `sadece_kesif=false` kısıtlamasız (rota motoru/test). |
 | `GET /yerler/{yer_id}` | Bir yerin tam detayını getirir (yer profili, duygu özeti, örnek yorumlar dahil) |
 | `POST /rotalar/olustur` | Kullanıcı tercihlerine göre kişiselleştirilmiş rota üretir (bkz. aşağıdaki senaryolar) |
 | `GET /rotalar/{rota_id}` | Daha önce üretilmiş, paylaşılabilir linkli bir rotayı getirir |

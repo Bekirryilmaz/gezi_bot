@@ -32,6 +32,16 @@ class AdayYer:
     duygu_skoru_ortalama: float | None = None
     kapak_fotografi_url: str | None = None
     ilce: str | None = None
+    ozellikler: dict = field(default_factory=dict)
+
+    def ozellik_isaretli(self, anahtar: str) -> bool:
+        """ozellikler JSONB karsiligi: true / evet / 1 ise isaretli."""
+        deger = self.ozellikler.get(anahtar)
+        if deger is True or deger == 1:
+            return True
+        if isinstance(deger, str) and deger.strip().lower() in {"true", "evet", "1"}:
+            return True
+        return False
 
 
 @dataclass

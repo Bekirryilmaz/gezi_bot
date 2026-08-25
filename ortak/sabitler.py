@@ -191,3 +191,152 @@ VARSAYILAN_DENEYIM_PUANLARI: dict[str, dict[str, int]] = {
         DeneyimEksen.RAHATLATICI_SAKIN.value: 40,
     },
 }
+
+
+class OzelEtiket(str, Enum):
+    """Kurasyon, ticari ve hizmet etiketleri. `ozellikler` JSONB icinde
+    evet/hayir olarak tutulur (bkz. dokumanlar/kategori_taksonomisi.md #2
+    ve #2.1). Ana/alt kategori degildir."""
+
+    SEHRIN_KLASIGI = "sehrin_klasigi"
+    SPONSORLU_MEKAN = "sponsorlu_mekan"
+    KAHVALTI_VERIR = "kahvalti_verir"
+
+
+OZEL_ETIKETLER: tuple[str, ...] = tuple(etiket.value for etiket in OzelEtiket)
+
+
+class ZamanDilimi(str, Enum):
+    """Gun ici zaman dilimleri. Rota motoru bir duragi hangi saatte
+    onerecegini bu anahtarlara gore karar verir.
+    dokumanlar/kategori_taksonomisi.md #8."""
+
+    SABAH = "sabah"
+    OGLE = "ogle"
+    IKINDI = "ikindi"
+    AKSAM = "aksam"
+    GECE = "gece"
+
+
+# Alt kategori -> o kategorinin dogal olarak uyumlu oldugu zaman dilimleri.
+# Listede olmayan alt kategoriler icin rota motoru kisit uygulamaz.
+KATEGORI_ZAMAN_DILIMLERI: dict[str, list[str]] = {
+    YemeIcmeAltKategori.KAHVE_UZMANLIK.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    YemeIcmeAltKategori.RESTORAN_LOKANTA.value: [
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.AKSAM.value,
+    ],
+    YemeIcmeAltKategori.KEBAP_IZGARA.value: [
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.AKSAM.value,
+    ],
+    YemeIcmeAltKategori.DENIZ_MAHSULLERI.value: [
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.AKSAM.value,
+    ],
+    YemeIcmeAltKategori.EV_YEMEKLERI_ESNAF.value: [
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.AKSAM.value,
+    ],
+    YemeIcmeAltKategori.SOKAK_LEZZETI.value: [
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.AKSAM.value,
+    ],
+    YemeIcmeAltKategori.FINE_DINING_ROMANTIK.value: [
+        ZamanDilimi.AKSAM.value,
+        ZamanDilimi.GECE.value,
+    ],
+    YemeIcmeAltKategori.MEYHANE_BAR.value: [
+        ZamanDilimi.AKSAM.value,
+        ZamanDilimi.GECE.value,
+    ],
+    GezilecekYerAltKategori.GECE_HAYATI.value: [
+        ZamanDilimi.GECE.value,
+    ],
+    GezilecekYerAltKategori.TARIHI_KULTUREL.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    GezilecekYerAltKategori.DOGA_MANZARA.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    GezilecekYerAltKategori.DINI_MANEVI.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    GezilecekYerAltKategori.FOTOGRAF_NOKTASI.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    GezilecekYerAltKategori.ALISVERIS.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    GezilecekYerAltKategori.PLAJ_SU.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    GezilecekYerAltKategori.EGLENCE_AKTIVITE.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    GezilecekYerAltKategori.SPOR_DOGA_YURUYUS.value: [
+        ZamanDilimi.SABAH.value,
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+    ],
+    YemeIcmeAltKategori.TATLI_PASTANE.value: [
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+        ZamanDilimi.AKSAM.value,
+    ],
+    YemeIcmeAltKategori.CAY_BAHCESI.value: [
+        ZamanDilimi.OGLE.value,
+        ZamanDilimi.IKINDI.value,
+        ZamanDilimi.AKSAM.value,
+    ],
+}
+
+
+# Ana kategori -> mekan ici ziyaret suresine EKLENEN lojistik tampon (dk).
+# Park, kuyruk, garson/hesap, tuvalet/dinlenme gibi insan payi.
+# dokumanlar/kategori_taksonomisi.md #9.
+MEKAN_BEKLEME_SURELERI_DK: dict[str, int] = {
+    AnaKategori.YEME_ICME.value: 30,
+    AnaKategori.GEZILECEK_YER.value: 15,
+    AnaKategori.KONAKLAMA.value: 20,
+}
+
+_VARSAYILAN_BEKLEME_PAYI_DK = 15
+
+
+def zaman_dilimi_uygun_mu(alt_kategori: str, zaman_dilimi: str) -> bool:
+    """Bu alt kategori verilen dilimde dogal mi? Sozlukte yoksa kisit yok."""
+    dilimler = KATEGORI_ZAMAN_DILIMLERI.get(alt_kategori)
+    if dilimler is None:
+        return True
+    return zaman_dilimi in dilimler
+
+
+def uygun_zaman_dilimleri(alt_kategori: str) -> list[str]:
+    """Alt kategorinin uyumlu dilimleri. Tanimli degilse tum dilimleri verir."""
+    dilimler = KATEGORI_ZAMAN_DILIMLERI.get(alt_kategori)
+    if dilimler is None:
+        return [dilim.value for dilim in ZamanDilimi]
+    return list(dilimler)
+
+
+def bekleme_payi_dk(ana_kategori: str) -> int:
+    """Ziyaret suresine eklenecek lojistik tampon (dk). Bilinmiyorsa 15."""
+    return MEKAN_BEKLEME_SURELERI_DK.get(ana_kategori, _VARSAYILAN_BEKLEME_PAYI_DK)

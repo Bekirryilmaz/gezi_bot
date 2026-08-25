@@ -13,6 +13,7 @@ kullanici geri bildirimiyle zamanla ayarlanmasi beklenir):
 from __future__ import annotations
 
 from ortak.cografya_araclari import haversine_metre
+from ortak.sabitler import bekleme_payi_dk
 from sunucu.rota_motoru.veri_tipleri import AdayYer
 
 GUNLUK_GEZI_DAKIKASI = 8 * 60  # 09:00 - 17:00 gibi bir gezi gunu varsayimi
@@ -71,5 +72,6 @@ def gun_butcesine_sigar_mi(
     farkli olabilir, bu kabul edilebilir bir yaklastirma."""
     ulasim = ulasim_suresi_tahmini_dk(onceki_nokta, (eklenecek_yer.enlem, eklenecek_yer.boylam))
     ziyaret = ziyaret_suresi_tahmini_dk(eklenecek_yer)
-    yeni_toplam = mevcut_dakika + ulasim + ziyaret
+    tampon = bekleme_payi_dk(eklenecek_yer.ana_kategori)
+    yeni_toplam = mevcut_dakika + ulasim + ziyaret + tampon
     return yeni_toplam <= GUNLUK_GEZI_DAKIKASI, yeni_toplam

@@ -8,19 +8,18 @@ değildir (skorlar her zaman bir kırılımla döner).
 ## Zincir
 
 ```
-skorlama.py -> zaman_butcesi.py -> kumeleme.py -> siralama.py -> rota_olusturucu.py
+skorlama.py -> zaman_butcesi.py -> kumeleme.py -> gunluk_slotlari_diz -> rota_olusturucu.py
 ```
 
 - **`veri_tipleri.py`** — Veritabanından (SQLAlchemy) BAĞIMSIZ saf veri
   tipleri (`AdayYer`, `RotaTercihleri`, `RotaSonucu`, ...). Böylece
   aşağıdaki modüller gerçek bir veritabanı bağlantısı olmadan, sentetik
   verilerle test edilebilir.
-- **`skorlama.py`** — `yer_uygunluk_puani(yer, tercihler) -> SkorSonucu`.
-  Deneyim ekseni ağırlıklı ortalaması + aktivite eşleşme bonusu + fiyat/
-  sakinlik tercihi katkısı (`dokumanlar/kategori_taksonomisi.md` #6) + kaynak
-  kalitesi katkısından oluşur. Zorunlu duraklar skordan bağımsız her zaman
-  en üstte. Her sonuç, hangi bileşenin ne kadar katkı yaptığını gösteren bir
-  `kirilim` sözlüğüyle döner.
+- **`skorlama.py`** — `yer_uygunluk_puani(yer, tercihler, yol_suresi_dk=...) -> SkorSonucu`.
+  Deneyim ekseni + aktivite + fiyat/sakinlik + kaynak kalitesi + ticari
+  etiket bonusları (`sponsorlu_mekan` +30, `sehrin_klasigi` +15). Yol süresi
+  ziyaret süresinin 1.5 katını aşarsa skor yarıya iner (`yol_yorgunlugu_cezasi`).
+  Zorunlu duraklar her zaman en üstte. Her sonuç bir `kirilim` sözlüğüyle döner.
 - **`zaman_butcesi.py`** — Bir günün kaç durak kaldırabileceğini hesaplar
   (ortalama ziyaret süresi + haversine mesafeye dayalı kaba ulaşım süresi
   tahmini). Sabitler (`GUNLUK_GEZI_DAKIKASI`, `ORTALAMA_SEHIR_ICI_HIZ_KMH`)
@@ -32,21 +31,21 @@ skorlama.py -> zaman_butcesi.py -> kumeleme.py -> siralama.py -> rota_olusturucu
   `gun_sayisi` kadar bitişik açısal dilime böler — k-means gibi rastgele
   başlangıca bağlı olmayan, deterministik bir yöntem. Ardından her günü
   zaman bütçesine göre budar (en düşük skorlu duraklar önce çıkar).
-- **`siralama.py`** — `gun_rotasini_sirala(...)`. Klasik TSP sezgiseli:
-  nearest-neighbor ile bir başlangıç rotası, ardından 2-opt ile iyileştirme.
-- **`rota_olusturucu.py`** — Orkestratör. `senaryo_1_rota_olustur` ve
-  `senaryo_2_rota_olustur` fonksiyonlarını dışa verir (aşağıya bakınız).
-  Sonuç `KullaniciRotasi` tablosuna kaydedilir (flush edilir, commit **API
-  katmanının** sorumluluğundadır).
+- **`siralama.py`** — TSP sezgiseli (nearest-neighbor + 2-opt). Gün içi sıra
+  artık slot şablonundadır; bu modül birim testleri ve yedek olarak durur.
+- **`rota_olusturucu.py`** — Orkestratör. Günleri bearing ile böler, her günü
+  sabah / öğle / ikindi / akşam slotlarına dizer. Geçiş maliyeti =
+  yol + ziyaret + `bekleme_payi_dk(ana_kategori)`. Sonuç `KullaniciRotasi`
+  tablosuna kaydedilir (flush; commit API katmanının sorumluluğundadır).
 
 ## Senaryolar
 
 - **Senaryo 1 (konaklama belli)**: `senaryo_1_rota_olustur(oturum, sehir_id,
   konaklama_noktasi, gun_sayisi, tercihler)`. Adayları çeker (konaklama
   noktasından `_MAKSIMUM_ADAY_MESAFESI_METRE` içindekiler + zorunlu
-  duraklar) → skorlar → en iyi N'i seçer → günlere kümeler → her günü sıralar
-  → her güne en yakın/en uygun bir `YEME_ICME` durağı ekler (öğle/akşam
-  yemeği).
+  duraklar) → skorlar → en iyi N'i seçer → günlere kümeler → her günü
+  slot şablonuna göre dizer (kahvaltı/gezilecek, öğle yemeği ≤20 km,
+  öğleden sonra gezilecek/kafe, akşam yemeği).
 - **Senaryo 2 (konaklama belli değil)**: `senaryo_2_rota_olustur(oturum,
   sehir_id, gun_sayisi, tercihler)`. Aynı skorlamayla önce en iyi adayları
   seçer, ağırlık merkezini hesaplar, o merkeze en yakın/en kaliteli
@@ -63,9 +62,8 @@ skorlama.py -> zaman_butcesi.py -> kumeleme.py -> siralama.py -> rota_olusturucu
 - `ORTALAMA_SEHIR_ICI_HIZ_KMH` (30 km/sa) ve `GUNLUK_GEZI_DAKIKASI` (8 saat):
   kaba varsayımlardır, gerçek kullanım verisiyle ayarlanması beklenir.
 - Kümeleme sonrası zaman bütçesi budaması, duraklar SKOR sırasına göre
-  eklenerek yapılır (henüz coğrafi olarak optimize edilmiş sırayla değil) —
-  nihai sıralama `siralama.py`'de yapılır, bu yüzden bütçe tahmini gerçek
-  rota mesafesinden biraz farklı olabilir.
+  eklenerek yapılır; gün içi nihai sıra slot şablonundadır. Bütçe tahmini
+  gerçek rota mesafesinden biraz farklı olabilir.
 
 ## Testler
 
@@ -73,8 +71,8 @@ skorlama.py -> zaman_butcesi.py -> kumeleme.py -> siralama.py -> rota_olusturucu
 python -m pytest sunucu/rota_motoru/testler/ -v
 ```
 
-`skorlama.py`, `kumeleme.py`, `siralama.py` saf fonksiyonlar olduğu için
-sentetik `AdayYer` verisiyle test edilir — gerçek bir veritabanı bağlantısı
-gerekmez. `rota_olusturucu.py` (veritabanına bağımlı olduğu için) ve API +
-DB bütünleşik testi, Faz 1'deki alışkanlıkla tutarlı şekilde Swagger
-(`/docs`) üzerinden manuel yapılır.
+`skorlama.py`, `kumeleme.py`, `siralama.py` ve `gunluk_slotlari_diz` saf
+fonksiyonlar olduğu için sentetik `AdayYer` verisiyle test edilir — gerçek
+bir veritabanı bağlantısı gerekmez. `rota_olusturucu.py`'nin DB'ye bağlı
+senaryoları ve API + DB bütünleşik testi Swagger (`/docs`) üzerinden
+yapılır.
