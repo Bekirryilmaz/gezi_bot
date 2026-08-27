@@ -1,4 +1,4 @@
-Samsun Gezi Platformu (Rotam) — Calistirma Rehberi
+Samsun Gezi Platformu (ŞAMANDIRA) — Calistirma Rehberi
 ==================================================
 
 Bu proje iki servisle ayaga kalkar: FastAPI (sunucu) + Next.js (site).

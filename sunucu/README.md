@@ -4,7 +4,7 @@ Bu klasör üç parçadan oluşur: veritabanı şeması + veri aktarımı
 (`veritabani/`), REST API (`api/`) ve kişiselleştirilmiş rota üretme
 algoritması (`rota_motoru/`). `veri/` katmanının ürettiği JSONL dosyalarını
 okuyup PostgreSQL'e aktarır, üzerine bir API + rota motoru inşa eder.
-`site/` (Next.js arayüzü) Faz 3'te bu API'yi tüketecek.
+`site/` (ŞAMANDIRA — Next.js 16) bu API'yi tüketir.
 
 ```mermaid
 flowchart LR
@@ -78,9 +78,10 @@ bağlanamadığı özetlenir.
 uvicorn sunucu.api.uygulama:uygulama --reload
 ```
 
-Sonra tarayıcıda `http://127.0.0.1:8000/docs` adresine gidip Swagger arayüzü
-üzerinden tüm uç noktaları deneyebilirsin (Faz 2'nin test yöntemi budur —
-henüz bir frontend yok). Detaylar için `sunucu/api/README.md`.
+Sonra tarayıcıda `http://127.0.0.1:8000/docs` (veya `8125`) adresine gidip
+Swagger üzerinden uç noktaları deneyebilirsin. ŞAMANDIRA sitesi aynı
+API'yi `NEXT_PUBLIC_API_URL` ile kullanır. Detaylar için
+`sunucu/api/README.md`.
 
 ## Rota Motoru (`rota_motoru/`)
 
@@ -119,6 +120,6 @@ sunucu/
 
 ## Şu Anki Durum
 
-Faz 2 tamamlandı: veri aktarımı, API (yer + rota uç noktaları) ve rota
-motoru çalışıyor, Samsun verisiyle uçtan uca test edildi. `site/` (Next.js)
-ve canlıya alma (Docker/nginx) Faz 3'e bırakıldı.
+Veri aktarımı, yer/rota API'si ve rota motoru çalışıyor. ŞAMANDIRA
+(Next.js 16) bu API'nin tüketicisidir. Canlıya alma (Docker/nginx)
+henüz yapılmamıştır.

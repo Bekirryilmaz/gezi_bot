@@ -81,7 +81,7 @@ def wikipedia_ozeti(baslik: str) -> str | None:
                 "titles": baslik,
             },
             timeout=_WIKI_TIMEOUT,
-            headers={"User-Agent": "RotamGeziBot/0.1 (egitim; tanitim metni)"},
+            headers={"User-Agent": "SamandiraGeziBot/0.1 (egitim; tanitim metni)"},
         )
         yanit.raise_for_status()
         sayfalar = yanit.json().get("query", {}).get("pages", {})

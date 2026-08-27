@@ -59,6 +59,11 @@ export default async function YerDetaySayfasi({ params }: Props) {
           <h1 className="mt-4 font-display text-4xl leading-tight md:text-6xl">
             {yer.isim}
           </h1>
+          {yer.topluluk_kesfi ? (
+            <p className="mt-3 inline-flex rounded-full bg-white/15 px-3 py-1 text-sm">
+              Topluluk Keşfi
+            </p>
+          ) : null}
           <p className="mt-3 text-white/75">
             {kategoriEtiketi(yer.ana_kategori)} · {altKategoriEtiketi(yer.alt_kategori)}
             {yer.ilce ? ` · ${yer.ilce}` : ""}
@@ -70,6 +75,19 @@ export default async function YerDetaySayfasi({ params }: Props) {
         <div className="space-y-12">
           <section>
             <h2 className="font-display text-2xl text-deniz md:text-3xl">Tanıtım</h2>
+            {yer.fotograf_urlleri.length > 0 ? (
+              <div className="mt-4 flex gap-3 overflow-x-auto">
+                {yer.fotograf_urlleri.slice(0, 6).map((src) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={src}
+                    src={src}
+                    alt=""
+                    className="h-40 w-56 shrink-0 rounded-xl object-cover"
+                  />
+                ))}
+              </div>
+            ) : null}
             {tanitim ? (
               <p className="mt-4 text-lg leading-relaxed text-ink/85">{tanitim}</p>
             ) : (

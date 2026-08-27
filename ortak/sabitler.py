@@ -201,9 +201,28 @@ class OzelEtiket(str, Enum):
     SEHRIN_KLASIGI = "sehrin_klasigi"
     SPONSORLU_MEKAN = "sponsorlu_mekan"
     KAHVALTI_VERIR = "kahvalti_verir"
+    TOPLULUK_KESFI = "topluluk_kesfi"
 
 
 OZEL_ETIKETLER: tuple[str, ...] = tuple(etiket.value for etiket in OzelEtiket)
+
+
+class MekanOneriKategori(str, Enum):
+    """Kullanici mekan onerisi formundaki rozet kategorileri."""
+
+    GIZLI_KOY = "gizli_koy"
+    SELALE_DOGA = "selale_doga"
+    BUTIK_KAFE = "butik_kafe"
+    MANZARA_TEPE = "manzara_tepe"
+    TARIHI_KALINTI = "tarihi_kalinti"
+    KAMP_KARAVAN = "kamp_karavan"
+    DIGER = "diger"
+
+
+class MekanOneriDurumu(str, Enum):
+    BEKLEMEDE = "beklemede"
+    ONAYLANDI = "onaylandi"
+    REDDEDILDI = "reddedildi"
 
 
 class ZamanDilimi(str, Enum):

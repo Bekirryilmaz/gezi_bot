@@ -1,6 +1,6 @@
-# Site (Frontend) — Rotam
+# Site (Frontend) — ŞAMANDIRA
 
-Next.js (App Router) + Tailwind CSS. Marka: **Rotam**.
+Next.js 16 (App Router) + Tailwind CSS. Marka: **ŞAMANDIRA**.
 
 ## Çalıştırma
 
@@ -8,7 +8,7 @@ API’nin ayakta olması gerekir (`http://127.0.0.1:8125` varsayılan):
 
 ```bash
 # repo kökünden
-.\.venv_test\Scripts\python.exe -m uvicorn sunucu.api.uygulama:uygulama --host 127.0.0.1 --port 8125
+.\.venv\Scripts\python.exe -m uvicorn sunucu.api.uygulama:uygulama --host 127.0.0.1 --port 8125
 ```
 
 ```bash
@@ -26,12 +26,14 @@ Tarayıcı: [http://localhost:3000](http://localhost:3000)
 | Yol | Açıklama |
 |-----|----------|
 | `/` | Ana sayfa (marka hero + CTA) |
-| `/sehir/[anahtar]` | Keşif listesi (kategori filtresi) |
-| `/yer/[id]` | Yer detayı (duygu özeti, örnek yorumlar) |
+| `/kesfet` | GIS ilçe haritası + vitrin (17 ilçe) |
+| `/sehir/[anahtar]` | İlçe haritası + keşif listesi |
+| `/yer/[id]` | Yer detayı (duygu özeti) |
 | `/sehir/[anahtar]/bolgeler` | Şehir + ilçe bölge profilleri |
-| `/sehir/[anahtar]/rota` | Kişisel rota sihirbazı |
+| `/sehir/[anahtar]/rota` | Hava durumu + kişisel rota sihirbazı |
 
 ## Notlar
 
 - CORS: sunucu `API_IZINLI_ORIGINLER` ile `http://localhost:3000` izinli olmalı.
-- Harita görünümü henüz yok; sonraki iterasyonda eklenebilir.
+- Hava durumu: Open-Meteo (anahtar gerekmez).
+- Harita: Leaflet + Carto tiles, `next/dynamic` ile `ssr: false`.

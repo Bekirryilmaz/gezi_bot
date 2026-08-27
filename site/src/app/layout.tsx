@@ -17,11 +17,20 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: {
-    default: "Rotam — Karadeniz’de senin rotan",
-    template: "%s · Rotam",
+    default: "ŞAMANDIRA — Karadeniz’de senin rotan",
+    template: "%s · ŞAMANDIRA",
   },
   description:
-    "Samsun’dan başlayan kişisel gezi platformu. Yerleri keşfet, bölgeleri oku, gün gün rota kur.",
+    "Samsun’dan başlayan kişisel gezi platformu. İlçeleri haritada keşfet, hava durumuna bak, gün gün rota kur.",
+  applicationName: "ŞAMANDIRA",
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName: "ŞAMANDIRA",
+    title: "ŞAMANDIRA — Karadeniz’de senin rotan",
+    description:
+      "Samsun’dan başlayan kişisel gezi platformu. İlçeleri haritada keşfet, hava durumuna bak, gün gün rota kur.",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

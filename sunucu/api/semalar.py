@@ -11,8 +11,15 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from ortak.sabitler import Aktivite, DeneyimEksen
-from sunucu.veritabani.modeller import BolgeProfili, SabitRota, Sehir, Yer
+from ortak.sabitler import Aktivite, DeneyimEksen, OzelEtiket
+from sunucu.veritabani.modeller import BolgeProfili, MekanOneri, SabitRota, Sehir, Yer
+
+
+def _etiket_isaretli(ozellikler: dict | None, anahtar: str) -> bool:
+    if not ozellikler:
+        return False
+    deger = ozellikler.get(anahtar)
+    return deger is True or str(deger).lower() in ("true", "evet", "1")
 
 
 class SehirCevap(BaseModel):
@@ -51,6 +58,7 @@ class YerOzet(BaseModel):
     kaynakta_puan_ortalamasi: float | None = None
     duygu_skoru_ortalama: float | None = None
     kapak_fotografi_url: str | None = None
+    topluluk_kesfi: bool = False
 
     @classmethod
     def yerden_olustur(cls, yer: Yer, enlem: float, boylam: float) -> "YerOzet":
@@ -65,6 +73,7 @@ class YerOzet(BaseModel):
             kaynakta_puan_ortalamasi=yer.kaynakta_puan_ortalamasi,
             duygu_skoru_ortalama=yer.duygu_skoru_ortalama,
             kapak_fotografi_url=yer.fotograf_urlleri[0] if yer.fotograf_urlleri else None,
+            topluluk_kesfi=_etiket_isaretli(yer.ozellikler, OzelEtiket.TOPLULUK_KESFI.value),
         )
 
 
@@ -124,6 +133,7 @@ class YerDetay(YerOzet):
             yer_profili=yer.yer_profili,
             duygu_ozeti=yer.duygu_ozeti,
             ornek_yorumlar=ornek_yorumlar,
+            topluluk_kesfi=_etiket_isaretli(yer.ozellikler, OzelEtiket.TOPLULUK_KESFI.value),
         )
 
 
@@ -252,3 +262,67 @@ class RotaCevap(BaseModel):
 
 class AlternatifRotalarCevap(BaseModel):
     alternatifler: list[RotaCevap]
+
+
+class MekanOneriGonderen(BaseModel):
+    name: str | None = None
+    email: str
+
+
+class MekanOneriKoordinat(BaseModel):
+    lat: float
+    lng: float
+
+
+class MekanOneriCevap(BaseModel):
+    """site/src/types/placeSuggestion.ts::PlaceSuggestion ile eslesir."""
+
+    id: str
+    title: str
+    category: str
+    city: str
+    district: str
+    description: str
+    specialTip: str | None = None
+    coordinates: MekanOneriKoordinat
+    images: list[str]
+    submitter: MekanOneriGonderen
+    status: str
+    createdAt: str
+    yerId: str | None = None
+    redNedeni: str | None = None
+
+    @classmethod
+    def kayittan(cls, oneri: MekanOneri, *, eposta_gizle: bool = False) -> "MekanOneriCevap":
+        eposta = oneri.gonderen_eposta
+        if eposta_gizle:
+            eposta = "***"
+        return cls(
+            id=oneri.id,
+            title=oneri.baslik,
+            category=oneri.kategori,
+            city=oneri.sehir,
+            district=oneri.ilce,
+            description=oneri.aciklama,
+            specialTip=oneri.ziyaretci_tuyosu,
+            coordinates=MekanOneriKoordinat(lat=oneri.enlem, lng=oneri.boylam),
+            images=list(oneri.fotograf_urlleri or []),
+            submitter=MekanOneriGonderen(name=oneri.gonderen_adi, email=eposta),
+            status=oneri.durum,
+            createdAt=oneri.olusturulma_zamani.isoformat() if oneri.olusturulma_zamani else "",
+            yerId=oneri.yer_id,
+            redNedeni=oneri.red_nedeni,
+        )
+
+
+class MekanOneriGonderimCevabi(BaseModel):
+    id: str
+    status: str
+    mesaj: str
+
+
+class MekanOneriOnayCevabi(BaseModel):
+    id: str
+    status: str
+    yerId: str
+    mesaj: str

@@ -288,3 +288,42 @@ class KullaniciRotasi(Taban):
     )
 
     olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class MekanOneri(Taban):
+    """Kullanicinin gonderdigi, henuz haritaya dusmemis mekan onerisi.
+
+    Varsayilan durum `beklemede`'dir; yonetici onaylamadan `Yer` tablosuna
+    kopyalanmaz. Onay sonrasi `yer_id` doldurulur ve `ozellikler` icinde
+    `topluluk_kesfi` etiketi tasinir.
+    """
+
+    __tablename__ = "mekan_onerileri"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
+    baslik: Mapped[str] = mapped_column(String(200), nullable=False)
+    kategori: Mapped[str] = mapped_column(String(40), nullable=False)
+    sehir: Mapped[str] = mapped_column(String(100), nullable=False)
+    ilce: Mapped[str] = mapped_column(String(100), nullable=False)
+    aciklama: Mapped[str] = mapped_column(Text, nullable=False)
+    ziyaretci_tuyosu: Mapped[str | None] = mapped_column(Text)
+    enlem: Mapped[float] = mapped_column(Float, nullable=False)
+    boylam: Mapped[float] = mapped_column(Float, nullable=False)
+    fotograf_urlleri: Mapped[list] = mapped_column(JSONB, default=list)
+    gonderen_adi: Mapped[str | None] = mapped_column(String(120))
+    gonderen_eposta: Mapped[str] = mapped_column(String(254), nullable=False)
+    durum: Mapped[str] = mapped_column(String(20), nullable=False, default="beklemede")
+    red_nedeni: Mapped[str | None] = mapped_column(Text)
+    ip_adresi: Mapped[str | None] = mapped_column(String(64))
+    yer_id: Mapped[str | None] = mapped_column(ForeignKey("yerler.id", ondelete="SET NULL"))
+    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    yer: Mapped["Yer | None"] = relationship()
+
+    __table_args__ = (
+        Index("ix_mekan_onerileri_durum", "durum"),
+        Index("ix_mekan_onerileri_eposta", "gonderen_eposta"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<MekanOneri {self.baslik} ({self.durum})>"

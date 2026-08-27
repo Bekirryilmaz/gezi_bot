@@ -1,6 +1,9 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { RotaSihirbazi } from "@/components/RotaSihirbazi";
+import { WeatherErrorBoundary } from "@/components/rota/WeatherErrorBoundary";
+import { WeatherWidget } from "@/components/rota/WeatherWidget";
 import { bolgeleriGetir, sehirleriGetir } from "@/lib/api";
+import { SAMSUN_MERKEZ } from "@/lib/ilceler";
 
 type Props = {
   params: Promise<{ anahtar: string }>;
@@ -14,7 +17,7 @@ export async function generateMetadata({ params }: Props) {
   const { anahtar } = await params;
   const sehirler = await sehirleriGetir().catch(() => []);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
-  return { title: sehir ? `${sehir.isim} rota` : "Rota" };
+  return { title: sehir ? `${sehir.isim} Rota` : "Rota" };
 }
 
 export default async function RotaSayfasi({ params, searchParams }: Props) {
@@ -25,7 +28,7 @@ export default async function RotaSayfasi({ params, searchParams }: Props) {
     bolgeleriGetir(anahtar).catch(() => []),
   ]);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
-  const isim = sehir?.isim ?? anahtar;
+  const isim = sehir?.isim ?? (anahtar === "samsun" ? "Samsun" : anahtar);
 
   return (
     <main className="atmosfer min-h-screen">
@@ -43,7 +46,14 @@ export default async function RotaSayfasi({ params, searchParams }: Props) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">
+      <div className="mx-auto max-w-6xl space-y-10 px-5 py-12 md:px-8">
+        <WeatherErrorBoundary>
+          <WeatherWidget
+            enlem={sehir?.merkez_enlem ?? SAMSUN_MERKEZ[0]}
+            boylam={sehir?.merkez_boylam ?? SAMSUN_MERKEZ[1]}
+            konumEtiketi={isim}
+          />
+        </WeatherErrorBoundary>
         <RotaSihirbazi
           sehirAnahtari={anahtar}
           sehirIsim={isim}

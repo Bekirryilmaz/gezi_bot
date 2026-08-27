@@ -10,11 +10,14 @@ from __future__ import annotations
 
 import os
 from collections.abc import Generator
+from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+_sunucu_env = Path(__file__).resolve().parents[1] / ".env"
+load_dotenv(_sunucu_env)
 load_dotenv()
 
 VARSAYILAN_VERITABANI_URL = "postgresql+psycopg://gezi_kullanici:gezi_sifre@localhost:5432/gezi_veritabani"

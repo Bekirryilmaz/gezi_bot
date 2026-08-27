@@ -23,6 +23,7 @@ _VITRIN_ETIKETLERI = (
     OzelEtiket.SEHRIN_KLASIGI.value,
     OzelEtiket.SPONSORLU_MEKAN.value,
     OzelEtiket.KAHVALTI_VERIR.value,
+    OzelEtiket.TOPLULUK_KESFI.value,
 )
 
 
@@ -60,6 +61,7 @@ def _kesif_vitrin_kosulu():
     return or_(
         Yer.ana_kategori == AnaKategori.GEZILECEK_YER.value,
         yeme_icme_vitrin,
+        _ozellik_etiketi_kosulu(OzelEtiket.TOPLULUK_KESFI.value),
     )
 
 

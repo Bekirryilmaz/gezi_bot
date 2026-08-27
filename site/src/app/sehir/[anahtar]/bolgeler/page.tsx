@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props) {
   const { anahtar } = await params;
   const sehirler = await sehirleriGetir().catch(() => []);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
-  return { title: sehir ? `${sehir.isim} bölgeleri` : "Bölgeler" };
+  return { title: sehir ? `${sehir.isim} Bölgeleri` : "Bölgeler" };
 }
 
 export default async function BolgelerSayfasi({ params }: Props) {
@@ -29,7 +29,7 @@ export default async function BolgelerSayfasi({ params }: Props) {
         <div className="mx-auto max-w-6xl px-5 md:px-8">
           <p className="text-sm uppercase tracking-[0.2em] text-white/55">Bölgeler</p>
           <h1 className="mt-3 font-display text-4xl md:text-6xl">
-            {sehir?.isim ?? anahtar} ve ilçeleri
+            {sehir?.isim ?? (anahtar === "samsun" ? "Samsun" : anahtar)} ve İlçeleri
           </h1>
           <p className="mt-4 max-w-xl text-white/75">
             Önce tanıtım, sonra orada yaşayanların ve gidenlerin ortak izlenimi.

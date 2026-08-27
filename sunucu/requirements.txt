@@ -13,5 +13,8 @@ geoalchemy2>=0.14
 # .env dosyasindan ortam degiskeni okumak icin
 python-dotenv>=1.0
 
+# Form/dosya yukleme (mekan onerisi)
+python-multipart>=0.0.9
+
 # rota_motoru/ birim testleri icin (sunucu/rota_motoru/testler/)
 pytest>=8.0

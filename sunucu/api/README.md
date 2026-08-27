@@ -2,8 +2,8 @@
 
 FastAPI ile yazılmış REST API. `veri/` katmanından `veritabani/aktarim/` ile
 aktarılmış veriyi okuyup sunar, `rota_motoru/`'nu çağırıp kişiselleştirilmiş
-rota üretir. Şu an tek tüketicisi Swagger arayüzüdür (`site/` Faz 3'te
-eklenecek).
+rota üretir. Tüketicisi ŞAMANDIRA sitesidir (`site/`, Next.js 16);
+Swagger (`/docs`) geliştirme ve manuel test içindir.
 
 ## Çalıştırma
 

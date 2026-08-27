@@ -7,6 +7,8 @@
   --kumsal: #d4a574;
   --gunes: #f2c14e;
   --yosun: #1f7a6b;
+  --bordo: #7a2433;
+  --bordo-derin: #4c1520;
   --ink: #142126;
   --sis: #f3f7f6;
   --cizgi: rgba(10, 77, 92, 0.12);
@@ -23,6 +25,8 @@
   --color-kumsal: var(--kumsal);
   --color-gunes: var(--gunes);
   --color-yosun: var(--yosun);
+  --color-bordo: var(--bordo);
+  --color-bordo-derin: var(--bordo-derin);
   --color-ink: var(--ink);
   --color-sis: var(--sis);
   --font-sans: var(--font-sora);
@@ -62,9 +66,50 @@ body {
 
 .hero-dalga {
   background:
-    linear-gradient(180deg, rgba(6, 54, 66, 0.35) 0%, rgba(6, 54, 66, 0.72) 55%, rgba(6, 54, 66, 0.88) 100%),
+    linear-gradient(
+      180deg,
+      rgba(76, 21, 32, 0.28) 0%,
+      rgba(6, 54, 66, 0.72) 52%,
+      rgba(6, 54, 66, 0.9) 100%
+    ),
     url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=80")
       center / cover no-repeat;
+}
+
+.leaflet-container {
+  font-family: inherit;
+  height: 100%;
+  width: 100%;
+  background: var(--deniz-derin);
+}
+
+.samandira-tooltip {
+  border: none !important;
+  border-radius: 999px !important;
+  background: var(--deniz-derin) !important;
+  color: var(--kopuk) !important;
+  font-size: 12px;
+  padding: 4px 10px !important;
+  box-shadow: none !important;
+}
+
+.samandira-tooltip::before {
+  display: none !important;
+}
+
+@keyframes alinti-gir {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alinti-kayma {
+  animation: alinti-gir 0.55s ease both;
 }
 
 @keyframes yukselt {
@@ -104,11 +149,94 @@ body {
   animation: nefes 7s ease-in-out infinite;
 }
 
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  background: var(--deniz-derin);
+  font-family: inherit;
+}
+
+.leaflet-tooltip.ilce-tooltip {
+  background: var(--deniz-derin);
+  color: var(--kopuk);
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  box-shadow: 0 8px 20px rgba(6, 54, 66, 0.28);
+}
+
+.leaflet-tooltip.ilce-tooltip::before {
+  border-top-color: var(--deniz-derin);
+}
+
+.rota-hatti-aktif {
+  filter: drop-shadow(0 0 5px rgba(15, 118, 110, 0.75));
+}
+
+.rota-pin {
+  background: transparent;
+  border: none;
+}
+
+.rota-pin-disk {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 2px solid var(--kopuk);
+  color: var(--kopuk);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 14px rgba(6, 54, 66, 0.38);
+}
+
+.leaflet-popup.rota-popup .leaflet-popup-content-wrapper {
+  background: var(--deniz-derin);
+  color: var(--kopuk);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(6, 54, 66, 0.28);
+}
+
+.leaflet-popup.rota-popup .leaflet-popup-tip {
+  background: var(--deniz-derin);
+}
+
+.leaflet-popup.rota-popup .leaflet-popup-content {
+  margin: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(13 148 136 / 0.3) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thumb-teal-600\/30::-webkit-scrollbar-thumb {
+  background: rgb(13 148 136 / 0.3);
+  border-radius: 999px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-yukselt,
   .anim-yukselt-gec,
   .anim-yukselt-daha-gec,
-  .anim-nefes {
+  .anim-nefes,
+  .alinti-kayma {
     animation: none;
   }
 }

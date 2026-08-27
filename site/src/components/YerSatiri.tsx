@@ -22,6 +22,11 @@ export function YerSatiri({ yer }: Props) {
       <div>
         <h3 className="font-display text-xl text-ink transition group-hover:text-deniz md:text-2xl">
           {yer.isim}
+          {yer.topluluk_kesfi ? (
+            <span className="ml-2 align-middle rounded-full bg-yosun/15 px-2 py-0.5 text-[11px] font-sans font-medium text-yosun">
+              Topluluk Keşfi
+            </span>
+          ) : null}
         </h3>
         <p className="mt-1 text-sm text-ink/60">
           {kategoriEtiketi(yer.ana_kategori)}

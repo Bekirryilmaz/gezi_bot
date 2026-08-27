@@ -1,87 +1,73 @@
-# Samsun Gezi Platformu
+# ŞAMANDIRA
 
-Samsun ile başlayıp Karadeniz bölgesine büyüyecek, Türkiye'ye özel, kişiselleştirilmiş
-rota algoritmasına sahip bir gezi/keşif platformu. Detaylı yol haritası için
-`.cursor/plans/` altındaki plan dosyasına bakabilirsin.
+Samsun ile başlayıp Karadeniz’e büyüyecek, kişiselleştirilmiş rota
+algoritmasına sahip gezi/keşif platformu. Marka adı **ŞAMANDIRA**
+(küçük harfle `samandira`).
 
-## Proje Neden Bu Şekilde Bölündü
+Yerel MVP ayaktadır: FastAPI + PostgreSQL/PostGIS API ve Next.js 16 /
+Tailwind arayüzü birlikte çalışır. Keşif haritası, ilçe vitrini, hava
+durumu widget’ı ve rota sihirbazı sitede canlıdır. Canlıya alma
+(nginx/SSL) henüz yapılmamıştır.
 
-Proje üç ana, birbirinden bağımsız çalışabilen parçaya ayrılmıştır. Amaç, veri
-toplama tarafında yapılan bir değişikliğin site tarafını etkilememesi, ikisinin
-ayrı ayrı geliştirilip test edilebilmesidir:
+## Mimari
 
-- **`veri/`** — Veri toplama (scraping), kaynaklar arası eşleştirme, duygu analizi
-  ve veri kalite kontrolü. Tamamen Python. Çıktısı: temiz, standart formatlı veri.
-- **`sunucu/`** — Veritabanı şeması + veri aktarımı, REST API ve kişiselleştirilmiş
-  rota üretme algoritması. Tamamen Python (FastAPI). `veri/` katmanının ürettiği
-  veriyi PostgreSQL'e aktarır, siteye API olarak sunar. Detaylar için `sunucu/README.md`.
-- **`site/`** — Kullanıcının göreceği web sitesi (ileride Next.js ile yazılacak,
-  Faz 3'te doldurulacak). Şu an sadece yer tutucu.
+Üç katman birbirinden bağımsız geliştirilebilir:
+
+- **`veri/`** — Toplama, eşleme, duygu analizi, kalite kontrolü (Python).
+  Çıktı: temiz JSONL.
+- **`sunucu/`** — SQLAlchemy + Alembic, JSONL aktarımı, FastAPI, rota
+  motoru. PostgreSQL + PostGIS. Detay: `sunucu/README.md`.
+- **`site/`** — Next.js 16 (App Router) + TypeScript + Tailwind.
+  Marka: ŞAMANDIRA. Sayfalar: ana sayfa, `/kesfet` (ilçe haritası),
+  yer listesi/detay, bölgeler, rota (hava durumu + sihirbaz).
 
 Ayrıca:
 
-- **`ortak/`** — Sadece `veri/` ve `sunucu/` arasında paylaşılan kategori
-  taksonomisi sabitleri (`sabitler.py`). Bilerek çok küçük tutulur; nadiren
-  değişir, bu yüzden iki tarafın da bağlı olması çakışma riski yaratmaz.
-- **`dokumanlar/`** — Kategori taksonomisi, veri sözlüğü gibi Türkçe, herkesin
-  (özellikle kod yazmayanların da) anlayabileceği açıklayıcı dokümanlar.
-- **`altyapi/`** — Docker Compose, veritabanı ve dağıtım (deployment) ile ilgili
-  dosyalar.
-
-## Kod Yazım Kuralı
-
-Bu projede fonksiyon, değişken ve sınıf isimleri **Türkçe ama Türkçe karaktersiz**
-yazılır. Örnek: `isletme_verisi`, `duygu_skoru`, `rota_olustur`. Yorum satırları ve
-dokümantasyon tamamen Türkçe'dir. Amaç, projenin veri kalitesini kontrol eden,
-kod yazmayan biri tarafından bile büyük ölçüde anlaşılabilir olmasıdır.
-
-## Klasör Yapısı
+- **`ortak/`** — Kategori taksonomisi sabitleri (`sabitler.py`).
+- **`dokumanlar/`** — Taksonomi ve veri sözlüğü.
+- **`altyapi/`** — Docker Compose (yerel PostGIS) ve ileride dağıtım.
 
 ```
 gezi_bot/
-  ortak/                    Sadece kategori taksonomisi sabitleri (veri ve sunucu arasinda paylasilir)
-  veri/                     Veri toplama, temizleme, duygu analizi (Python)
-    ortak/                  Toplayicilara ozel veri semalari (Pydantic modelleri)
-    toplayicilar/           Kaynak basina bir dosya (osm, google, eksi sozluk, tripadvisor)
-    esleme/                 Kaynaklar arasi tekillestirme (deduplication)
-    duygu_analizi/          Sentiment + konu (aspect) analizi pipeline'i
-    kalite_kontrol/         Turkce veri kalite raporlari
-    cikti/                  Ham ve islenmis veri ciktilari (git'e girmez, buyuk dosyalar)
-  sunucu/                   FastAPI backend + rota algoritmasi (Python)
-    api/                    REST uc noktalari (yer listeleme/detay, rota olusturma)
-    veritabani/             SQLAlchemy modelleri + Alembic migration + JSONL aktarim katmani
-    rota_motoru/            Rota algoritmasi (skorlama -> kumeleme -> siralama -> orkestrator)
-  site/                     Next.js frontend (Faz 3)
-  dokumanlar/               Kategori taksonomisi, veri sozlugu, mimari notlari
-  altyapi/                  Docker Compose, veritabani, dagitim betikleri
+  ortak/
+  veri/           toplayicilar, esleme, duygu_analizi, kalite_kontrol
+  sunucu/         api, veritabani, rota_motoru
+  site/           Next.js 16 arayüzü (ŞAMANDIRA)
+  dokumanlar/
+  altyapi/
 ```
 
-## Kurulum (Geliştirme Ortamı)
+## Kod Yazım Kuralı
 
-### 1. Veritabanı (yerel geliştirme için)
+Fonksiyon, değişken ve sınıf isimleri **Türkçe ama Türkçe karaktersiz**
+yazılır. Örnek: `isletme_verisi`, `duygu_skoru`, `rota_olustur`. Yorum
+ve dokümantasyon Türkçe’dir.
 
-Yerel bilgisayarında PostgreSQL + PostGIS'i Docker ile ayağa kaldırmak için:
+## Kurulum (geliştirme)
+
+### 1. Veritabanı
+
+Docker ile:
 
 ```bash
 cd altyapi
 docker compose up -d
 ```
 
-Bu, `localhost:5432` üzerinde `gezi_veritabani` adında bir veritabanı açar
-(kullanıcı adı/şifre için `altyapi/docker-compose.yml` içine bak).
+`localhost:5432` üzerinde `gezi_veritabani` açılır. Yerel PostgreSQL +
+PostGIS de kullanılabilir (`calis.txt`).
 
 ### 2. Veri katmanı (`veri/`)
 
 ```bash
 cd veri
 python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # Linux/Mac (Oracle sunucu)
+.venv\Scripts\activate
 pip install -r requirements.txt
-playwright install chromium     # Google Maps ve TripAdvisor toplayicilari icin gerekli
+playwright install chromium
 ```
 
-Toplayıcıları çalıştırma örnekleri `veri/README.md` içinde anlatılıyor.
+Toplayıcı örnekleri: `veri/README.md`.
 
 ### 3. Sunucu (`sunucu/`)
 
@@ -90,29 +76,37 @@ cd sunucu
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env          # Windows, DB baglanti bilgisini duzenle
-alembic upgrade head            # Veritabani semasini olustur
+copy .env.example .env
+alembic upgrade head
 ```
 
-Sonra (repo kökünden), önce veriyi aktar, sonra API'yi başlat:
+Repo kökünden veri aktarımı ve API:
 
 ```bash
 python -m sunucu.veritabani.aktarim.calistir --sehir samsun
-uvicorn sunucu.api.uygulama:uygulama --reload
+uvicorn sunucu.api.uygulama:uygulama --reload --host 127.0.0.1 --port 8125
 ```
 
-`http://127.0.0.1:8000/docs` adresinden Swagger arayüzüyle tüm uç noktaları
-deneyebilirsin. Detaylar için `sunucu/README.md`, `sunucu/api/README.md` ve
-`sunucu/rota_motoru/README.md`.
+Swagger: `http://127.0.0.1:8125/docs`
+
+### 4. Site (`site/`)
+
+```bash
+cd site
+npm install
+npm run dev
+```
+
+Tarayıcı: `http://localhost:3000`  
+`site/.env.local`: `NEXT_PUBLIC_API_URL=http://127.0.0.1:8125`
 
 ## Ortam Değişkenleri
 
-Her alt proje kendi `.env.example` dosyasını içerir. Gerçek `.env` dosyaları asla
-git'e eklenmez (bkz. `.gitignore`).
+Her alt projenin `.env.example` dosyası vardır. Gerçek `.env` git’e
+girmez.
 
-## Şu Anki Durum
+## Şu anki durum
 
-Faz 1 (veri toplama + duygu analizi) ve Faz 2 (veri aktarımı + sunucu API +
-rota algoritması) tamamlandı, Samsun verisiyle uçtan uca test edildi. Faz 3
-(Next.js sitesi + canlıya alma) için klasörler hazır ama içerik henüz
-doldurulmadı.
+Veri pipeline’ı, FastAPI + PostGIS ve ŞAMANDIRA arayüzü yerel MVP olarak
+birlikte çalışır. Samsun odaklıdır; ikinci şehir ve üretim dağıtımı
+sonraki iştir.

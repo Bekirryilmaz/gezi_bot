@@ -39,3 +39,8 @@ Thumbs.db
 # Veritabani yerel dosyalari
 *.sqlite3
 altyapi/postgres_veri/
+
+# Kullanici yuklemeleri
+sunucu/yuklemeler/mekan-onerileri/*
+!sunucu/yuklemeler/mekan-onerileri/.gitkeep
+site/public/uploads/

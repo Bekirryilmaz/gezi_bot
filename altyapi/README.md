@@ -5,7 +5,10 @@
 `docker-compose.yml` sadece yerel geliştirme için PostgreSQL + PostGIS veritabanını
 ayağa kaldırır. Kullanımı için kök `README.md` içindeki "Kurulum" bölümüne bakabilirsin.
 
-## Faz 3'te Eklenecekler
+## Canlıya almada eklenecekler
+
+ŞAMANDIRA arayüzü ve FastAPI yerel MVP olarak çalışıyor. Aşağıdakiler
+üretim dağıtımı içindir:
 
 - `sunucu` (FastAPI) ve `site` (Next.js) servisleri `docker-compose.yml`'a eklenecek
 - Nginx reverse proxy + Let's Encrypt (certbot) ile SSL/domain bağlama

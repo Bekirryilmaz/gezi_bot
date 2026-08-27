@@ -19,6 +19,7 @@ export type YerOzet = {
   kaynakta_puan_ortalamasi: number | null;
   duygu_skoru_ortalama: number | null;
   kapak_fotografi_url: string | null;
+  topluluk_kesfi?: boolean;
 };
 
 export type YerListeCevabi = {
