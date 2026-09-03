@@ -52,11 +52,11 @@ export default async function YerDetaySayfasi({ params }: Props) {
     <main className="atmosfer min-h-screen">
       <div className="relative bg-deniz-derin pb-14 pt-24 text-white">
         <SiteHeader />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
           <Link href="/sehir/samsun" className="text-sm text-white/60 hover:text-white">
             ← Samsun keşif
           </Link>
-          <h1 className="mt-4 font-display text-4xl leading-tight md:text-6xl">
+          <h1 className="mt-4 font-display text-2xl font-bold leading-tight tracking-tight sm:text-3xl md:text-5xl">
             {yer.isim}
           </h1>
           {yer.topluluk_kesfi ? (

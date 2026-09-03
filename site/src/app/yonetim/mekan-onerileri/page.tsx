@@ -11,16 +11,18 @@ export default function YonetimOnerilerSayfasi() {
     <main className="atmosfer min-h-screen">
       <div className="relative bg-deniz-derin pb-10 pt-24 text-white">
         <SiteHeader />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
           <p className="text-sm uppercase tracking-[0.2em] text-white/55">Yönetim</p>
-          <h1 className="mt-3 font-display text-4xl">Öneriler</h1>
+          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl md:text-5xl">
+            Öneriler
+          </h1>
           <p className="mt-3 max-w-2xl text-white/75">
             Bekleyen keşifleri onayla; onaylananlar Topluluk Keşfi etiketiyle yer
             listesine geçer.
           </p>
         </div>
       </div>
-      <div className="mx-auto max-w-6xl px-5 py-10 md:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
         <OneriYonetim />
       </div>
     </main>

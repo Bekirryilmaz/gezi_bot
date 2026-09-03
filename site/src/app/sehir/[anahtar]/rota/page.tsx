@@ -34,9 +34,9 @@ export default async function RotaSayfasi({ params, searchParams }: Props) {
     <main className="atmosfer min-h-screen">
       <div className="relative bg-deniz-derin pb-14 pt-24 text-white">
         <SiteHeader sehirAnahtari={anahtar} />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
           <p className="text-sm uppercase tracking-[0.2em] text-white/55">Rota</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl">
+          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl md:text-5xl">
             {isim} için rotan
           </h1>
           <p className="mt-4 max-w-xl text-white/75">
@@ -46,7 +46,7 @@ export default async function RotaSayfasi({ params, searchParams }: Props) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl space-y-10 px-5 py-12 md:px-8">
+      <div className="mx-auto max-w-6xl space-y-10 px-4 py-12 md:px-8">
         <WeatherErrorBoundary>
           <WeatherWidget
             enlem={sehir?.merkez_enlem ?? SAMSUN_MERKEZ[0]}

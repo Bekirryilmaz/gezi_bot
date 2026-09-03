@@ -26,9 +26,9 @@ export default async function BolgelerSayfasi({ params }: Props) {
     <main className="atmosfer min-h-screen">
       <div className="relative bg-deniz-derin pb-14 pt-24 text-white">
         <SiteHeader sehirAnahtari={anahtar} />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
           <p className="text-sm uppercase tracking-[0.2em] text-white/55">Bölgeler</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl">
+          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl md:text-5xl">
             {sehir?.isim ?? (anahtar === "samsun" ? "Samsun" : anahtar)} ve İlçeleri
           </h1>
           <p className="mt-4 max-w-xl text-white/75">
@@ -37,7 +37,7 @@ export default async function BolgelerSayfasi({ params }: Props) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl space-y-14 px-5 py-12 md:px-8">
+      <div className="mx-auto max-w-6xl space-y-14 px-4 py-12 md:px-8">
         {bolgeler.length === 0 ? (
           <p className="text-ink/60">Bölge profili bulunamadı.</p>
         ) : (

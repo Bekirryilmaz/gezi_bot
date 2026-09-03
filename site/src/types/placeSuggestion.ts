@@ -16,6 +16,13 @@ export interface PlaceSuggestion {
   city: string;
   district: string;
   description: string;
+  directions?: string;
+  transportation?: {
+    carAccess: string;
+    walkingDistance: string;
+    roadCondition: string;
+    publicTransit: string;
+  };
   specialTip?: string;
   coordinates: {
     lat: number;
@@ -28,6 +35,20 @@ export interface PlaceSuggestion {
   };
   status: PlaceSuggestionStatus;
   createdAt: string;
+  slug?: string;
+  likesCount?: number;
+  commentsCount?: number;
+  visibleFields?: {
+    showDirections: boolean;
+    showTransportation: boolean;
+    showExactCoordinates: boolean;
+    showSpecialTip: boolean;
+  };
+  adminEditorial?: {
+    historicalContext?: string;
+    adminNotes?: string;
+    publishedAt: string;
+  };
 }
 
 export type Oneri = PlaceSuggestion;

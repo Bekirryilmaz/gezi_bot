@@ -39,6 +39,9 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -46,6 +49,16 @@ body {
   color: var(--foreground);
   font-family: var(--font-sora), system-ui, sans-serif;
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+iframe {
+  max-width: 100%;
 }
 
 ::selection {
@@ -80,7 +93,14 @@ body {
   font-family: inherit;
   height: 100%;
   width: 100%;
+  max-width: 100%;
   background: var(--deniz-derin);
+}
+
+@media (max-width: 767px) {
+  .leaflet-container {
+    touch-action: pan-y;
+  }
 }
 
 .samandira-tooltip {
@@ -157,7 +177,8 @@ body {
   font-family: inherit;
 }
 
-.leaflet-tooltip.ilce-tooltip {
+.leaflet-tooltip.ilce-tooltip,
+.leaflet-tooltip.custom-map-tooltip {
   background: var(--deniz-derin);
   color: var(--kopuk);
   border: none;
@@ -168,7 +189,8 @@ body {
   box-shadow: 0 8px 20px rgba(6, 54, 66, 0.28);
 }
 
-.leaflet-tooltip.ilce-tooltip::before {
+.leaflet-tooltip.ilce-tooltip::before,
+.leaflet-tooltip.custom-map-tooltip::before {
   border-top-color: var(--deniz-derin);
 }
 
@@ -240,3 +262,8 @@ body {
     animation: none;
   }
 }
+
+.prose-slate blockquote {
+  quotes: none;
+}
+

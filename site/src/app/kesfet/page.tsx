@@ -19,15 +19,17 @@ export default async function KesfetSayfasi() {
     <main className="atmosfer min-h-screen">
       <div className="relative bg-deniz-derin pb-14 pt-24 text-white">
         <SiteHeader />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
           <p className="text-sm uppercase tracking-[0.2em] text-white/55">Keşfet</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl">Samsun</h1>
+          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl md:text-5xl">
+            Samsun
+          </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/80 md:text-lg">
             {SAMSUN_OZET}
           </p>
         </div>
       </div>
-      <div className="mx-auto max-w-6xl px-5 py-10 md:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
         <KesfetPaneli sehirAnahtari="samsun" />
       </div>
     </main>

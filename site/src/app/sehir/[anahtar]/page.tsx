@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { YerSatiri } from "@/components/YerSatiri";
 import { KesfetPaneli } from "@/components/discovery/KesfetPaneli";
 import { sehirleriGetir, yerleriGetir } from "@/lib/api";
+import { IL_SECICI_ACIK } from "@/lib/kesfetOzellik";
 import { ANA_KATEGORILER } from "@/lib/sabitler";
 
 type Props = {
@@ -39,17 +40,19 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
     <main className="atmosfer min-h-screen">
       <div className="relative bg-deniz-derin pb-16 pt-24 text-white">
         <SiteHeader sehirAnahtari={anahtar} />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
           <p className="text-sm uppercase tracking-[0.2em] text-white/55">Keşfet</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl">{baslik}</h1>
+          <h1 className="mt-3 font-display text-2xl font-bold tracking-tight sm:text-3xl md:text-5xl">
+            {baslik}
+          </h1>
           <p className="mt-4 max-w-xl text-white/75">
             İlçeyi haritada seç, sonra kategoriye göre yerleri süz.
           </p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl space-y-14 px-5 py-10 md:px-8">
-        {anahtar === "samsun" ? (
+      <div className="mx-auto max-w-6xl space-y-14 px-4 py-10 md:px-8">
+        {IL_SECICI_ACIK || anahtar === "samsun" ? (
           <section>
             <h2 className="mb-6 font-display text-3xl text-deniz">İlçeler</h2>
             <KesfetPaneli sehirAnahtari={anahtar} />
@@ -61,7 +64,7 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
           <div className="flex flex-wrap gap-2">
             <Link
               href={`/sehir/${anahtar}`}
-              className={`rounded-full px-4 py-2 text-sm transition ${
+              className={`inline-flex min-h-[44px] items-center rounded-full px-4 py-2 text-sm transition ${
                 !kategori
                   ? "bg-deniz text-white"
                   : "bg-white/70 text-ink hover:bg-white"
@@ -73,7 +76,7 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
               <Link
                 key={k.deger}
                 href={`/sehir/${anahtar}?kategori=${k.deger}`}
-                className={`rounded-full px-4 py-2 text-sm transition ${
+                className={`inline-flex min-h-[44px] items-center rounded-full px-4 py-2 text-sm transition ${
                   kategori === k.deger
                     ? "bg-deniz text-white"
                     : "bg-white/70 text-ink hover:bg-white"

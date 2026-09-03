@@ -274,6 +274,13 @@ class MekanOneriKoordinat(BaseModel):
     lng: float
 
 
+class MekanOneriUlasim(BaseModel):
+    carAccess: str
+    walkingDistance: str
+    roadCondition: str
+    publicTransit: str
+
+
 class MekanOneriCevap(BaseModel):
     """site/src/types/placeSuggestion.ts::PlaceSuggestion ile eslesir."""
 
@@ -283,6 +290,8 @@ class MekanOneriCevap(BaseModel):
     city: str
     district: str
     description: str
+    directions: str = ""
+    transportation: MekanOneriUlasim | None = None
     specialTip: str | None = None
     coordinates: MekanOneriKoordinat
     images: list[str]
@@ -291,12 +300,30 @@ class MekanOneriCevap(BaseModel):
     createdAt: str
     yerId: str | None = None
     redNedeni: str | None = None
+    slug: str = ""
+    likesCount: int = 0
+    commentsCount: int = 0
+    visibleFields: dict | None = None
+    adminEditorial: dict | None = None
 
     @classmethod
-    def kayittan(cls, oneri: MekanOneri, *, eposta_gizle: bool = False) -> "MekanOneriCevap":
+    def kayittan(
+        cls,
+        oneri: MekanOneri,
+        *,
+        eposta_gizle: bool = False,
+        comments_count: int = 0,
+    ) -> "MekanOneriCevap":
         eposta = oneri.gonderen_eposta
         if eposta_gizle:
             eposta = "***"
+        editorial = None
+        if oneri.tarih_baglam or oneri.editor_notu or oneri.yayin_zamani:
+            editorial = {
+                "historicalContext": oneri.tarih_baglam,
+                "adminNotes": oneri.editor_notu,
+                "publishedAt": oneri.yayin_zamani.isoformat() if oneri.yayin_zamani else "",
+            }
         return cls(
             id=oneri.id,
             title=oneri.baslik,
@@ -304,6 +331,13 @@ class MekanOneriCevap(BaseModel):
             city=oneri.sehir,
             district=oneri.ilce,
             description=oneri.aciklama,
+            directions=oneri.adres_tarifi or "",
+            transportation=MekanOneriUlasim(
+                carAccess=oneri.araba_erisimi or "",
+                walkingDistance=oneri.yurume_mesafesi or "",
+                roadCondition=oneri.yol_durumu or "",
+                publicTransit=oneri.toplu_tasima or "",
+            ),
             specialTip=oneri.ziyaretci_tuyosu,
             coordinates=MekanOneriKoordinat(lat=oneri.enlem, lng=oneri.boylam),
             images=list(oneri.fotograf_urlleri or []),
@@ -312,6 +346,16 @@ class MekanOneriCevap(BaseModel):
             createdAt=oneri.olusturulma_zamani.isoformat() if oneri.olusturulma_zamani else "",
             yerId=oneri.yer_id,
             redNedeni=oneri.red_nedeni,
+            slug=oneri.slug or oneri.id,
+            likesCount=oneri.begeni_sayisi or 0,
+            commentsCount=comments_count,
+            visibleFields={
+                "showDirections": bool(oneri.gorunur_tarif),
+                "showTransportation": bool(oneri.gorunur_ulasim),
+                "showExactCoordinates": bool(oneri.gorunur_koordinat),
+                "showSpecialTip": bool(oneri.gorunur_tuyo),
+            },
+            adminEditorial=editorial,
         )
 
 
@@ -326,3 +370,71 @@ class MekanOneriOnayCevabi(BaseModel):
     status: str
     yerId: str
     mesaj: str
+
+
+class ToplulukUlasim(BaseModel):
+    carAccess: str
+    walkingDistance: str
+    roadCondition: str
+
+
+class ToplulukEditorial(BaseModel):
+    historicalContext: str | None = None
+    adminNotes: str | None = None
+    publishedAt: str
+
+
+class ToplulukGorunurluk(BaseModel):
+    showDirections: bool
+    showTransportation: bool
+    showExactCoordinates: bool
+    showSpecialTip: bool
+
+
+class ToplulukYaziCevap(BaseModel):
+    """site/src/types/suggestion.ts::CommunityPost ile eslesir. E-posta blogda yok."""
+
+    id: str
+    slug: str
+    title: str
+    category: str
+    city: str
+    district: str
+    coordinates: MekanOneriKoordinat
+    directions: str
+    transportation: ToplulukUlasim
+    userStory: str
+    specialTip: str | None = None
+    approvedImages: list[str]
+    submitterEmail: str = ""
+    adminEditorial: ToplulukEditorial | None = None
+    visibleFields: ToplulukGorunurluk
+    likesCount: int
+    commentsCount: int
+    status: str
+
+
+class YorumCevap(BaseModel):
+    id: str
+    postId: str
+    authorName: str
+    content: str
+    createdAt: str
+    status: str
+
+
+class YorumOlusturGovde(BaseModel):
+    authorName: str
+    content: str
+
+
+class GorunurlukGuncelle(BaseModel):
+    showDirections: bool | None = None
+    showTransportation: bool | None = None
+    showExactCoordinates: bool | None = None
+    showSpecialTip: bool | None = None
+
+
+class EditorialGuncelle(BaseModel):
+    historicalContext: str | None = None
+    adminNotes: str | None = None

@@ -26,6 +26,7 @@ from datetime import datetime
 from geoalchemy2 import Geography
 from sqlalchemy import (
     JSON,
+    Boolean,
     DateTime,
     Float,
     ForeignKey,
@@ -307,9 +308,24 @@ class MekanOneri(Taban):
     ilce: Mapped[str] = mapped_column(String(100), nullable=False)
     aciklama: Mapped[str] = mapped_column(Text, nullable=False)
     ziyaretci_tuyosu: Mapped[str | None] = mapped_column(Text)
+    adres_tarifi: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    araba_erisimi: Mapped[str] = mapped_column(String(40), nullable=False, default="")
+    yurume_mesafesi: Mapped[str] = mapped_column(String(200), nullable=False, default="")
+    yol_durumu: Mapped[str] = mapped_column(String(120), nullable=False, default="")
+    toplu_tasima: Mapped[str] = mapped_column(String(300), nullable=False, default="")
     enlem: Mapped[float] = mapped_column(Float, nullable=False)
     boylam: Mapped[float] = mapped_column(Float, nullable=False)
     fotograf_urlleri: Mapped[list] = mapped_column(JSONB, default=list)
+    onayli_fotograflar: Mapped[list] = mapped_column(JSONB, default=list)
+    slug: Mapped[str] = mapped_column(String(220), nullable=False, unique=True)
+    begeni_sayisi: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    gorunur_tarif: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    gorunur_ulasim: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    gorunur_koordinat: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    gorunur_tuyo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    tarih_baglam: Mapped[str | None] = mapped_column(Text)
+    editor_notu: Mapped[str | None] = mapped_column(Text)
+    yayin_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     gonderen_adi: Mapped[str | None] = mapped_column(String(120))
     gonderen_eposta: Mapped[str] = mapped_column(String(254), nullable=False)
     durum: Mapped[str] = mapped_column(String(20), nullable=False, default="beklemede")
@@ -319,6 +335,10 @@ class MekanOneri(Taban):
     olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     yer: Mapped["Yer | None"] = relationship()
+    yorumlar: Mapped[list["OneriYorum"]] = relationship(
+        back_populates="oneri",
+        cascade="all, delete-orphan",
+    )
 
     __table_args__ = (
         Index("ix_mekan_onerileri_durum", "durum"),
@@ -327,3 +347,26 @@ class MekanOneri(Taban):
 
     def __repr__(self) -> str:
         return f"<MekanOneri {self.baslik} ({self.durum})>"
+
+
+class OneriYorum(Taban):
+    """Topluluk blog yazisina dusen ziyaretci yorumu."""
+
+    __tablename__ = "oneri_yorumlari"
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
+    oneri_id: Mapped[str] = mapped_column(
+        ForeignKey("mekan_onerileri.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    yazar_adi: Mapped[str] = mapped_column(String(80), nullable=False)
+    icerik: Mapped[str] = mapped_column(Text, nullable=False)
+    durum: Mapped[str] = mapped_column(String(20), nullable=False, default="yayinda")
+    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    oneri: Mapped["MekanOneri"] = relationship(back_populates="yorumlar")
+
+    __table_args__ = (Index("ix_oneri_yorumlari_oneri", "oneri_id"),)
+
+    def __repr__(self) -> str:
+        return f"<OneriYorum {self.yazar_adi}>"

@@ -16,6 +16,8 @@ import type { Feature, FeatureCollection, GeoJsonObject } from "geojson";
 import type { CityDetail } from "@/types/city";
 import type { PopularRoute } from "@/data/popularRoutes";
 import { TURKIYE_MERKEZ } from "@/lib/sehirler";
+import { useMobilDokunma } from "@/hooks/useMobilDokunma";
+import { HaritaBoyut } from "@/components/map/HaritaBoyut";
 import "leaflet/dist/leaflet.css";
 
 type IlOzellik = { id: string; name: string; slug: string };
@@ -28,6 +30,7 @@ type Props = {
   selectedRoute: PopularRoute | null;
   onSelectRoute: (rota: PopularRoute) => void;
   odakSayac?: number;
+  ilOdakSayac?: number;
 };
 
 const STIL_VARSAYILAN: PathOptions = {
@@ -73,12 +76,14 @@ function IlPoligonlari({
   selectedProvince,
   onSelect,
   rotaOdakli,
+  ilOdakSayac,
 }: {
   geo: FeatureCollection;
   sehirler: CityDetail[];
   selectedProvince: CityDetail | null;
   onSelect: (sehir: CityDetail) => void;
   rotaOdakli: boolean;
+  ilOdakSayac: number;
 }) {
   const harita = useMap();
   const katmanRef = useRef<LeafletGeoJSON | null>(null);
@@ -149,6 +154,8 @@ function IlPoligonlari({
       return;
     }
 
+    void ilOdakSayac;
+
     if (!selectedId) {
       harita.setView(TURKIYE_MERKEZ, 6);
       return;
@@ -167,7 +174,7 @@ function IlPoligonlari({
         duration: 0.75,
       });
     });
-  }, [selectedId, harita, geo, rotaOdakli]);
+  }, [selectedId, harita, geo, rotaOdakli, ilOdakSayac]);
 
   return (
     <GeoJSON
@@ -328,6 +335,7 @@ export function TurkeyMap({
   selectedRoute,
   onSelectRoute,
   odakSayac = 0,
+  ilOdakSayac = 0,
 }: Props) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
 
@@ -349,15 +357,21 @@ export function TurkeyMap({
     };
   }, []);
 
+  const mobil = useMobilDokunma();
+
   return (
-    <div className="h-full min-h-[420px] w-full">
+    <div className="h-full w-full max-w-full">
       <MapContainer
         center={TURKIYE_MERKEZ}
         zoom={6}
-        scrollWheelZoom
-        className="z-0 h-full w-full"
-        style={{ height: "100%", width: "100%", minHeight: 420 }}
+        dragging={!mobil}
+        scrollWheelZoom={!mobil}
+        touchZoom
+        doubleClickZoom={!mobil}
+        className="z-0 h-full w-full max-w-full"
+        style={{ height: "100%", width: "100%" }}
       >
+        <HaritaBoyut tetik={geo ? "ok" : "yukleniyor"} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -369,6 +383,7 @@ export function TurkeyMap({
             selectedProvince={selectedProvince}
             onSelect={onSelect}
             rotaOdakli={selectedRoute != null}
+            ilOdakSayac={ilOdakSayac}
           />
         ) : null}
         <RotaKatmani

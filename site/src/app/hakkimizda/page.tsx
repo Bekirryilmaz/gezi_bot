@@ -38,11 +38,11 @@ export default function HakkimizdaSayfasi() {
     <main className="atmosfer min-h-screen">
       <div className="relative bg-deniz-derin pb-16 pt-24 text-white">
         <SiteHeader />
-        <div className="mx-auto max-w-6xl space-y-6 px-5 md:px-8">
+        <div className="mx-auto max-w-6xl space-y-6 px-4 md:px-8">
           <p className="text-sm tracking-[0.2em] text-white/55">
             ROTANIN PUSULASI & BİZ KİMİZ
           </p>
-          <h1 className="font-display text-4xl leading-tight md:text-6xl">
+          <h1 className="font-display text-2xl font-bold leading-tight tracking-tight sm:text-3xl md:text-5xl">
             Yolda Öğrenen İki Öğrencinin Seyir Defteri
           </h1>
           <p className="max-w-4xl text-base leading-relaxed text-white/80 md:text-lg">
@@ -58,7 +58,7 @@ export default function HakkimizdaSayfasi() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl space-y-16 px-5 py-12 md:space-y-20 md:px-8 md:py-16">
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 md:space-y-20 md:px-8 md:py-16">
         <section className="grid items-stretch gap-8 overflow-hidden rounded-2xl border border-teal-100/60 bg-white/70 shadow-sm backdrop-blur lg:grid-cols-2">
           <div className="relative min-h-[240px] overflow-hidden lg:min-h-full">
             <Image
@@ -70,8 +70,8 @@ export default function HakkimizdaSayfasi() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-deniz-derin/70 via-deniz-derin/20 to-transparent lg:bg-gradient-to-r" />
           </div>
-          <div className="space-y-6 p-6 md:p-10">
-            <h2 className="font-display text-3xl leading-snug text-deniz md:text-4xl">
+          <div className="space-y-6 p-4 md:p-10">
+            <h2 className="font-display text-2xl font-bold tracking-tight text-deniz sm:text-3xl md:text-4xl">
               Denizde Bir Sınır, Karada Bir Rehber: Neden ŞAMANDIRA?
             </h2>
             <div className="space-y-6 text-base leading-relaxed text-slate-700 md:text-lg">
@@ -103,7 +103,7 @@ export default function HakkimizdaSayfasi() {
             {DEGERLER.map((deger) => (
               <li
                 key={deger.baslik}
-                className="rounded-2xl border border-teal-100/60 bg-white/70 p-6 shadow-sm backdrop-blur"
+                className="rounded-2xl border border-teal-100/60 bg-white/70 p-4 shadow-sm backdrop-blur md:p-6"
               >
                 <p className="text-3xl" aria-hidden>
                   {deger.ikon}

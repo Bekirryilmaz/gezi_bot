@@ -8,7 +8,7 @@ export const TurkeyMapYukle = dynamic(
     ssr: false,
     loading: () => (
       <div
-        className="flex h-full min-h-[420px] w-full items-center justify-center bg-deniz-derin text-sm text-kopuk/70"
+        className="flex h-full w-full items-center justify-center bg-deniz-derin text-sm text-kopuk/70"
         aria-busy="true"
       >
         Harita yükleniyor…

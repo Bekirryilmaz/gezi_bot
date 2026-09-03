@@ -55,7 +55,9 @@ export function DistrictShowcase({ district, sehirAnahtari = "samsun" }: Props) 
   return (
     <section className="space-y-6">
       <header className="flex flex-wrap items-center gap-3">
-        <h2 className="font-display text-3xl text-deniz md:text-4xl">{district.name}</h2>
+        <h2 className="font-display text-2xl font-bold tracking-tight text-deniz sm:text-3xl md:text-4xl">
+          {district.name}
+        </h2>
         <span className="rounded-full bg-yosun/15 px-3 py-1 text-sm font-medium text-yosun">
           {district.vibe}
         </span>

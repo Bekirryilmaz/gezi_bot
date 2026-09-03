@@ -44,3 +44,6 @@ altyapi/postgres_veri/
 sunucu/yuklemeler/mekan-onerileri/*
 !sunucu/yuklemeler/mekan-onerileri/.gitkeep
 site/public/uploads/
+
+# Ham ilçe GeoJSON (script ile parçalanır)
+site/scripts/tur-adm2-simplified.geojson

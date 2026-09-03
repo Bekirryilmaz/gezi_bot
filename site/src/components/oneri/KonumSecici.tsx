@@ -4,6 +4,8 @@ import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-lea
 import { useEffect, useMemo } from "react";
 import { DivIcon } from "leaflet";
 import { TURKIYE_MERKEZ } from "@/lib/sehirler";
+import { useMobilDokunma } from "@/hooks/useMobilDokunma";
+import { HaritaBoyut } from "@/components/map/HaritaBoyut";
 import "leaflet/dist/leaflet.css";
 
 type Koordinat = { lat: number; lng: number };
@@ -55,15 +57,20 @@ function Odaklan({ konum }: { konum: Koordinat | null }) {
 
 export function KonumSecici({ value, onChange }: Props) {
   const ikon = useMemo(() => pinIkon(), []);
+  const mobil = useMobilDokunma();
 
   return (
     <MapContainer
       center={value ? [value.lat, value.lng] : TURKIYE_MERKEZ}
       zoom={value ? 13 : 6}
-      scrollWheelZoom
-      className="z-0 h-full w-full rounded-2xl"
-      style={{ height: "100%", width: "100%", minHeight: 420 }}
+      dragging={!mobil}
+      scrollWheelZoom={!mobil}
+      touchZoom
+      doubleClickZoom={!mobil}
+      className="z-0 h-full w-full max-w-full rounded-2xl"
+      style={{ height: "100%", width: "100%" }}
     >
+      <HaritaBoyut tetik={value ? "konum" : "bos"} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

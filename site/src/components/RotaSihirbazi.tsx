@@ -348,7 +348,7 @@ export function RotaSihirbazi({
               <button
                 type="button"
                 onClick={() => setAdim("senaryo")}
-                className="rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
+                className="inline-flex min-h-[44px] items-center rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
               >
                 Geri
               </button>
@@ -397,7 +397,7 @@ export function RotaSihirbazi({
             <button
               type="button"
               onClick={() => setAdim("tercihler")}
-              className="rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
+              className="inline-flex min-h-[44px] items-center rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
             >
               Geri
             </button>
@@ -415,7 +415,7 @@ export function RotaSihirbazi({
               setAlternatifler([]);
               setAdim("senaryo");
             }}
-            className="rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
+            className="inline-flex min-h-[44px] items-center rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
           >
             Yeni rota
           </button>

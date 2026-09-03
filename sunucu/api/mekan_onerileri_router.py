@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import re
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile
@@ -26,9 +28,22 @@ from sunucu.api.guvenlik import (
     turnstile_dogrula,
     yonetici_gerekli,
 )
-from sunucu.api.semalar import MekanOneriCevap, MekanOneriGonderimCevabi, MekanOneriOnayCevabi
+from sunucu.api.semalar import (
+    EditorialGuncelle,
+    GorunurlukGuncelle,
+    MekanOneriCevap,
+    MekanOneriGonderimCevabi,
+    MekanOneriKoordinat,
+    MekanOneriOnayCevabi,
+    ToplulukEditorial,
+    ToplulukGorunurluk,
+    ToplulukUlasim,
+    ToplulukYaziCevap,
+    YorumCevap,
+    YorumOlusturGovde,
+)
 from sunucu.veritabani.baglanti import oturum_al
-from sunucu.veritabani.modeller import MekanOneri, Sehir, Yer, YerKaynak
+from sunucu.veritabani.modeller import MekanOneri, OneriYorum, Sehir, Yer, YerKaynak
 from veri.ortak.metin_araclari import turkce_kucuk_harf
 
 yonlendirici = APIRouter(tags=["mekan-onerileri"])
@@ -71,6 +86,88 @@ KATEGORI_ESLEME: dict[str, tuple[str, str]] = {
         GezilecekYerAltKategori.DOGA_MANZARA.value,
     ),
 }
+
+
+def _slug_uret(baslik: str, sehir: str, kayit_id: str) -> str:
+    ham = turkce_kucuk_harf(f"{baslik} {sehir}")
+    temiz = re.sub(r"[^a-z0-9]+", "-", ham).strip("-")[:80]
+    kisa = kayit_id.replace("-", "")[:8]
+    return f"{temiz}-{kisa}" if temiz else kisa
+
+
+def _blog_kategori(kategori: str) -> str:
+    if kategori == "kamp_karavan":
+        return "kamp_alani"
+    return kategori
+
+
+def _yorum_sayisi(oturum: Session, oneri_id: str) -> int:
+    return (
+        oturum.query(OneriYorum)
+        .filter(OneriYorum.oneri_id == oneri_id, OneriYorum.durum == "yayinda")
+        .count()
+    )
+
+
+def _yazi_cevap(oneri: MekanOneri, yorum_sayisi: int) -> ToplulukYaziCevap:
+    gorseller = list(oneri.onayli_fotograflar or []) or list(oneri.fotograf_urlleri or [])
+    editorial = None
+    if oneri.tarih_baglam or oneri.editor_notu or oneri.yayin_zamani:
+        editorial = ToplulukEditorial(
+            historicalContext=oneri.tarih_baglam,
+            adminNotes=oneri.editor_notu,
+            publishedAt=oneri.yayin_zamani.isoformat() if oneri.yayin_zamani else "",
+        )
+    return ToplulukYaziCevap(
+        id=oneri.id,
+        slug=oneri.slug,
+        title=oneri.baslik,
+        category=_blog_kategori(oneri.kategori),
+        city=oneri.sehir,
+        district=oneri.ilce,
+        coordinates=MekanOneriKoordinat(lat=oneri.enlem, lng=oneri.boylam),
+        directions=oneri.adres_tarifi or "",
+        transportation=ToplulukUlasim(
+            carAccess=oneri.araba_erisimi or "",
+            walkingDistance=oneri.yurume_mesafesi or "",
+            roadCondition=oneri.yol_durumu or "",
+        ),
+        userStory=oneri.aciklama,
+        specialTip=oneri.ziyaretci_tuyosu,
+        approvedImages=gorseller,
+        submitterEmail="",
+        adminEditorial=editorial,
+        visibleFields=ToplulukGorunurluk(
+            showDirections=bool(oneri.gorunur_tarif),
+            showTransportation=bool(oneri.gorunur_ulasim),
+            showExactCoordinates=bool(oneri.gorunur_koordinat),
+            showSpecialTip=bool(oneri.gorunur_tuyo),
+        ),
+        likesCount=oneri.begeni_sayisi or 0,
+        commentsCount=yorum_sayisi,
+        status=oneri.durum,
+    )
+
+
+def _yayin_bul(oturum: Session, anahtar: str) -> MekanOneri | None:
+    oneri = (
+        oturum.query(MekanOneri)
+        .filter(
+            MekanOneri.durum == MekanOneriDurumu.ONAYLANDI.value,
+            MekanOneri.slug == anahtar,
+        )
+        .first()
+    )
+    if oneri:
+        return oneri
+    return (
+        oturum.query(MekanOneri)
+        .filter(
+            MekanOneri.durum == MekanOneriDurumu.ONAYLANDI.value,
+            MekanOneri.id == anahtar,
+        )
+        .first()
+    )
 
 
 def _uzanti_bul(icerik: bytes) -> str:
@@ -130,6 +227,17 @@ def _oneri_yer_aktar(oturum: Session, oneri: MekanOneri) -> Yer:
     sehir = _sehir_bul_veya_olustur(oturum, oneri.sehir, oneri.enlem, oneri.boylam)
 
     aciklama_parcalari = [oneri.aciklama]
+    if oneri.adres_tarifi:
+        aciklama_parcalari.append(f"Adres tarifi: {oneri.adres_tarifi}")
+    ulasim = [
+        f"Arac: {oneri.araba_erisimi}" if oneri.araba_erisimi else "",
+        f"Yol: {oneri.yol_durumu}" if oneri.yol_durumu else "",
+        f"Yurume: {oneri.yurume_mesafesi}" if oneri.yurume_mesafesi else "",
+        f"Toplu tasima: {oneri.toplu_tasima}" if oneri.toplu_tasima else "",
+    ]
+    ulasim_metni = " · ".join(p for p in ulasim if p)
+    if ulasim_metni:
+        aciklama_parcalari.append(f"Ulasim: {ulasim_metni}")
     if oneri.ziyaretci_tuyosu:
         aciklama_parcalari.append(f"Ziyaretci tuyosu: {oneri.ziyaretci_tuyosu}")
 
@@ -171,7 +279,11 @@ async def mekan_onerisi_olustur(
     gonderen_eposta: str = Form(...),
     enlem: float = Form(...),
     boylam: float = Form(...),
-    gonderen_adi: str | None = Form(default=None),
+    adres_tarifi: str = Form(...),
+    araba_erisimi: str = Form(...),
+    yurume_mesafesi: str = Form(...),
+    yol_durumu: str = Form(...),
+    toplu_tasima: str = Form(...),
     ziyaretci_tuyosu: str | None = Form(default=None),
     turnstile_jetonu: str | None = Form(default=None),
     sirket_sitesi: str | None = Form(default=None),
@@ -191,7 +303,11 @@ async def mekan_onerisi_olustur(
     ilce = ilce.strip()
     aciklama = aciklama.strip()
     eposta = gonderen_eposta.strip()
-    adi = gonderen_adi.strip() if gonderen_adi else None
+    tarif = adres_tarifi.strip()
+    araba = araba_erisimi.strip()
+    yurume = yurume_mesafesi.strip()
+    yol = yol_durumu.strip()
+    toplu = toplu_tasima.strip()
     tuyo = ziyaretci_tuyosu.strip() if ziyaretci_tuyosu else None
 
     if len(baslik) < 3 or len(baslik) > 200:
@@ -202,6 +318,16 @@ async def mekan_onerisi_olustur(
         raise HTTPException(status_code=400, detail="Sehir ve ilce zorunludur.")
     if len(aciklama) < 20 or len(aciklama) > 2500:
         raise HTTPException(status_code=400, detail="Aciklama 20-2500 karakter olmali.")
+    if len(tarif) < 10 or len(tarif) > 1500:
+        raise HTTPException(status_code=400, detail="Adres tarifi 10-1500 karakter olmali.")
+    if araba not in {"kolay", "zor", "4x4_gerekli", "aracsiz_ulasilamaz"}:
+        raise HTTPException(status_code=400, detail="Arac erisimini sec.")
+    if len(yurume) < 2 or len(yurume) > 200:
+        raise HTTPException(status_code=400, detail="Yurume mesafesi zorunludur.")
+    if len(yol) < 2 or len(yol) > 120:
+        raise HTTPException(status_code=400, detail="Yol tipini gir.")
+    if len(toplu) < 2 or len(toplu) > 300:
+        raise HTTPException(status_code=400, detail="Toplu tasima bilgisini gir.")
     if not eposta_gecerli_mi(eposta):
         raise HTTPException(status_code=400, detail="Gecerli bir e-posta gir.")
     if not (-90 <= enlem <= 90 and -180 <= boylam <= 180):
@@ -214,17 +340,24 @@ async def mekan_onerisi_olustur(
     hiz_siniri_kontrol(ip, eposta)
 
     urller = _fotograflari_kaydet([f for f in fotograflar if f.filename])
+    kayit_id = str(uuid.uuid4())
     oneri = MekanOneri(
+        id=kayit_id,
+        slug=_slug_uret(baslik, sehir, kayit_id),
         baslik=baslik,
         kategori=kategori,
         sehir=sehir,
         ilce=ilce,
         aciklama=aciklama,
         ziyaretci_tuyosu=tuyo,
+        adres_tarifi=tarif,
+        araba_erisimi=araba,
+        yurume_mesafesi=yurume,
+        yol_durumu=yol,
+        toplu_tasima=toplu,
         enlem=enlem,
         boylam=boylam,
         fotograf_urlleri=urller,
-        gonderen_adi=adi or None,
         gonderen_eposta=eposta,
         durum=MekanOneriDurumu.BEKLEMEDE.value,
         ip_adresi=ip[:64],
@@ -252,7 +385,131 @@ def mekan_onerilerini_listele(
     sorgu = oturum.query(MekanOneri).order_by(MekanOneri.olusturulma_zamani.desc())
     if durum:
         sorgu = sorgu.filter(MekanOneri.durum == durum)
-    return [MekanOneriCevap.kayittan(kayit) for kayit in sorgu.limit(200).all()]
+    return [
+        MekanOneriCevap.kayittan(kayit, comments_count=_yorum_sayisi(oturum, kayit.id))
+        for kayit in sorgu.limit(200).all()
+    ]
+
+
+@yonlendirici.get("/mekan-onerileri/yayinlar", response_model=list[ToplulukYaziCevap])
+def yayinlanan_oneriler(oturum: Session = Depends(oturum_al)) -> list[ToplulukYaziCevap]:
+    kayitlar = (
+        oturum.query(MekanOneri)
+        .filter(MekanOneri.durum == MekanOneriDurumu.ONAYLANDI.value)
+        .order_by(MekanOneri.olusturulma_zamani.desc())
+        .limit(120)
+        .all()
+    )
+    return [_yazi_cevap(k, _yorum_sayisi(oturum, k.id)) for k in kayitlar]
+
+
+@yonlendirici.get("/mekan-onerileri/yayinlar/{anahtar}", response_model=ToplulukYaziCevap)
+def yayin_detay(anahtar: str, oturum: Session = Depends(oturum_al)) -> ToplulukYaziCevap:
+    oneri = _yayin_bul(oturum, anahtar)
+    if oneri is None:
+        raise HTTPException(status_code=404, detail="Yazi bulunamadi.")
+    return _yazi_cevap(oneri, _yorum_sayisi(oturum, oneri.id))
+
+
+@yonlendirici.get("/mekan-onerileri/yayinlar/{anahtar}/yorumlar", response_model=list[YorumCevap])
+def yayin_yorumlari(anahtar: str, oturum: Session = Depends(oturum_al)) -> list[YorumCevap]:
+    oneri = _yayin_bul(oturum, anahtar)
+    if oneri is None:
+        raise HTTPException(status_code=404, detail="Yazi bulunamadi.")
+    kayitlar = (
+        oturum.query(OneriYorum)
+        .filter(OneriYorum.oneri_id == oneri.id, OneriYorum.durum == "yayinda")
+        .order_by(OneriYorum.olusturulma_zamani.desc())
+        .limit(100)
+        .all()
+    )
+    return [
+        YorumCevap(
+            id=y.id,
+            postId=y.oneri_id,
+            authorName=y.yazar_adi,
+            content=y.icerik,
+            createdAt=y.olusturulma_zamani.isoformat() if y.olusturulma_zamani else "",
+            status=y.durum,
+        )
+        for y in kayitlar
+    ]
+
+
+@yonlendirici.post("/mekan-onerileri/yayinlar/{anahtar}/yorumlar", response_model=YorumCevap)
+def yayin_yorum_ekle(
+    anahtar: str,
+    govde: YorumOlusturGovde,
+    oturum: Session = Depends(oturum_al),
+) -> YorumCevap:
+    oneri = _yayin_bul(oturum, anahtar)
+    if oneri is None:
+        raise HTTPException(status_code=404, detail="Yazi bulunamadi.")
+    ad = govde.authorName.strip()
+    icerik = govde.content.strip()
+    if len(ad) < 2 or len(ad) > 80:
+        raise HTTPException(status_code=400, detail="Isim 2-80 karakter olmali.")
+    if len(icerik) < 4 or len(icerik) > 1200:
+        raise HTTPException(status_code=400, detail="Yorum 4-1200 karakter olmali.")
+    yorum = OneriYorum(
+        oneri_id=oneri.id,
+        yazar_adi=ad,
+        icerik=icerik,
+        durum="yayinda",
+    )
+    oturum.add(yorum)
+    oturum.commit()
+    oturum.refresh(yorum)
+    return YorumCevap(
+        id=yorum.id,
+        postId=yorum.oneri_id,
+        authorName=yorum.yazar_adi,
+        content=yorum.icerik,
+        createdAt=yorum.olusturulma_zamani.isoformat() if yorum.olusturulma_zamani else "",
+        status=yorum.durum,
+    )
+
+
+@yonlendirici.patch("/mekan-onerileri/{oneri_id}/gorunurluk", response_model=MekanOneriCevap)
+def gorunurluk_guncelle(
+    oneri_id: str,
+    govde: GorunurlukGuncelle,
+    oturum: Session = Depends(oturum_al),
+    _: None = Depends(yonetici_gerekli),
+) -> MekanOneriCevap:
+    oneri = oturum.query(MekanOneri).filter(MekanOneri.id == oneri_id).first()
+    if oneri is None:
+        raise HTTPException(status_code=404, detail="Oneri bulunamadi.")
+    if govde.showDirections is not None:
+        oneri.gorunur_tarif = govde.showDirections
+    if govde.showTransportation is not None:
+        oneri.gorunur_ulasim = govde.showTransportation
+    if govde.showExactCoordinates is not None:
+        oneri.gorunur_koordinat = govde.showExactCoordinates
+    if govde.showSpecialTip is not None:
+        oneri.gorunur_tuyo = govde.showSpecialTip
+    oturum.commit()
+    oturum.refresh(oneri)
+    return MekanOneriCevap.kayittan(oneri, comments_count=_yorum_sayisi(oturum, oneri.id))
+
+
+@yonlendirici.patch("/mekan-onerileri/{oneri_id}/editorial", response_model=MekanOneriCevap)
+def editorial_guncelle(
+    oneri_id: str,
+    govde: EditorialGuncelle,
+    oturum: Session = Depends(oturum_al),
+    _: None = Depends(yonetici_gerekli),
+) -> MekanOneriCevap:
+    oneri = oturum.query(MekanOneri).filter(MekanOneri.id == oneri_id).first()
+    if oneri is None:
+        raise HTTPException(status_code=404, detail="Oneri bulunamadi.")
+    if govde.historicalContext is not None:
+        oneri.tarih_baglam = govde.historicalContext.strip()[:4000] or None
+    if govde.adminNotes is not None:
+        oneri.editor_notu = govde.adminNotes.strip()[:2000] or None
+    oturum.commit()
+    oturum.refresh(oneri)
+    return MekanOneriCevap.kayittan(oneri, comments_count=_yorum_sayisi(oturum, oneri.id))
 
 
 @yonlendirici.get("/mekan-onerileri/{oneri_id}", response_model=MekanOneriCevap)
@@ -289,6 +546,11 @@ def mekan_onerisi_onayla(
     yer = _oneri_yer_aktar(oturum, oneri)
     oneri.durum = MekanOneriDurumu.ONAYLANDI.value
     oneri.yer_id = yer.id
+    if not oneri.slug:
+        oneri.slug = _slug_uret(oneri.baslik, oneri.sehir, oneri.id)
+    if not oneri.onayli_fotograflar:
+        oneri.onayli_fotograflar = list(oneri.fotograf_urlleri or [])
+    oneri.yayin_zamani = datetime.now(timezone.utc)
     oturum.commit()
     return MekanOneriOnayCevabi(
         id=oneri.id,

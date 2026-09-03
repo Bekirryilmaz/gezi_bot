@@ -18,44 +18,56 @@ import type {
 import { DomEvent } from "leaflet";
 import type { Feature, FeatureCollection, GeoJsonObject } from "geojson";
 import type { DistrictDetail } from "@/types/discovery";
-import { SAMSUN_MERKEZ } from "@/lib/ilceler";
+import { ilceGeoYolu } from "@/lib/ilceGeo";
+import { TURKIYE_MERKEZ } from "@/lib/sehirler";
+import { useMobilDokunma } from "@/hooks/useMobilDokunma";
+import { HaritaBoyut } from "@/components/map/HaritaBoyut";
 import "leaflet/dist/leaflet.css";
 
 type IlceOzellik = { id: string; name: string; slug: string };
 
 type Props = {
+  sehirSlug: string;
   ilceler: DistrictDetail[];
   selectedDistrict: DistrictDetail | null;
   onSelect: (ilce: DistrictDetail) => void;
 };
 
 const STIL_VARSAYILAN: PathOptions = {
-  fillColor: "#0f766e",
-  fillOpacity: 0.15,
-  color: "#0d9488",
-  weight: 1.5,
+  fillColor: "#0d9488",
+  fillOpacity: 0.12,
+  color: "#0f766e",
+  weight: 1.8,
 };
 
 const STIL_HOVER: PathOptions = {
-  fillColor: "#0f766e",
-  fillOpacity: 0.4,
+  fillColor: "#0d9488",
+  fillOpacity: 0.35,
   color: "#115e59",
   weight: 2.5,
 };
 
 const STIL_AKTIF: PathOptions = {
   fillColor: "#042f2e",
-  fillOpacity: 0.6,
+  fillOpacity: 0.55,
   color: "#0f172a",
   weight: 3,
 };
 
 function ozellikAl(feature?: Feature): IlceOzellik | null {
   const p = feature?.properties;
-  if (!p || typeof p !== "object" || !("id" in p) || typeof p.id !== "string") {
-    return null;
-  }
-  return p as IlceOzellik;
+  if (!p || typeof p !== "object") return null;
+  const name =
+    (typeof p.name === "string" && p.name) ||
+    (typeof p.ilce_adi === "string" && p.ilce_adi) ||
+    "";
+  const id =
+    (typeof p.id === "string" && p.id) ||
+    (typeof p.slug === "string" && p.slug) ||
+    "";
+  if (!id && !name) return null;
+  const slug = typeof p.slug === "string" && p.slug ? p.slug : id || name.toLocaleLowerCase("tr-TR");
+  return { id: id || slug, name: name || slug, slug };
 }
 
 function katmanStili(layer: Layer, selectedId: string | null) {
@@ -81,7 +93,7 @@ function IlcePoligonlari({
 }) {
   const harita = useMap();
   const katmanRef = useRef<LeafletGeoJSON | null>(null);
-  const genelBakis = useRef(false);
+  const ilSigdirildi = useRef(false);
   const selectedId = selectedDistrict?.id ?? null;
 
   const selectedIdRef = useRef(selectedId);
@@ -94,13 +106,19 @@ function IlcePoligonlari({
     ilcelerRef.current = ilceler;
   }, [selectedId, onSelect, ilceler]);
 
-  const tumunuSigdir = useCallback(() => {
+  const iliSigdir = useCallback(() => {
     const gj = katmanRef.current;
-    if (!gj || genelBakis.current) return;
+    if (!gj) return;
     const tumu = gj.getBounds();
     if (!tumu.isValid()) return;
-    harita.fitBounds(tumu, { padding: [18, 18], maxZoom: 9, animate: false });
-    genelBakis.current = true;
+    harita.fitBounds(tumu, {
+      padding: [20, 20],
+      maxZoom: 10,
+      animate: true,
+      duration: 0.75,
+    });
+    harita.invalidateSize();
+    ilSigdirildi.current = true;
   }, [harita]);
 
   const stil = useCallback((feature?: Feature): PathOptions => {
@@ -112,11 +130,11 @@ function IlcePoligonlari({
     const oz = ozellikAl(feature);
     if (!oz) return;
 
-    layer.bindTooltip(oz.name, {
+    layer.bindTooltip(`<strong>${oz.name}</strong>`, {
       sticky: true,
       direction: "center",
       opacity: 1,
-      className: "ilce-tooltip",
+      className: "ilce-tooltip custom-map-tooltip",
     });
 
     layer.on({
@@ -138,11 +156,43 @@ function IlcePoligonlari({
       },
       click: (e: LeafletMouseEvent) => {
         DomEvent.stopPropagation(e);
-        const ilce = ilcelerRef.current.find((i) => i.id === oz.id);
-        if (ilce) onSelectRef.current(ilce);
+        const ilce =
+          ilcelerRef.current.find((i) => i.id === oz.id || i.slug === oz.slug) ??
+          ({
+            id: oz.id,
+            name: oz.name,
+            slug: oz.slug,
+            coordinates: [0, 0],
+            vibe: "",
+            highlights: {
+              attractions: [],
+              gastronomy: [],
+              travelTips: {
+                tip: "",
+                bestTimeToVisit: "",
+                atmosphere: "",
+                transport: "",
+              },
+            },
+          } satisfies DistrictDetail);
+        onSelectRef.current(ilce);
+        const getBounds = (layer as Layer & { getBounds?: () => LatLngBounds })
+          .getBounds;
+        if (typeof getBounds === "function") {
+          harita.fitBounds(getBounds.call(layer), {
+            padding: [30, 30],
+            maxZoom: 12,
+            animate: true,
+            duration: 0.75,
+          });
+        }
       },
     });
-  }, []);
+  }, [harita]);
+
+  useEffect(() => {
+    ilSigdirildi.current = false;
+  }, [geo]);
 
   useEffect(() => {
     const gj = katmanRef.current;
@@ -150,15 +200,12 @@ function IlcePoligonlari({
 
     gj.eachLayer((layer) => katmanStili(layer, selectedId));
 
-    if (!genelBakis.current) {
-      tumunuSigdir();
+    if (!ilSigdirildi.current) {
+      iliSigdir();
       return;
     }
 
-    if (!selectedId) {
-      harita.setView(SAMSUN_MERKEZ, 9);
-      return;
-    }
+    if (!selectedId) return;
 
     gj.eachLayer((layer) => {
       const oz = ozellikAl((layer as Layer & { feature?: Feature }).feature);
@@ -167,13 +214,13 @@ function IlcePoligonlari({
         .getBounds;
       if (typeof getBounds !== "function") return;
       harita.fitBounds(getBounds.call(layer), {
-        padding: [32, 32],
+        padding: [30, 30],
         maxZoom: 12,
         animate: true,
         duration: 0.75,
       });
     });
-  }, [selectedId, harita, geo, tumunuSigdir]);
+  }, [selectedId, harita, geo, iliSigdir]);
 
   return (
     <GeoJSON
@@ -181,17 +228,23 @@ function IlcePoligonlari({
       data={geo as GeoJsonObject}
       style={stil}
       onEachFeature={onEachFeature}
-      eventHandlers={{ add: tumunuSigdir }}
+      eventHandlers={{ add: iliSigdir }}
     />
   );
 }
 
-export function DistrictMap({ ilceler, selectedDistrict, onSelect }: Props) {
+export function DistrictMap({
+  sehirSlug,
+  ilceler,
+  selectedDistrict,
+  onSelect,
+}: Props) {
   const [geo, setGeo] = useState<FeatureCollection | null>(null);
 
   useEffect(() => {
     let iptal = false;
-    fetch("/data/samsun-ilceler.geojson")
+    setGeo(null);
+    fetch(ilceGeoYolu(sehirSlug))
       .then((r) => {
         if (!r.ok) throw new Error(`GeoJSON ${r.status}`);
         return r.json() as Promise<FeatureCollection>;
@@ -205,17 +258,25 @@ export function DistrictMap({ ilceler, selectedDistrict, onSelect }: Props) {
     return () => {
       iptal = true;
     };
-  }, []);
+  }, [sehirSlug]);
+
+  const merkez = ilceler[0]?.coordinates ?? TURKIYE_MERKEZ;
+  const mobil = useMobilDokunma();
 
   return (
-    <div className="h-full min-h-[420px] w-full">
+    <div className="h-full w-full max-w-full">
       <MapContainer
-        center={SAMSUN_MERKEZ}
-        zoom={9}
-        scrollWheelZoom
-        className="z-0 h-full w-full"
-        style={{ height: "100%", width: "100%", minHeight: 420 }}
+        key={sehirSlug}
+        center={merkez}
+        zoom={8}
+        dragging={!mobil}
+        scrollWheelZoom={!mobil}
+        touchZoom
+        doubleClickZoom={!mobil}
+        className="z-0 h-full w-full max-w-full"
+        style={{ height: "100%", width: "100%" }}
       >
+        <HaritaBoyut tetik={sehirSlug + (geo ? "-ok" : "")} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

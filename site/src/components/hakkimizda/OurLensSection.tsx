@@ -44,7 +44,7 @@ export function OurLensSection() {
         </p>
       </div>
 
-      <ul className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
         {KARELER.map((kare) => (
           <li
             key={kare.yer}

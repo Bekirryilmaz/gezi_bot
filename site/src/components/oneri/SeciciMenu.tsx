@@ -17,10 +17,11 @@ type Props = {
   onSec: (id: string, etiket: string) => void;
   aranabilir?: boolean;
   gerekli?: boolean;
+  hata?: string;
 };
 
 const LISTE_SINIFI =
-  "absolute left-0 top-full z-50 mt-1.5 w-full max-h-52 overflow-hidden overflow-y-auto bg-white shadow-2xl rounded-xl border border-teal-100 overscroll-contain scrollbar-thin scrollbar-thumb-teal-600/30 scrollbar-track-transparent";
+  "absolute left-0 top-full z-50 mt-1.5 w-full max-h-40 overflow-y-auto bg-white shadow-2xl rounded-xl border border-teal-100 overscroll-contain";
 
 const SATIR_SINIFI =
   "flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm text-slate-700 transition-colors hover:bg-teal-50 hover:text-teal-900";
@@ -33,6 +34,7 @@ export function SeciciMenu({
   onSec,
   aranabilir = false,
   gerekli = false,
+  hata,
 }: Props) {
   const kutuRef = useRef<HTMLDivElement>(null);
   const listeId = useId();
@@ -73,8 +75,18 @@ export function SeciciMenu({
   }
 
   return (
-    <label className={`block space-y-2 ${acik ? "relative z-40" : "relative z-30"}`}>
-      <span className="text-sm font-medium text-deniz">{etiket}</span>
+    <label className={`block ${etiket ? "space-y-2" : ""} ${acik ? "relative z-40" : "relative z-30"}`}>
+      {etiket ? (
+        <span className="text-sm font-medium text-deniz">
+          {etiket}
+          {gerekli ? (
+            <>
+              {" "}
+              <span className="text-red-500">*</span>
+            </>
+          ) : null}
+        </span>
+      ) : null}
       <div ref={kutuRef} className="relative">
         {aranabilir ? (
           <div className="relative">
@@ -112,7 +124,11 @@ export function SeciciMenu({
             aria-expanded={acik}
             aria-controls={listeId}
             aria-haspopup="listbox"
-            className="flex w-full items-center justify-between rounded-xl border border-[var(--cizgi)] bg-white px-3 py-2.5 text-left text-ink outline-none focus:border-deniz"
+            className={`flex min-h-[44px] w-full items-center justify-between px-3 py-2.5 text-left text-ink outline-none ${
+              etiket
+                ? "rounded-xl border border-[var(--cizgi)] bg-white focus:border-deniz"
+                : "bg-transparent text-base font-medium"
+            }`}
           >
             <span className={secili ? "flex items-center gap-2" : "text-ink/40"}>
               {secili ? (
@@ -170,6 +186,7 @@ export function SeciciMenu({
           </ul>
         ) : null}
       </div>
+      {hata ? <p className="text-sm text-red-500">{hata}</p> : null}
     </label>
   );
 }

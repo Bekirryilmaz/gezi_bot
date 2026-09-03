@@ -3,8 +3,20 @@
 import { useCallback, useState } from "react";
 import type { PlaceSuggestion } from "@/types/placeSuggestion";
 import { ONERI_KATEGORILERI } from "@/types/placeSuggestion";
+import {
+  toggleFieldVisibility,
+  updateAdminContext,
+  type CommunityVisibleFields,
+} from "@/types/suggestion";
 
 const DEPO_ANAHTAR = "samandira-yonetici";
+
+const VARSAYILAN_ALAN: CommunityVisibleFields = {
+  showDirections: true,
+  showTransportation: true,
+  showExactCoordinates: false,
+  showSpecialTip: true,
+};
 
 function kategoriEtiket(id: string): string {
   const k = ONERI_KATEGORILERI.find((x) => x.id === id);
@@ -15,6 +27,10 @@ function kategoriEtiket(id: string): string {
 function anahtarOku(): string {
   if (typeof window === "undefined") return "";
   return sessionStorage.getItem(DEPO_ANAHTAR) ?? "";
+}
+
+function alanlar(oneri: PlaceSuggestion): CommunityVisibleFields {
+  return oneri.visibleFields ?? VARSAYILAN_ALAN;
 }
 
 export function OneriYonetim() {
@@ -71,6 +87,37 @@ export function OneriYonetim() {
     if (yanit.ok) await yukle();
   }
 
+  async function gorunurlukKaydet(oneri: PlaceSuggestion, field: keyof CommunityVisibleFields) {
+    const sonraki = toggleFieldVisibility(alanlar(oneri), field);
+    const yanit = await fetch(`/api/suggestions/${oneri.id}/gorunurluk`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...basliklar() },
+      body: JSON.stringify(sonraki),
+    });
+    const json = (await yanit.json()) as PlaceSuggestion | { mesaj?: string };
+    setMesaj(yanit.ok ? "Görünürlük güncellendi." : ((json as { mesaj?: string }).mesaj ?? "Güncellenemedi."));
+    if (yanit.ok) await yukle();
+  }
+
+  async function editorialKaydet(oneri: PlaceSuggestion, form: HTMLFormElement) {
+    const veri = new FormData(form);
+    const guncel = updateAdminContext(oneri.adminEditorial, {
+      historicalContext: String(veri.get("historicalContext") ?? ""),
+      adminNotes: String(veri.get("adminNotes") ?? ""),
+    });
+    const yanit = await fetch(`/api/suggestions/${oneri.id}/editorial`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...basliklar() },
+      body: JSON.stringify({
+        historicalContext: guncel.historicalContext,
+        adminNotes: guncel.adminNotes,
+      }),
+    });
+    const json = (await yanit.json()) as { mesaj?: string };
+    setMesaj(yanit.ok ? "Editör notu kaydedildi." : (json.mesaj ?? "Kaydedilemedi."));
+    if (yanit.ok) await yukle();
+  }
+
   return (
     <div className="space-y-6">
       <form
@@ -123,6 +170,15 @@ export function OneriYonetim() {
                 </p>
                 <h2 className="font-display text-2xl text-deniz">{oneri.title}</h2>
                 <p className="mt-2 text-sm text-ink/75">{oneri.description}</p>
+                {oneri.directions ? (
+                  <p className="mt-2 text-sm text-ink/70">Tarif: {oneri.directions}</p>
+                ) : null}
+                {oneri.transportation ? (
+                  <p className="mt-1 text-sm text-ink/60">
+                    Ulaşım: {oneri.transportation.carAccess} · {oneri.transportation.roadCondition} ·{" "}
+                    {oneri.transportation.walkingDistance} · {oneri.transportation.publicTransit}
+                  </p>
+                ) : null}
                 {oneri.specialTip ? (
                   <p className="mt-2 text-sm text-yosun">Tüyo: {oneri.specialTip}</p>
                 ) : null}
@@ -164,6 +220,64 @@ export function OneriYonetim() {
                     className="h-24 w-32 rounded-lg object-cover"
                   />
                 ))}
+              </div>
+            ) : null}
+            {oneri.status === "onaylandi" ? (
+              <div className="mt-4 space-y-3 border-t border-teal-100 pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
+                  Blog görünürlüğü
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      ["showDirections", "Adres tarifi"],
+                      ["showTransportation", "Ulaşım"],
+                      ["showExactCoordinates", "Tam koordinat"],
+                      ["showSpecialTip", "Tüyo"],
+                    ] as const
+                  ).map(([alan, etiket]) => (
+                    <button
+                      key={alan}
+                      type="button"
+                      onClick={() => void gorunurlukKaydet(oneri, alan)}
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        alanlar(oneri)[alan]
+                          ? "bg-yosun text-white"
+                          : "bg-kopuk text-ink/60"
+                      }`}
+                    >
+                      {etiket}
+                    </button>
+                  ))}
+                </div>
+                <form
+                  className="grid gap-2 md:grid-cols-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void editorialKaydet(oneri, e.currentTarget);
+                  }}
+                >
+                  <textarea
+                    name="historicalContext"
+                    defaultValue={oneri.adminEditorial?.historicalContext ?? ""}
+                    rows={3}
+                    placeholder="Tarihi / kültürel arka plan"
+                    className="w-full rounded-xl border border-[var(--cizgi)] px-3 py-2 text-sm"
+                  />
+                  <textarea
+                    name="adminNotes"
+                    defaultValue={oneri.adminEditorial?.adminNotes ?? ""}
+                    rows={3}
+                    placeholder="Editör tavsiyesi"
+                    className="w-full rounded-xl border border-[var(--cizgi)] px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-full bg-deniz px-3 py-1.5 text-xs font-semibold text-white md:col-span-2"
+                  >
+                    Editör notunu kaydet
+                  </button>
+                </form>
               </div>
             ) : null}
           </li>

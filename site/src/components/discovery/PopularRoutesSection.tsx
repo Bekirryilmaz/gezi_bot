@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { Clock, Compass, Footprints, Car, MapPin } from "lucide-react";
+import { ChevronDown, Clock, Compass, Footprints, Car, MapPin } from "lucide-react";
 import {
   POPULER_ROTALAR,
   type PopularRoute,
@@ -16,6 +16,8 @@ const FILTRELER: { id: Filtre; etiket: string }[] = [
   { id: "roadtrip", etiket: "Manzaralı Yolculuklar (Road Trip)" },
   { id: "kultur_doga", etiket: "Kültür & Doğa" },
 ];
+
+const MASAUSTU_SORGU = "(min-width: 1024px)";
 
 function filtreyeUyan(rota: PopularRoute, filtre: Filtre): boolean {
   if (filtre === "tumu") return true;
@@ -49,10 +51,12 @@ function RotaKarti({
   rota,
   secili,
   onSec,
+  gorselYukle,
 }: {
   rota: PopularRoute;
   secili: boolean;
   onSec: (rota: PopularRoute) => void;
+  gorselYukle: boolean;
 }) {
   return (
     <article
@@ -66,14 +70,17 @@ function RotaKarti({
         onClick={() => onSec(rota)}
         className="w-full text-left"
       >
-      <div className="relative aspect-video">
-        <Image
-          src={rota.imageUrl}
-          alt={rota.title}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-        />
+      <div className="relative aspect-video bg-kopuk">
+        {gorselYukle ? (
+          <Image
+            src={rota.imageUrl}
+            alt={rota.title}
+            fill
+            loading="lazy"
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+          />
+        ) : null}
         <span className="absolute left-3 top-3 max-w-[85%] rounded-full bg-deniz-derin/88 px-2.5 py-1 text-[11px] font-medium leading-snug text-kopuk">
           {rota.badge}
         </span>
@@ -134,54 +141,130 @@ export function PopularRoutesSection({
   activeRouteId: string | null;
   onSelectRoute: (rota: PopularRoute) => void;
 }) {
+  const bolumRef = useRef<HTMLElement>(null);
   const [filtre, setFiltre] = useState<Filtre>("tumu");
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const rotalar = useMemo(
     () => POPULER_ROTALAR.filter((r) => filtreyeUyan(r, filtre)),
     [filtre],
   );
 
+  useEffect(() => {
+    const mq = window.matchMedia(MASAUSTU_SORGU);
+    setIsExpanded(mq.matches);
+  }, []);
+
+  useEffect(() => {
+    if (activeRouteId) setIsExpanded(true);
+  }, [activeRouteId]);
+
+  function acKapa() {
+    setIsExpanded((onceki) => {
+      const yeni = !onceki;
+      if (yeni && !window.matchMedia(MASAUSTU_SORGU).matches) {
+        window.requestAnimationFrame(() => {
+          bolumRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        });
+      }
+      return yeni;
+    });
+  }
+
+  const icerikId = "populer-rotalar-icerik";
+  const rotaSayisi = POPULER_ROTALAR.length;
+
   return (
-    <section className="space-y-6">
-      <header className="max-w-3xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink/45">
-          Rotalar
-        </p>
-        <h2 className="mt-2 font-display text-3xl text-deniz md:text-4xl">
-          Türkiye’nin En Çok Tercih Edilen ve İkonik Rotaları
-        </h2>
-      </header>
+    <section ref={bolumRef} id="populer-rotalar" className="w-full scroll-mt-24">
+      <button
+        type="button"
+        onClick={acKapa}
+        className="group flex w-full items-center justify-between rounded-2xl border border-teal-100 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md md:p-5"
+        aria-expanded={isExpanded}
+        aria-controls={icerikId}
+      >
+        <div className="flex min-w-0 items-center gap-3 text-left">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 transition-colors group-hover:bg-teal-600 group-hover:text-white">
+            <Compass className="h-5 w-5" aria-hidden />
+          </div>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-teal-600">
+                Rotalar
+              </span>
+              <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-medium text-teal-800">
+                {rotaSayisi} İkonik Rota
+              </span>
+            </div>
+            <h2 className="text-sm font-bold leading-snug text-slate-800 sm:text-base md:text-lg">
+              Türkiye’nin En Çok Tercih Edilen ve İkonik Rotaları
+            </h2>
+          </div>
+        </div>
 
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Rota kategorileri">
-        {FILTRELER.map((f) => {
-          const aktif = filtre === f.id;
-          return (
-            <button
-              key={f.id}
-              type="button"
-              role="tab"
-              aria-selected={aktif}
-              onClick={() => setFiltre(f.id)}
-              className={`rounded-full px-3.5 py-1.5 text-sm transition ${
-                aktif
-                  ? "bg-deniz text-white shadow-sm"
-                  : "bg-white/70 text-ink hover:bg-white"
-              }`}
-            >
-              {f.etiket}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {rotalar.map((rota) => (
-          <RotaKarti
-            key={rota.id}
-            rota={rota}
-            secili={activeRouteId === rota.id}
-            onSec={onSelectRoute}
+        <div className="flex shrink-0 items-center gap-2 text-sm font-semibold text-teal-700">
+          <span className="hidden sm:inline">
+            {isExpanded ? "Rotaları Gizle" : "Rotaları Göster"}
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 transition-transform duration-300 ${
+              isExpanded ? "rotate-180 text-teal-600" : "text-slate-400"
+            }`}
+            aria-hidden
           />
-        ))}
+        </div>
+      </button>
+
+      <div
+        id={icerikId}
+        className={`grid transition-all duration-500 ease-in-out ${
+          isExpanded
+            ? "mt-6 grid-rows-[1fr] opacity-100"
+            : "pointer-events-none grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div
+            className="mb-6 flex flex-wrap gap-2"
+            role="tablist"
+            aria-label="Rota kategorileri"
+          >
+            {FILTRELER.map((f) => {
+              const aktif = filtre === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={aktif}
+                  onClick={() => setFiltre(f.id)}
+                  className={`rounded-full px-3.5 py-1.5 text-sm transition ${
+                    aktif
+                      ? "bg-deniz text-white shadow-sm"
+                      : "bg-white/70 text-ink hover:bg-white"
+                  }`}
+                >
+                  {f.etiket}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {rotalar.map((rota) => (
+              <RotaKarti
+                key={rota.id}
+                rota={rota}
+                secili={activeRouteId === rota.id}
+                onSec={onSelectRoute}
+                gorselYukle={isExpanded}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
