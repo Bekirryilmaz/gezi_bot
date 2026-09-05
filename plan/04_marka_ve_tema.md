@@ -18,13 +18,14 @@ Metafor eşlemesi (tasarımda tutarlı kullanılır):
 | Pusula | Tercih sliderları (rota sihirbazı) |
 | Demir atmak | Kaydedilen/paylaşılan rota |
 
-**Konumlanma cümlesi:** "Şamandıra, Karadeniz'in kişisel gezi rehberi — keşfet, oku, gün gün rotanı kur."
+**Konumlanma cümlesi:** "Şamandıra, Türkiye'nin kişisel gezi rehberi — keşfet, oku, gün gün rotanı kur." (K6: bölge-nötr; ilk şehir Samsun. Eski "Karadeniz'in kişisel gezi rehberi" cümlesi 2026-09-05 itibarıyla geçersizdir — T-03 madde 8 ile tüm yüzeylerden temizlenir.)
 
 ## 2. İsim ve slogan kullanımı
 
 - Yazım: **Şamandıra** (baş harf büyük, Türkçe karakterli). Logo wordmark'ta küçük harf: **şamandıra**.
 - Kod/URL/e-posta gibi ASCII gereken her yerde: **samandira** (Türkçe karaktersiz — mevcut proje kuralıyla uyumlu).
 - Slogan adayları (anket yapın — Instagram hikâyesi bile yeterli):
+  **Durum (2026-09-05):** Aşağıdaki v1 listesi, v2 listesi ve Cursor'ın ilk turu kullanıcı tarafından reddedildi ("can alıcı değil"). Slogan, T-03A keşif turunda Cursor tarafından araştırma destekli yeniden üretilecek; filtreler: ≤5 kelime, bölge kilidi YOK (K6), marka/rota bağı, akılda kalıcılık.
   1. **"Rotanı şamandıra ile bul."** (önerilen — eylem + marka bir arada, SEO başlıklarına uyar)
   2. "Şehri işaretleyen rehber."
   3. "Yönün belli, rotan hazır."

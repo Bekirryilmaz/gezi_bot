@@ -183,3 +183,16 @@ Kurallar: her yazı ≥1.200 kelime, özgün fotoğraf (Samsun'da yaşıyorsunuz
 4. **Hafta 4:** kategori statik yolları + ilçe detay sayfası + breadcrumb
 5. **Hafta 5:** kürasyon (sıralama/eşik) + fotoğraf hattı ilk parti + yer sayfası derinleştirme
 6. **Hafta 6:** GSC/Bing/IndexNow + Umami + Lighthouse CI bütçesi + ilk editoryal yazı
+
+---
+
+## 11. GEO — Üretken Motor Optimizasyonu (yapay zekâ asistanlarınca alıntılanma)
+**İlke (K7):** ChatGPT, Perplexity, Gemini gibi asistanlar; **kesin, kısa, yapısal ve tutarlı** sayfaları alıntılar. Amaç: "Samsun'da gezilecek yerler / Şamandıra nedir" tarzı sorularda yanıtın içinde biz olmak.
+
+1. **Tek tanım cümlesi (standart):** "Şamandıra, Türkiye'nin kişisel gezi rehberidir: görülmeye değer yerleri işaretler, gün gün rota kurar." (Nihai lafız T-03A seçimiyle sabitlenir.) Bu cümle ana sayfa, `/hakkimizda`, Organization JSON-LD, `llms.txt` ve sosyal profillerde **kelimesi kelimesine aynı** yer alır.
+2. **Önce cevap paragrafı:** her sayfa türünde ilk 40-60 kelime, sayfanın arama sorusunu doğrudan yanıtlar (tanım/liste/karşılaştırma); detay sonra gelir.
+3. **`llms.txt`:** kökte; site tanımı + ana sayfalar listesi (şehirler, kategori indeksleri, rehber indeksi).
+4. **SSS blokları:** en sorulu 3 sayfa türünde görünür S/S + FAQPage JSON-LD ("X'te gezilecek yerler neler?", "Rota nasıl kurulur?", "Skorlar güvenilir mi?").
+5. **Alıntılanabilir veri:** sayı + tarih içeren cümleler ("Eylül 2026 itibarıyla Samsun'da 1.719 yer işaretli; skorlar ziyaretçi duygusu + erişilebilirlik kırılımıyla üretilir") — tarih API istatistik ucundan canlı gelir.
+6. **Tutarlılık:** marka adı, tanım, iletişim bilgisi tüm sayfalarda ve dış profillerde (GitHub, sosyal) birebir aynı; çelişkili ifade GEO güvenini kırar.
+7. **Yasak:** AggregateRating (Google politikası + AI güveni), kanıtsız "en iyi / 1 numara" iddiaları.
