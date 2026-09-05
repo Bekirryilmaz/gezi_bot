@@ -34,7 +34,7 @@ Site: http://localhost:3000 · API/Swagger: http://127.0.0.1:8125/docs · `site/
 
 ## Kritik uyarı
 
-Kök ve `sunucu/` README’leri bayat ("Faz 3 boş / site yok" iddiaları). Çelişkide **`calis.txt`**, **`plan/00_brief_eki.md`** ve **`dokumanlar/`** kazanır. `plan/BRIF.md` tarihî belgedir; güncel karar `plan/00_brief_eki.md`’dedir.
+Kök / `sunucu/` / `site/` README’leri `calis.txt` ile hizalıdır. Çelişkide **`calis.txt`**, **`plan/00_brief_eki.md`** ve **`dokumanlar/`** kazanır. `plan/BRIF.md` tarihî belgedir; güncel karar `plan/00_brief_eki.md`’dedir.
 
 ## Doğrulama politikası
 

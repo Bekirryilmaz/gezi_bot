@@ -1,12 +1,13 @@
-Samsun Gezi Platformu (Rotam) — Calistirma Rehberi
-==================================================
+Samandira (Alegre Group) — Calistirma Rehberi
+=============================================
 
 Bu proje iki servisle ayaga kalkar: FastAPI (sunucu) + Next.js (site).
-Ikisi de PostgreSQL'e bagli calisir.
+Ikisi de PostgreSQL'e bagli calisir. Marka: Samandira. Repo: gezi_bot.
 
 ONKOSUL: PostgreSQL
 -------------------
-Bu makinede yerel PostgreSQL kullanilir (Docker yok).
+Bu makinede yerel PostgreSQL kullanilir (Docker yok). altyapi/ compose
+yalniz baska ortamlar icin; burada C:\PostgreSQL gecerli.
 
   # Durum kontrol
   C:\PostgreSQL\bin\pg_ctl.exe status -D C:\PostgreSQL\data
@@ -22,6 +23,30 @@ Baglanti (sunucu/.env veya varsayilan):
 
   sunucu/.env yoksa:
   copy sunucu\.env.example sunucu\.env
+
+Python venv: repo kokunde .venv_test (veri + sunucu ayni venv).
+
+
+Ilk kurulum (bir kez)
+---------------------
+Repo kokunden (gezi_bot\):
+
+  python -m venv .venv_test
+  .\.venv_test\Scripts\python.exe -m pip install -r sunucu\requirements.txt
+  .\.venv_test\Scripts\python.exe -m pip install -r veri\requirements.txt
+  .\.venv_test\Scripts\python.exe -m playwright install chromium
+
+  cd sunucu
+  ..\.venv_test\Scripts\python.exe -m alembic upgrade head
+
+  cd ..
+  .\.venv_test\Scripts\python.exe -m sunucu.veritabani.aktarim.calistir --sehir samsun
+
+  cd site
+  npm install
+
+site\.env.local icinde API adresi olmali (yoksa olustur):
+  NEXT_PUBLIC_API_URL=http://127.0.0.1:8125
 
 
 1) API (FastAPI) — port 8125
@@ -42,8 +67,26 @@ Baska bir terminalde:
 
 Tarayici: http://localhost:3000
 
-site\.env.local icinde API adresi olmali:
-  NEXT_PUBLIC_API_URL=http://127.0.0.1:8125
+
+Veri hatti (toplayici -> aktarim) — gerekirse
+---------------------------------------------
+Repo kokunden. TripAdvisor/Booking varsayilan kapali.
+
+  .\.venv_test\Scripts\python.exe -m veri.toplayicilar.tum_kaynaklari_calistir --sehir samsun
+  .\.venv_test\Scripts\python.exe -m veri.esleme.eslestirici --sehir samsun
+  .\.venv_test\Scripts\python.exe -m veri.duygu_analizi.pipeline_calistir --sehir samsun
+  .\.venv_test\Scripts\python.exe -m veri.duygu_analizi.profil_pipeline_calistir --sehir samsun
+  .\.venv_test\Scripts\python.exe -m veri.duygu_analizi.bolge_profili_pipeline_calistir --sehir samsun
+  .\.venv_test\Scripts\python.exe -m veri.duygu_analizi.tanitim_pipeline_calistir --sehir samsun
+  .\.venv_test\Scripts\python.exe -m veri.kalite_kontrol.rapor_olustur --sehir samsun
+  .\.venv_test\Scripts\python.exe -m sunucu.veritabani.aktarim.calistir --sehir samsun
+
+Google Maps takilirsa: veri.toplayicilar.nobetci_calistir (ayrintilar veri/README.md).
+
+
+Rota motoru testleri
+--------------------
+  .\.venv_test\Scripts\python.exe -m pytest sunucu/rota_motoru/testler/ -v
 
 
 Hizli kontrol
@@ -51,17 +94,17 @@ Hizli kontrol
   # API saglik
   curl http://127.0.0.1:8125/docs
 
+  # Ornek API
+  curl http://127.0.0.1:8125/sehirler
+
   # Site
   curl http://localhost:3000
 
 
 Notlar
 ------
-- Ilk kurulumda (bir kez) sunucu\ klasorunden migrasyon:
-    cd sunucu
-    ..\.venv_test\Scripts\python.exe -m alembic upgrade head
-  Sonra repo kokunden veri aktarimi:
-    .\.venv_test\Scripts\python.exe -m sunucu.veritabani.aktarim.calistir --sehir samsun
-- Ornek API: http://127.0.0.1:8125/sehirler
+- Migrasyon her zaman sunucu\ icinden: ..\.venv_test\Scripts\python.exe -m alembic upgrade head
+- Aktarim ve uvicorn her zaman repo kokunden.
 - CORS icin sunucunun localhost:3000'e izin vermesi gerekir (API_IZINLI_ORIGINLER).
 - Port doluysa: netstat -ano | findstr ":8125 :3000 :5432"
+- Guncel kararlar: plan\00_brief_eki.md  |  calistirma bu dosya kazanir.

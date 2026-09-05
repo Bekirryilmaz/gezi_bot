@@ -46,7 +46,7 @@ alwaysApply: true
 - Katmanlar: `veri/` (scraping+analiz) → `sunucu/` (DB+API+rota) → `site/` (Next.js). `ortak/` yalnız taksonomi sabitleri. Katmanlar arası import yasağı: site → sunucu kodu import edemez (yalnız HTTP API).
 - JSONB esnek alanlar (`ozellikler`, `aktiviteler`, `deneyim_puanlari`, `konu_duygulari`, `yer_profili`) dururken yeni kolon/migration AÇMA; yeni etiket = taksonomi + sabit.
 - Kullanıcı açıkça istemeden `git commit` / `git push` YAPMA.
-- README'ler eski ve yanlış (Faz 3 boş / site yok iddiaları); doğrusu `calis.txt` ve `dokumanlar/` altındaki güncel brif. Çelişkide güncel brif kazanır.
+- README'ler `calis.txt` ile hizalıdır. Çelişkide `calis.txt`, `plan/00_brief_eki.md` ve `dokumanlar/` kazanır.
 - Ortamlar: API port 8125, site 3000, PostgreSQL yerelde C:\PostgreSQL (Docker yok), venv: `.venv_test`.
 ```
 

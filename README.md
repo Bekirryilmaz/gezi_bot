@@ -1,118 +1,232 @@
-# Samsun Gezi Platformu
+# Şamandıra
 
-Samsun ile başlayıp Karadeniz bölgesine büyüyecek, Türkiye'ye özel, kişiselleştirilmiş
-rota algoritmasına sahip bir gezi/keşif platformu. Detaylı yol haritası için
-`.cursor/plans/` altındaki plan dosyasına bakabilirsin.
+Karadeniz kıyısından başlayan kişiselleştirilmiş gezi / keşif platformu.
+Marka: **Şamandıra** (Alegre Group). Repo adı henüz `gezi_bot` (GitHub’da
+`samandira` olacak). Canonical: `https://şamandıra.com`.
 
-## Proje Neden Bu Şekilde Bölündü
+İlk şehir: **Samsun**. Kullanıcıya üç şey sunar:
 
-Proje üç ana, birbirinden bağımsız çalışabilen parçaya ayrılmıştır. Amaç, veri
-toplama tarafında yapılan bir değişikliğin site tarafını etkilememesi, ikisinin
-ayrı ayrı geliştirilip test edilebilmesidir:
+- **Keşif** — şehirdeki yerleri listele, filtrele, detay oku (konaklama vitrinde gizlenir)
+- **Bölgeler** — şehir + ilçe tanıtımı ve ziyaretçi yorumlarından derlenen duygu özeti
+- **Rota** — ilgi ağırlıklarına göre gün gün plan; konaklama belli veya değil
 
-- **`veri/`** — Veri toplama (scraping), kaynaklar arası eşleştirme, duygu analizi
-  ve veri kalite kontrolü. Tamamen Python. Çıktısı: temiz, standart formatlı veri.
-- **`sunucu/`** — Veritabanı şeması + veri aktarımı, REST API ve kişiselleştirilmiş
-  rota üretme algoritması. Tamamen Python (FastAPI). `veri/` katmanının ürettiği
-  veriyi PostgreSQL'e aktarır, siteye API olarak sunar. Detaylar için `sunucu/README.md`.
-- **`site/`** — Kullanıcının göreceği web sitesi (ileride Next.js ile yazılacak,
-  Faz 3'te doldurulacak). Şu an sadece yer tutucu.
+Yerel çalıştırma kaynağı: [`calis.txt`](calis.txt). Güncel ürün kararları:
+[`plan/00_brief_eki.md`](plan/00_brief_eki.md). `plan/BRIF.md` tarihî belgedir;
+çelişkide brief eki kazanır.
 
-Ayrıca:
+## Şu anki durum
 
-- **`ortak/`** — Sadece `veri/` ve `sunucu/` arasında paylaşılan kategori
-  taksonomisi sabitleri (`sabitler.py`). Bilerek çok küçük tutulur; nadiren
-  değişir, bu yüzden iki tarafın da bağlı olması çakışma riski yaratmaz.
-- **`dokumanlar/`** — Kategori taksonomisi, veri sözlüğü gibi Türkçe, herkesin
-  (özellikle kod yazmayanların da) anlayabileceği açıklayıcı dokümanlar.
-- **`altyapi/`** — Docker Compose, veritabanı ve dağıtım (deployment) ile ilgili
-  dosyalar.
+| Parça | Durum |
+|---|---|
+| Veri toplama + eşleme + duygu + profil + tanıtım | Yazılmış, Samsun ile çalıştırılmış |
+| PostgreSQL + PostGIS + Alembic (`0001`–`0004`) | Hazır (bu makinede Docker yok; yerel `C:\PostgreSQL`) |
+| JSONL → DB aktarım | Hazır, idempotent |
+| FastAPI + rota motoru | Hazır, uçtan uca test edilmiş — port **8125** |
+| Next.js site | Yazılmış ve yerel çalışıyor — port **3000** |
+| Harita (site içi) | Yok (yer detayında dış harita linki var) |
+| Kullanıcı hesabı / ödeme / admin / canlı yayın | Yok |
+| İkinci şehir | Yok (`veri/ortak/sehir_ayarlari.py` yeter) |
 
-## Kod Yazım Kuralı
+DB’de Samsun için yer kataloğu dolu (~1.700 kayıt). Keşif vitrini varsayılan
+limit ile ilk sayfayı gösterir; sayfalama UI’si henüz yok.
 
-Bu projede fonksiyon, değişken ve sınıf isimleri **Türkçe ama Türkçe karaktersiz**
-yazılır. Örnek: `isletme_verisi`, `duygu_skoru`, `rota_olustur`. Yorum satırları ve
-dokümantasyon tamamen Türkçe'dir. Amaç, projenin veri kalitesini kontrol eden,
-kod yazmayan biri tarafından bile büyük ölçüde anlaşılabilir olmasıdır.
+## Mimari
 
-## Klasör Yapısı
+Üç bağımsız katman + ince ortak dil:
 
 ```
-gezi_bot/
-  ortak/                    Sadece kategori taksonomisi sabitleri (veri ve sunucu arasinda paylasilir)
-  veri/                     Veri toplama, temizleme, duygu analizi (Python)
-    ortak/                  Toplayicilara ozel veri semalari (Pydantic modelleri)
-    toplayicilar/           Kaynak basina bir dosya (osm, google, eksi sozluk, tripadvisor)
-    esleme/                 Kaynaklar arasi tekillestirme (deduplication)
-    duygu_analizi/          Sentiment + konu (aspect) analizi pipeline'i
-    kalite_kontrol/         Turkce veri kalite raporlari
-    cikti/                  Ham ve islenmis veri ciktilari (git'e girmez, buyuk dosyalar)
-  sunucu/                   FastAPI backend + rota algoritmasi (Python)
-    api/                    REST uc noktalari (yer listeleme/detay, rota olusturma)
-    veritabani/             SQLAlchemy modelleri + Alembic migration + JSONL aktarim katmani
-    rota_motoru/            Rota algoritmasi (skorlama -> kumeleme -> siralama -> orkestrator)
-  site/                     Next.js frontend (Faz 3)
-  dokumanlar/               Kategori taksonomisi, veri sozlugu, mimari notlari
-  altyapi/                  Docker Compose, veritabani, dagitim betikleri
+Kaynaklar (OSM, Google, Ekşi, …)
+  → veri/cikti/ham/*.jsonl
+  → eşleme → birlesik_yerler
+  → duygu → yorumlar
+  → yer/bölge profili + tanıtım
+  → python -m sunucu.veritabani.aktarim.calistir --sehir samsun
+  → PostgreSQL
+  → FastAPI (8125)
+  → Next.js (tarayıcı /backend/* vekili; SSR doğrudan 8125)
 ```
 
-## Kurulum (Geliştirme Ortamı)
+| Klasör | Dil | Ne işe yarar |
+|---|---|---|
+| `veri/` | Python | Scraping, eşleme, duygu, kalite. Çıktı: JSONL (`veri/cikti/` git’te yok) |
+| `sunucu/` | Python | PostgreSQL aktarım + FastAPI + rota motoru |
+| `site/` | Next.js 16 + React 19 + Tailwind 4 | Kullanıcı arayüzü |
+| `ortak/` | Python | Yalnız taksonomi sabitleri (`veri` + `sunucu` paylaşır) |
+| `dokumanlar/` | Markdown | Taksonomi + veri sözlüğü |
+| `plan/` | Markdown | Brif, SEO, marka, deploy, görev paketleri (T-00…) |
+| `altyapi/` | Docker Compose | Yalnız PostGIS; **bu makinede kullanılmıyor** |
 
-### 1. Veritabanı (yerel geliştirme için)
+Katman kuralı: site sunucu kodunu import etmez (yalnız HTTP). Yeni şehir =
+`veri/ortak/sehir_ayarlari.py` içine `SehirAyari`; toplayıcı/API/rota koduna
+şehir adı gömülmez.
 
-Yerel bilgisayarında PostgreSQL + PostGIS'i Docker ile ayağa kaldırmak için:
+## Kod yazım kuralı
 
-```bash
-cd altyapi
-docker compose up -d
+Fonksiyon, değişken, sınıf, commit ve doküman tanımlayıcıları **Türkçe,
+Türkçe karaktersiz**: `isletme_verisi`, `duygu_skoru`, `rota_olustur`.
+Kullanıcıya görünen metinde marka **Şamandıra** (eski “Rotam” yok).
+
+Yeni özellik sırası: `dokumanlar/kategori_taksonomisi.md` → `ortak/sabitler.py`
+→ kod. Kara kutu yok: her skor `kirilim` ile açıklanır. Anlatım metinleri
+şablon + sabit tohum (LLM yok). Tek istisna: genel duygu skoru — Türkçe BERT.
+
+## Yerel kurulum
+
+Bu makine: PostgreSQL `C:\PostgreSQL`, ortak venv repo kökünde `.venv_test`,
+API **8125**, site **3000**. Komutların çoğu **repo kökünden** çalışır.
+
+### 1. PostgreSQL
+
+```text
+C:\PostgreSQL\bin\pg_ctl.exe status -D C:\PostgreSQL\data
 ```
 
-Bu, `localhost:5432` üzerinde `gezi_veritabani` adında bir veritabanı açar
-(kullanıcı adı/şifre için `altyapi/docker-compose.yml` içine bak).
+Gerekirse başlat:
 
-### 2. Veri katmanı (`veri/`)
-
-```bash
-cd veri
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # Linux/Mac (Oracle sunucu)
-pip install -r requirements.txt
-playwright install chromium     # Google Maps ve TripAdvisor toplayicilari icin gerekli
+```text
+C:\PostgreSQL\bin\pg_ctl.exe start -D C:\PostgreSQL\data -l C:\PostgreSQL\data\startup.log -w
 ```
 
-Toplayıcıları çalıştırma örnekleri `veri/README.md` içinde anlatılıyor.
+Bağlantı (`sunucu/.env` veya varsayılan):
 
-### 3. Sunucu (`sunucu/`)
+```text
+postgresql+psycopg://gezi_kullanici:gezi_sifre@localhost:5432/gezi_veritabani
+```
 
-```bash
+`sunucu/.env` yoksa: `copy sunucu\.env.example sunucu\.env`
+
+### 2. Python venv (bir kez)
+
+```text
+python -m venv .venv_test
+.\.venv_test\Scripts\python.exe -m pip install -r sunucu\requirements.txt
+.\.venv_test\Scripts\python.exe -m pip install -r veri\requirements.txt
+.\.venv_test\Scripts\python.exe -m playwright install chromium
+```
+
+Toplayıcılar Playwright Chromium ister; API/rota yalnız `sunucu/requirements.txt`
+ile de ayağa kalkar.
+
+### 3. Şema + aktarım (bir kez / şema değişince)
+
+```text
 cd sunucu
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-copy .env.example .env          # Windows, DB baglanti bilgisini duzenle
-alembic upgrade head            # Veritabani semasini olustur
+..\.venv_test\Scripts\python.exe -m alembic upgrade head
 ```
 
-Sonra (repo kökünden), önce veriyi aktar, sonra API'yi başlat:
+Sonra repo kökünden:
 
-```bash
-python -m sunucu.veritabani.aktarim.calistir --sehir samsun
-uvicorn sunucu.api.uygulama:uygulama --reload
+```text
+.\.venv_test\Scripts\python.exe -m sunucu.veritabani.aktarim.calistir --sehir samsun
 ```
 
-`http://127.0.0.1:8000/docs` adresinden Swagger arayüzüyle tüm uç noktaları
-deneyebilirsin. Detaylar için `sunucu/README.md`, `sunucu/api/README.md` ve
-`sunucu/rota_motoru/README.md`.
+Aktarım idempotenttir. Sıra: şehir → yerler → yorumlar → yer profilleri →
+bölge profilleri → tanıtımlar.
 
-## Ortam Değişkenleri
+### 4. API + site
 
-Her alt proje kendi `.env.example` dosyasını içerir. Gerçek `.env` dosyaları asla
-git'e eklenmez (bkz. `.gitignore`).
+```text
+.\.venv_test\Scripts\python.exe -m uvicorn sunucu.api.uygulama:uygulama --host 127.0.0.1 --port 8125
+```
 
-## Şu Anki Durum
+Başka terminalde:
 
-Faz 1 (veri toplama + duygu analizi) ve Faz 2 (veri aktarımı + sunucu API +
-rota algoritması) tamamlandı, Samsun verisiyle uçtan uca test edildi. Faz 3
-(Next.js sitesi + canlıya alma) için klasörler hazır ama içerik henüz
-doldurulmadı.
+```text
+cd site
+npm install
+npm run dev -- --port 3000
+```
+
+`site/.env.local`:
+
+```text
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8125
+```
+
+- Site: http://localhost:3000
+- API / Swagger: http://127.0.0.1:8125/docs
+- CORS: `API_IZINLI_ORIGINLER` (varsayılan `localhost:3000`). Tarayıcı
+  `/backend/*` → Next rewrite → FastAPI.
+
+## Veri hattı (toplayıcı → site)
+
+Hepsi repo kökünden, `.venv_test` ile. `--sehir` anahtarı
+`veri/ortak/sehir_ayarlari.py` içindeki kayıttır.
+
+```text
+.\.venv_test\Scripts\python.exe -m veri.toplayicilar.tum_kaynaklari_calistir --sehir samsun
+.\.venv_test\Scripts\python.exe -m veri.esleme.eslestirici --sehir samsun
+.\.venv_test\Scripts\python.exe -m veri.duygu_analizi.pipeline_calistir --sehir samsun
+.\.venv_test\Scripts\python.exe -m veri.duygu_analizi.profil_pipeline_calistir --sehir samsun
+.\.venv_test\Scripts\python.exe -m veri.duygu_analizi.bolge_profili_pipeline_calistir --sehir samsun
+.\.venv_test\Scripts\python.exe -m veri.duygu_analizi.tanitim_pipeline_calistir --sehir samsun
+.\.venv_test\Scripts\python.exe -m veri.kalite_kontrol.rapor_olustur --sehir samsun
+.\.venv_test\Scripts\python.exe -m sunucu.veritabani.aktarim.calistir --sehir samsun
+```
+
+TripAdvisor ve Booking varsayılan kapalı (engel). Google takılırsa:
+`veri.toplayicilar.nobetci_calistir`. Detay: `veri/README.md`.
+
+## API uçları (9 genel)
+
+| Metod | Yol | Ne işe yarar |
+|---|---|---|
+| GET | `/sehirler` | Aktif şehirler |
+| GET | `/sehirler/{anahtar}/yerler` | Liste. Varsayılan `sadece_kesif=true` |
+| GET | `/sehirler/{anahtar}/bolgeler` | Şehir + ilçe profilleri |
+| GET | `/yerler/{id}` | Detay + profil + örnek ifade (ham yorum metni yok) |
+| POST | `/rotalar/olustur` | Tek rota (Senaryo 1 veya eski Senaryo 2) |
+| POST | `/rotalar/olustur-alternatifler` | 2–3 alternatif; otel dayatma yok |
+| POST | `/rotalar/{id}/konaklama-bolgesi-oner` | Seçilen rotaya bölge önerisi |
+| GET | `/rotalar/{id}` | Kayıtlı rota (paylaşılabilir) |
+| GET | `/sabit-rotalar` | Elle küratör rotalar |
+
+Keşif vitrini (`sadece_kesif=true`): konaklama gizlenir; yeme-içme yalnızca
+`sehrin_klasigi` / `sponsorlu_mekan` / `kahvalti_verir` veya duygu ≥ 80/100.
+Rota motoru `sadece_kesif=false` ile kısıtsız çeker.
+
+## Site sayfaları (şu an)
+
+| Yol | Sayfa |
+|---|---|
+| `/` | Hero + Keşfet / Bölgeler / Rota |
+| `/sehir/[anahtar]` | Keşif listesi (konaklama chip’i yok) |
+| `/yer/[id]` | Tanıtım + duygu özeti + yan bilgiler (UUID; slug T-05) |
+| `/sehir/[anahtar]/bolgeler` | İlçe/şehir profilleri |
+| `/sehir/[anahtar]/rota` | Rota sihirbazı |
+
+Hedef URL’ler (`/yer/{sehir}/{slug}`, ilçe sayfası, `/rehber/{slug}`)
+`plan/00_brief_eki.md` §5 ve `plan/02_seo_mimarisi.md` içinde; henüz yok.
+
+Rota testleri:
+
+```text
+.\.venv_test\Scripts\python.exe -m pytest sunucu/rota_motoru/testler/ -v
+```
+
+## Doküman haritası
+
+| Dosya | İçerik |
+|---|---|
+| `calis.txt` | Bu makinede çalıştırma (port, venv, PostgreSQL) |
+| `dokumanlar/kategori_taksonomisi.md` | Kategori / özellik / deneyim eksenleri |
+| `dokumanlar/veri_sozlugu.md` | Alan adları sözlüğü |
+| `plan/BRIF.md` | Orijinal brif (değişmez tarihî belge) |
+| `plan/00_brief_eki.md` | Güncel kararlar + durum |
+| `plan/01_urun_analizi_ve_strateji.md` | Pazar, yol haritası, KPI |
+| `plan/02_seo_mimarisi.md` | URL, metadata, JSON-LD |
+| `plan/03_cursor_araclari_kurulumu.md` | Cursor rules / MCP / kalite kapıları |
+| `plan/04_marka_ve_tema.md` | Logo, palet, ses tonu |
+| `plan/05_deployment_oracle.md` | Canlıya alma (henüz uygulanmadı) |
+| `plan/06_mobil_ve_harita.md` | Harita + PWA (henüz yok) |
+| `plan/07_cursor_talimatlari.md` | T-00 … T-15 görev paketleri |
+| `veri/README.md` | Toplayıcı ayrıntıları |
+| `sunucu/README.md` | Aktarım, API, rota motoru |
+| `sunucu/api/README.md` | Uç nokta sözleşmesi |
+| `site/README.md` | Next.js çalıştırma ve sayfalar |
+
+## Bilinen boşluklar
+
+Site içi harita, auth, admin, prod yayın, ikinci şehir, keşif sayfalama UI,
+yer slug’ı, robots/sitemap/JSON-LD yok. Ham yorum metni ve yorumcu adı
+sitede gösterilmez. OSM atfı footer’da kalır (ODbL).

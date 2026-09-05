@@ -1,43 +1,48 @@
-# Sunucu Katmanı (Backend)
+# Sunucu katmanı
 
-Bu klasör üç parçadan oluşur: veritabanı şeması + veri aktarımı
-(`veritabani/`), REST API (`api/`) ve kişiselleştirilmiş rota üretme
-algoritması (`rota_motoru/`). `veri/` katmanının ürettiği JSONL dosyalarını
-okuyup PostgreSQL'e aktarır, üzerine bir API + rota motoru inşa eder.
-`site/` (Next.js arayüzü) Faz 3'te bu API'yi tüketecek.
+Üç parça: veritabanı şeması + JSONL aktarımı (`veritabani/`), REST API
+(`api/`), kişiselleştirilmiş rota motoru (`rota_motoru/`). `veri/` katmanının
+JSONL çıktısını PostgreSQL’e yazar; `site/` (Next.js, port 3000) bu API’yi
+tüketir.
 
-```mermaid
-flowchart LR
-    jsonl["veri/cikti/islenmis/*.jsonl"] --> aktarim["veritabani/aktarim/"]
-    aktarim --> db[("PostgreSQL + PostGIS")]
-    db --> api["api/"]
-    api --> rotaMotoru["rota_motoru/"]
-    rotaMotoru --> api
-    api --> swagger["/docs (Swagger) -- manuel test"]
 ```
+veri/cikti/islenmis/*.jsonl
+        → veritabani/aktarim/
+        → PostgreSQL + PostGIS
+        → api/  ↔  rota_motoru/
+        → site/  (SSR: 8125, tarayıcı: /backend rewrite)
+```
+
+Yerel çalıştırma: repo kökündeki [`calis.txt`](../calis.txt). Bu makinede
+Docker yok; PostgreSQL `C:\PostgreSQL`. Ortak venv: repo kökünde `.venv_test`.
+API portu **8125** (8000 değil).
 
 ## Kurulum
 
-```bash
-cd sunucu
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-pip install -r requirements.txt
-copy .env.example .env          # DB baglanti bilgisini duzenle (gerekirse)
-alembic upgrade head            # Veritabani semasini olustur/guncelle
+Komutları **repo kökünden** çalıştır (`ortak.*`, `veri.*`, `sunucu.*`). Alembic
+istisnası: `sunucu/` içinden.
+
+```text
+.\.venv_test\Scripts\python.exe -m pip install -r sunucu\requirements.txt
+copy sunucu\.env.example sunucu\.env
 ```
 
-Komutları **repo kökünden** (`gezi_bot/` içinden) çalıştır, çünkü modüller
-`ortak.*`, `veri.*` ve `sunucu.*` şeklinde birbirine referans veriyor.
+`VERITABANI_URL` varsayılanı:
 
-### Yerel PostgreSQL + PostGIS
+```text
+postgresql+psycopg://gezi_kullanici:gezi_sifre@localhost:5432/gezi_veritabani
+```
 
-`altyapi/docker-compose.yml` ile Docker üzerinden ayağa kaldırabilirsin
-(`cd altyapi && docker compose up -d`). Docker yoksa, herhangi bir
-PostgreSQL 14+ kurulumuna PostGIS eklentisini (bkz.
-[postgis.net/install](https://postgis.net/install/)) kurup
-`sunucu/.env.example`'daki `VERITABANI_URL` formatına uygun bir kullanıcı/
-veritabanı oluşturman yeterli:
+Şema (Alembic `0001_ilk_sema` … `0004_tanitim_metni`):
+
+```text
+cd sunucu
+..\.venv_test\Scripts\python.exe -m alembic upgrade head
+```
+
+Yerel Postgres yoksa (başka makine): PostGIS 14+ ve şu SQL yeter. `altyapi/`
+içindeki compose yalnız opsiyonel yedek yoldur; bu geliştirme makinesinde
+kullanılmaz.
 
 ```sql
 CREATE ROLE gezi_kullanici LOGIN PASSWORD 'gezi_sifre';
@@ -46,79 +51,78 @@ CREATE DATABASE gezi_veritabani OWNER gezi_kullanici;
 CREATE EXTENSION postgis;
 ```
 
-## Veri Aktarımı (`veritabani/aktarim/`)
+## Veri aktarımı
 
-`veri/cikti/islenmis/` altındaki JSONL çıktılarını (`veri/` katmanı
-tarafından üretilir, bkz. `veri/README.md`) PostgreSQL'e aktarır. **API'nin
-gerçek veriyle çalışabilmesi için önce bu adımın çalıştırılması gerekir.**
+API’nin gerçek veriyle dolması için:
 
-```bash
-python -m sunucu.veritabani.aktarim.calistir --sehir samsun
+```text
+.\.venv_test\Scripts\python.exe -m sunucu.veritabani.aktarim.calistir --sehir samsun
 ```
 
-Bu, sırasıyla:
+Önkoşul: `veri/` hattında eşleme + duygu + profil (+ bölge + tanıtım)
+JSONL’leri üretilmiş olmalı. Aktarım sırası:
 
-1. `Sehir` satırını `veri/ortak/sehir_ayarlari.py::SEHIRLER`'den upsert eder.
-2. En güncel `birlesik_yerler/*.jsonl` dosyasını okuyup her `BirlesikYer`i
-   `Yer` + `YerKaynak` satırlarına aktarır (`yer_aktar.py`).
-3. En güncel `yorumlar/*.jsonl` dosyasını okuyup `Yorum` satırlarına aktarır,
-   `Yer.duygu_skoru_ortalama`'yı günceller (`yorum_aktar.py`).
-4. En güncel `yer_profilleri/*.jsonl` dosyasını okuyup `Yer.yer_profili` /
-   `Yer.duygu_ozeti` alanlarını doldurur (`profil_aktar.py`).
+1. `Sehir` — `veri/ortak/sehir_ayarlari.py::SEHIRLER` üzerinden upsert
+2. Yerler + `YerKaynak` (`yer_aktar.py`)
+3. Yorumlar + `duygu_skoru_ortalama` (`yorum_aktar.py`)
+4. `yer_profili` / `duygu_ozeti` (`profil_aktar.py`)
+5. Bölge profilleri (`bolge_profil_aktar.py`)
+6. Tanıtım metinleri (`tanitim_aktar.py`)
 
-**İdempotenttir** — defalarca çalıştırılabilir, aynı yer/yorum tekrar tekrar
-eklenmez (eşleme `YerKaynak(kaynak, kaynak_id)` / yorum için
-`(kaynak, kaynak_yorum_id)` ya da `(yer, kaynak, yorum_metni)` üzerinden
-yapılır). Konsola her adım için kaç kayıt eklendiği/güncellendiği/
-bağlanamadığı özetlenir.
+İdempotenttir: aynı yer/yorum tekrar eklenmez. Konsola eklenen/güncellenen
+sayılar basılır.
 
-## API (`api/`)
+## API
 
-```bash
-uvicorn sunucu.api.uygulama:uygulama --reload
+```text
+.\.venv_test\Scripts\python.exe -m uvicorn sunucu.api.uygulama:uygulama --host 127.0.0.1 --port 8125
 ```
 
-Sonra tarayıcıda `http://127.0.0.1:8000/docs` adresine gidip Swagger arayüzü
-üzerinden tüm uç noktaları deneyebilirsin (Faz 2'nin test yöntemi budur —
-henüz bir frontend yok). Detaylar için `sunucu/api/README.md`.
+Swagger: http://127.0.0.1:8125/docs
 
-## Rota Motoru (`rota_motoru/`)
+Site tarayıcıda `/backend/*` → Next rewrite → bu süreç. CORS:
+`API_IZINLI_ORIGINLER` (varsayılan `http://localhost:3000`). Uç nokta tablosu:
+[`api/README.md`](api/README.md).
 
-Kütüphanesiz (dış ML/optimizasyon bağımlılığı olmayan), adım adım
-izlenebilir bir skorlama → kümeleme → sıralama zinciri. Detaylar için
-`sunucu/rota_motoru/README.md`.
+## Rota motoru
 
-```bash
-python -m pytest sunucu/rota_motoru/testler/ -v
+Kütüphanesiz, deterministik. Zincir: skorlama → açısal kümeleme → günlük
+slot dizimi. Her skor `kirilim` taşır. Ayrıntı: [`rota_motoru/README.md`](rota_motoru/README.md).
+
+```text
+.\.venv_test\Scripts\python.exe -m pytest sunucu/rota_motoru/testler/ -v
 ```
 
-## Klasör Yapısı
+Sitenin Senaryo 2 akışı: `POST /rotalar/olustur-alternatifler` → kullanıcı
+seçer → `POST /rotalar/{id}/konaklama-bolgesi-oner`. Eski
+`POST /rotalar/olustur` konaklama yoksa hâlâ otel önerir (geriye uyumluluk).
+
+## Klasör yapısı
 
 ```
 sunucu/
   veritabani/
-    modeller.py           SQLAlchemy ORM modelleri (Sehir, Yer, Yorum, ...)
-    baglanti.py            Veritabani baglantisi / oturum (session) uretimi
-    sorgular.py             Ortak sorgu yardimcilari (PostGIS enlem/boylam cikarma)
-    migrasyonlar/           Alembic migration'lari
-    aktarim/                JSONL -> PostgreSQL aktarim katmani
+    modeller.py            SQLAlchemy (Sehir, Yer, Yorum, BolgeProfili, …)
+    baglanti.py
+    sorgular.py            Keşif vitrini filtresi burada
+    migrasyonlar/          Alembic 0001–0004
+    aktarim/               JSONL → PostgreSQL
   api/
-    uygulama.py             FastAPI giris noktasi
-    semalar.py              Istek/cevap Pydantic semalari
-    yerler_router.py        Sehir/yer listeleme ve detay uc noktalari
-    rotalar_router.py       Rota olusturma/getirme + sabit rota uc noktalari
+    uygulama.py            FastAPI giriş
+    semalar.py             Dışarıya açık Pydantic (modeller.py değil)
+    yerler_router.py
+    rotalar_router.py
   rota_motoru/
-    veri_tipleri.py         DB'den bagimsiz saf veri tipleri (AdayYer, RotaTercihleri, ...)
-    skorlama.py              Yer uygunluk puanlama
-    zaman_butcesi.py         Gunluk zaman/durak butcesi hesaplari
-    kumeleme.py               Yerleri gunlere bolme (acisal/bearing tabanli)
-    siralama.py                Gun ici TSP sezgiseli (nearest-neighbor + 2-opt)
-    rota_olusturucu.py         Senaryo 1 / Senaryo 2 orkestratoru
-    testler/                    pytest birim testleri
+    veri_tipleri.py
+    skorlama.py
+    zaman_butcesi.py
+    kumeleme.py
+    siralama.py            TSP yedek; üretim slot kullanır
+    rota_olusturucu.py
+    rota_anlatim.py
+    testler/
 ```
 
-## Şu Anki Durum
-
-Faz 2 tamamlandı: veri aktarımı, API (yer + rota uç noktaları) ve rota
-motoru çalışıyor, Samsun verisiyle uçtan uca test edildi. `site/` (Next.js)
-ve canlıya alma (Docker/nginx) Faz 3'e bırakıldı.
+JSONB esnek alanlar (`ozellikler`, `aktiviteler`, `deneyim_puanlari`,
+`konu_duygulari`, `yer_profili`) dururken yeni kolon açma; etiket =
+taksonomi + `ortak/sabitler.py`.

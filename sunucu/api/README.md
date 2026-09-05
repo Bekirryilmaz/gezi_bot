@@ -1,58 +1,88 @@
 # API (`sunucu/api/`)
 
-FastAPI ile yazılmış REST API. `veri/` katmanından `veritabani/aktarim/` ile
-aktarılmış veriyi okuyup sunar, `rota_motoru/`'nu çağırıp kişiselleştirilmiş
-rota üretir. Şu an tek tüketicisi Swagger arayüzüdür (`site/` Faz 3'te
-eklenecek).
+FastAPI REST API. Aktarılmış kataloğu sunar; `rota_motoru/` ile kişiselleştirilmiş
+rota üretir. Tüketici: **Şamandıra sitesi** (`site/`, Next.js). Swagger:
+http://127.0.0.1:8125/docs
 
 ## Çalıştırma
 
-```bash
-uvicorn sunucu.api.uygulama:uygulama --reload
+Repo kökünden:
+
+```text
+.\.venv_test\Scripts\python.exe -m uvicorn sunucu.api.uygulama:uygulama --host 127.0.0.1 --port 8125
 ```
 
-`http://127.0.0.1:8000/docs` adresinde otomatik Swagger arayüzü açılır —
-tüm uç noktaları buradan, gerçek Samsun verisiyle deneyebilirsin.
+Port **8125** (`calis.txt` ile aynı; 8000 değil). `site/.env.local`:
+`NEXT_PUBLIC_API_URL=http://127.0.0.1:8125`. Tarayıcı istekleri aynı origin
+üzerinden `/backend/*` rewrite ile gelir (CORS ihtiyacını azaltır). SSR
+doğrudan `NEXT_PUBLIC_API_URL`’e gider.
+
+CORS: `API_IZINLI_ORIGINLER` (varsayılan `http://localhost:3000` ve
+`http://127.0.0.1:3000`).
 
 ## Dosyalar
 
-- `uygulama.py` — `FastAPI()` uygulaması, CORS middleware, router'ların
-  bağlanması.
-- `semalar.py` — İstek/cevap Pydantic şemaları. `sunucu/veritabani/modeller.py`
-  (veritabanı şeması) ile BİLEREK ayrı tutulur: biri "nasıl saklandığı",
-  diğeri "dışarıya nasıl gösterildiği/istendiği".
-- `yerler_router.py` — Şehir ve yer listeleme/detay uç noktaları.
-- `rotalar_router.py` — Rota oluşturma/getirme + sabit (küratörlüğü yapılmış)
-  rota listeleme uç noktaları.
+- `uygulama.py` — FastAPI uygulaması, CORS, router bağlama
+- `semalar.py` — İstek/cevap Pydantic. `veritabani/modeller.py` (saklama) ile
+  bilinçli ayrı: biri nasıl durduğu, diğeri dışarıya nasıl göründüğü
+- `yerler_router.py` — Şehir, keşif listesi, yer detay, bölgeler
+- `rotalar_router.py` — Rota üretme / getirme / alternatifler / bölge önerisi /
+  sabit rotalar
 
-## Uç Noktalar
+Site tipleri `site/src/lib/types.ts` bu şemalarla hizalı tutulur.
 
-| Metod & Yol | Açıklama |
-|---|---|
-| `GET /sehirler` | Aktif şehirleri listeler |
-| `GET /sehirler/{sehir_anahtari}/yerler` | `{ yerler, toplam_sayi }`. Varsayılan `sadece_kesif=true`: konaklama gizlenir; yeme-içme yalnızca `sehrin_klasigi` / `sponsorlu_mekan` / `kahvalti_verir` veya duygu ≥ 80/100. `sadece_kesif=false` kısıtlamasız (rota motoru/test). |
-| `GET /yerler/{yer_id}` | Bir yerin tam detayını getirir (yer profili, duygu özeti, örnek yorumlar dahil) |
-| `POST /rotalar/olustur` | Kullanıcı tercihlerine göre kişiselleştirilmiş rota üretir (bkz. aşağıdaki senaryolar) |
-| `GET /rotalar/{rota_id}` | Daha önce üretilmiş, paylaşılabilir linkli bir rotayı getirir |
-| `GET /sabit-rotalar` | Elle küratörlüğü yapılmış hazır rotaları listeler (opsiyonel `bolge` filtresi) |
+## Uç noktalar (9 genel)
 
-### `POST /rotalar/olustur` — Senaryo Seçimi
+`plan/00_brief_eki.md` §4: API ayakta. Aşağıdaki tablo brif §8 / kod ile aynıdır.
 
-İstekteki konaklama bilgisine göre otomatik karar verilir:
+| Metod | Yol | Açıklama |
+|---|---|---|
+| GET | `/sehirler` | Aktif şehirler |
+| GET | `/sehirler/{sehir_anahtari}/yerler` | `{ yerler, toplam_sayi }`. `limit` / `offset`. Varsayılan `sadece_kesif=true` |
+| GET | `/sehirler/{sehir_anahtari}/bolgeler` | Şehir merkezi + ilçe duygu profilleri |
+| GET | `/yerler/{yer_id}` | Detay: profil, duygu özeti, örnek ifadeler |
+| POST | `/rotalar/olustur` | Tek rota (Senaryo 1 veya eski Senaryo 2) |
+| POST | `/rotalar/olustur-alternatifler` | 2–3 alternatif; otel dayatma yok (sitenin Senaryo 2’si) |
+| POST | `/rotalar/{rota_id}/konaklama-bolgesi-oner` | Seçilen rotaya baskın ilçe + gerekçe + örnek tesis |
+| GET | `/rotalar/{rota_id}` | Kayıtlı, paylaşılabilir rota |
+| GET | `/sabit-rotalar` | Elle küratör rotalar (`bolge` filtresi opsiyonel) |
 
-- `konaklama_yer_id` **VEYA** `konaklama_enlem` + `konaklama_boylam`
-  verilmişse → **Senaryo 1** (konaklama bölgesi belli).
-- Hiçbiri verilmemişse → **Senaryo 2** (konaklama bölgesi belli değil,
-  algoritma en iyi adayların ağırlık merkezine göre bir konaklama önerir ve
-  cevapta `konaklama_onerisi` alanını doldurur).
+Şemada gizli: `GET /` (sağlık mesajı), `GET /sehirler-tanimli` (`include_in_schema=false`).
 
-Örnek istek gövdesi (Senaryo 1):
+### Keşif vitrini
+
+`sadece_kesif=true` (site varsayılanı, `sorgular.py`):
+
+- Konaklama gizlenir
+- Yeme-içme yalnız `sehrin_klasigi` / `sponsorlu_mekan` / `kahvalti_verir`
+  **veya** duygu ≥ 80/100 (skor ≥ 0.6)
+- Gezilecek yer serbest
+
+Rota motoru `sadece_kesif=false` ile kısıtsız çeker. Ham yorum metni ve
+yorumcu adı dönülmez; `ornek_ifade` kısa ve anonim kalır.
+
+### Rota senaryoları
+
+**Senaryo 1 — konaklama belli:** `konaklama_yer_id` veya `konaklama_enlem` +
+`konaklama_boylam` veya `konaklama_bolge_adi` (ilçe merkezi
+`sehir_ayarlari.ilce_merkezleri`). `POST /rotalar/olustur`.
+
+**Senaryo 2 — belli değil (sitenin kullandığı akış):**
+
+1. `POST /rotalar/olustur-alternatifler` → “Dengeli keşif” / “Tarih & kültür” /
+   “Doğa & manzara” benzeri alternatifler
+2. Kullanıcı birini seçer
+3. `POST /rotalar/{id}/konaklama-bolgesi-oner` → bölge önerisi (otel zorunlu değil)
+
+Eski `POST /rotalar/olustur` konaklama yoksa hâlâ otel önerir (geriye uyumluluk).
+
+Örnek gövde (Senaryo 1):
 
 ```json
 {
   "sehir_anahtari": "samsun",
   "gun_sayisi": 2,
-  "konaklama_yer_id": "<veritabanindaki bir KONAKLAMA yerinin id'si>",
+  "konaklama_yer_id": "<konaklama yer uuid>",
   "tercihler": {
     "ilgi_agirliklari": { "tarihi_kulturel_puani": 0.7, "doga_macera_puani": 0.3 },
     "aktiviteler": ["yuzme"],
@@ -63,6 +93,5 @@ tüm uç noktaları buradan, gerçek Samsun verisiyle deneyebilirsin.
 }
 ```
 
-Cevap, her gün için sıralı durakları (her durağın skor kırılımıyla birlikte
-— hangi bileşenin puana ne kadar katkı yaptığı, "kara kutu değil" ilkesiyle)
-ve toplam mesafe/süre tahminlerini içerir.
+Cevaptaki her durağın `kirilim` alanı skor bileşenlerini açıklar (kara kutu yok).
+Sonuç `kullanici_rotalari` tablosuna yazılır; commit API katmanındadır.
