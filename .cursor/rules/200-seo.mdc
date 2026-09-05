@@ -1,0 +1,13 @@
+---
+description: SEO kuralları — sayfa üreten her görevde
+globs: site/src/app/**/*.tsx,site/src/components/seo/**
+---
+# SEO Kuralları
+- Her indexlenebilir sayfada: benzersiz title/description, canonical, JSON-LD (doküman #02 §5 haritası), breadcrumb.
+- JSON-LD: schema-dts tipleriyle; `AggregateRating` KOYMA (Google politika ihlali — skorlarımız türetilmiş metrik).
+- Query parametreli filtre sayfaları canonical'ını statik yola verir; statik kategori yolları tercih edilir.
+- Yeni sayfa = sitemap.ts'e kayıt + (gerekirse) 301 eşlemesi.
+- Yer sayfaları index eşiği: ≥1 fotoğraf + yeterli metin; eşik altı sayfa `noindex,follow`.
+- Rota sihirbazı akışı `noindex,follow`; paylaşılan rota `/rota/{id}` indexlenebilir + OG image.
+- Görev bitiminde kontrol: JSON-LD validator + Lighthouse SEO ≥ 95.
+- SEO görevi bitiminde seo-audit skill'iyle denetim çalıştır.

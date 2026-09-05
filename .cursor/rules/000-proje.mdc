@@ -1,0 +1,15 @@
+---
+description: Şamandıra proje anayasası — her görevde geçerli
+alwaysApply: true
+---
+# Şamandıra (repo: gezi_bot → samandira) — Genel Kurallar
+- Ürün markası **Şamandıra**; kullanıcıya görünen hiçbir metinde "Rotam" bırakma. Stüdyo: Alegre Group.
+- Tüm kod tanımlayıcıları, yorumlar, commit mesajları ve dokümanlar **Türkçe ve Türkçe karaktersiz**: `isletme_verisi`, `duygu_skoru`, `rota_olustur`.
+- Yeni özellik sırası: önce `dokumanlar/kategori_taksonomisi.md` (gerekirse `veri_sozlugu.md`) → sonra `ortak/sabitler.py` → sonra kod. Taksonomi ile kod asla sapmaz.
+- Kara kutu yok: her skor/öneri `kirilim` ile açıklanabilir olmalı. Anlatım metinleri şablon + sabit tohum; LLM kullanma. (Tek istisna: genel duygu skoru — Türkçe BERT modeli.)
+- Şehir bağımsızlık: şehir bilgisi yalnız `veri/ortak/sehir_ayarlari.py` (SEHIRLER). Toplayıcı/API/rota/site koduna şehir adı gömme.
+- Katmanlar: `veri/` (scraping+analiz) → `sunucu/` (DB+API+rota) → `site/` (Next.js). `ortak/` yalnız taksonomi sabitleri. Katmanlar arası import yasağı: site → sunucu kodu import edemez (yalnız HTTP API).
+- JSONB esnek alanlar (`ozellikler`, `aktiviteler`, `deneyim_puanlari`, `konu_duygulari`, `yer_profili`) dururken yeni kolon/migration AÇMA; yeni etiket = taksonomi + sabit.
+- Kullanıcı açıkça istemeden `git commit` / `git push` YAPMA.
+- README'ler eski ve yanlış (Faz 3 boş / site yok iddiaları); doğrusu `calis.txt` ve `dokumanlar/` altındaki güncel brif. Çelişkide güncel brif kazanır.
+- Ortamlar: API port 8125, site 3000, PostgreSQL yerelde C:\PostgreSQL (Docker yok), venv: `.venv_test`.

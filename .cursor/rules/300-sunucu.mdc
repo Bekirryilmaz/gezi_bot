@@ -1,0 +1,12 @@
+---
+description: Python katmanı kuralları (veri + sunucu)
+globs: sunucu/**/*.py,veri/**/*.py,ortak/**/*.py
+---
+# Sunucu/Veri Kuralları
+- Dış API şemaları `sunucu/api/semalar.py`, saklama modelleri `sunucu/veritabani/modeller.py` — karıştırma; şema değişikliğinde `site/src/lib/types.ts` hizalanır.
+- Migration: Alembic, sıralı numara (0005+), geri alınabilir; mevcut migration'ları ASLA düzenleme.
+- Rota motoru deterministik kalır: aynı girdi → aynı çıktı; `kirilim` alanını doldurmadan skor döndürme. Testler: `pytest sunucu/rota_motoru/testler/ -v` her rota değişikliğinde koşar.
+- Keşif vitrini filtresi `sunucu/veritabani/sorgular.py`'de: konaklama gizli, yeme-içme eşikli (klasik/sponsor/kahvaltı veya duygu≥80). Filtreyi gevşetme; kürasyon görevleri ayrı tartışılır.
+- Scraping: engel tespitte nazikçe dur, kesinti dayanıklılık (kaldığı yerden devam) korunur; TripAdvisor/Booking varsayılan kapalı kalır.
+- Aktarım idempotent kalır: `python -m sunucu.veritabani.aktarim.calistir --sehir samsun` tekrar çalıştırılabilir olmalı.
+- Yeni ortak yardımcı (slug, transliterasyon) `ortak/`a gider; veri ve sunucu aynı fonksiyonu kullanır.

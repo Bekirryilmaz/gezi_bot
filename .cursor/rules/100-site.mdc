@@ -1,0 +1,15 @@
+---
+description: Next.js 16 site kuralları
+globs: site/**/*.ts,site/**/*.tsx
+---
+# Site Kuralları (Next.js 16 App Router, React 19, Tailwind 4)
+- Bu Next.js sürümü eğitim verinden farklı olabilir; API/props emin olmadığında **Context7 MCP** ile güncel dokümana bak, uydurma.
+- Varsayılan server component; yalnız gerekiyorsa "use client". Veri çekme `site/src/lib/api.ts` üzerinden; component içine ham fetch yazma.
+- Tipler `site/src/lib/types.ts` — Python şemalarıyla (sunucu/api/semalar.py) hizalı tut; API şeması değişince burayı da güncelle.
+- Her sayfa `generateMetadata` ile benzersiz title/description üretir (şablonlar doküman #02 §4). MetadataBase tanımlı.
+- Yer linkleri slug ile: `/yer/{sehir}/{slug}` — UUID linki YASAK (301 hariç).
+- Görseller `next/image` + anlamlı Türkçe `alt`; harici görsel domain'leri `next.config.ts` remotePatterns'a eklenir.
+- UI bileşenleri shadcn/ui + Tailwind tema tokenları (deniz/kopuk/kumsal/gunes + samandira vurgu); inline hex renk yazma, tema tokenı ekle.
+- Erişilebilirlik: semantik HTML, klavye navigasyonu, kontrast; form/slider'lar label'lı.
+- Değişiklik sonrası Playwright MCP ile tarayıcıda akışı doğrula (3000 portu): ilgili sayfa + en az 1 bağlı akış. Tek ekran görüntüsü kanıt sayılmaz.
+- UI görevlerinde ui-ux-pro-max skill'ini, performans konularında react-best-practices skill'ini kullan.

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Samandira marka A: geometrik samandira">
+  <defs>
+    <clipPath id="govdeA">
+      <path d="M18 27h28v13c0 6-6 10-14 10s-14-4-14-10Z"/>
+    </clipPath>
+  </defs>
+  <rect x="30.6" y="12" width="2.8" height="10" rx="1.4" fill="#0E3B43"/>
+  <circle cx="32" cy="8.6" r="4.2" fill="#F2B138"/>
+  <path d="M23.5 21h17l2.2 6H21.3Z" fill="#0E3B43"/>
+  <g clip-path="url(#govdeA)">
+    <rect x="18" y="27" width="28" height="23" fill="#F6F3EA"/>
+    <rect x="18" y="27" width="28" height="7.5" fill="#D6402C"/>
+    <rect x="18" y="41" width="28" height="9" fill="#D6402C"/>
+  </g>
+  <path d="M2 47q7.5-5.5 15 0t15 0 15 0 15 0v15H2Z" fill="#0E3B43"/>
+  <path d="M2 52.5q7.5-5.5 15 0t15 0 15 0 15 0" fill="none" stroke="#F6F3EA" stroke-opacity="0.45" stroke-width="2"/>
+</svg>

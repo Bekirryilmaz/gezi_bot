@@ -26,6 +26,11 @@ veri/cikti/raporlar/*.md
 site/node_modules/
 site/.next/
 site/out/
+site/test-results/
+site/playwright-report/
+site/blob-report/
+site/playwright/.cache/
+site/coverage/
 
 # Playwright
 veri/**/.playwright-cache/
@@ -39,3 +44,8 @@ Thumbs.db
 # Veritabani yerel dosyalari
 *.sqlite3
 altyapi/postgres_veri/
+
+# yerel arac kalintilari
+.cursor/mcp.json
+.playwright-mcp/
+.claude/
