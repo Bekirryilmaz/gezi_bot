@@ -2,8 +2,10 @@ import { SayfaHero } from "@/components/layout/SayfaHero";
 import { BosDurum } from "@/components/ui/BosDurum";
 import { Dugme } from "@/components/ui/Dugme";
 import { FiltreCip } from "@/components/ui/FiltreCip";
+import { FiltreSatiri } from "@/components/ui/FiltreSatiri";
 import { YerKarti } from "@/components/ui/YerKarti";
 import { RevealListe, RevealOge } from "@/components/hareket/Reveal";
+import { CTA_FILTRE_TEMIZLE } from "@/lib/marka";
 import { sehirleriGetir, yerleriGetir } from "@/lib/api";
 import { ANA_KATEGORILER } from "@/lib/sabitler";
 
@@ -46,34 +48,43 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
         ozet="Önce cevap: bu listedeki yerler deneyim eksenlerine göre sıralanır. Kategori süz, bir karta gir, kırılımı oku."
       />
 
-      <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">
-        <div className="flex flex-wrap gap-2">
-          <FiltreCip
-            href={`/sehir/${anahtar}`}
-            aktif={!kategori}
-            sayi={liste.toplam_sayi}
-          >
-            Tümü
-          </FiltreCip>
-          {ANA_KATEGORILER.filter((k) => k.deger !== "konaklama").map((k) => (
+      <div className="bg-kagit/92 border-bordo/12 sticky top-14 z-40 border-b md:top-16">
+        <div className="kabuk py-3">
+          <FiltreSatiri>
             <FiltreCip
-              key={k.deger}
-              href={`/sehir/${anahtar}?kategori=${k.deger}`}
-              aktif={kategori === k.deger}
+              href={`/sehir/${anahtar}`}
+              aktif={!kategori}
+              sayi={liste.toplam_sayi}
             >
-              {k.etiket}
+              Tümü
             </FiltreCip>
-          ))}
+            {ANA_KATEGORILER.filter((k) => k.deger !== "konaklama").map((k) => (
+              <FiltreCip
+                key={k.deger}
+                href={`/sehir/${anahtar}?kategori=${k.deger}`}
+                aktif={kategori === k.deger}
+              >
+                {k.etiket}
+              </FiltreCip>
+            ))}
+          </FiltreSatiri>
         </div>
+      </div>
 
-        <p className="text-ink/50 mt-8 text-sm tabular-nums">
-          {liste.toplam_sayi} yer işaretli
+      <div className="kabuk py-12">
+        <p className="text-ink/50 text-sm tabular-nums">
+          {liste.toplam_sayi.toLocaleString("tr-TR")} yer işaretli
         </p>
 
         {yerler.length === 0 ? (
           <BosDurum
             className="mt-6"
-            cta={{ href: `/sehir/${anahtar}/rota`, etiket: "Rotanı kur" }}
+            tip={kategori ? "filtre" : "veri"}
+            cta={
+              kategori
+                ? { href: `/sehir/${anahtar}`, etiket: CTA_FILTRE_TEMIZLE }
+                : { href: `/sehir/${anahtar}/rota`, etiket: "Rotanı kur" }
+            }
           />
         ) : (
           <RevealListe className="kart-liste mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -90,7 +101,7 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
             Bu şehir için rota kur
           </Dugme>
           <Dugme href={`/sehir/${anahtar}/bolgeler`} varyant="hayalet">
-            İlçe profilleri
+            Bölgeyi tanı
           </Dugme>
         </div>
       </div>

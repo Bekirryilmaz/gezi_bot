@@ -26,12 +26,12 @@ export default async function AnaSayfa() {
 
   return (
     <main>
-      <HeroKapak sehirAnahtari={sehirAnahtar} />
+      <HeroKapak sehirAnahtari={sehirAnahtar} yerSayisi={yerSayisi} />
 
-      <section className="bg-kagit px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-6xl">
+      <section className="bolum bg-kagit">
+        <div className="kabuk">
           <Reveal>
-            <p className="text-ink/80 max-w-2xl text-[17px] leading-relaxed">
+            <p className="yazi-govde text-ink/80 max-w-[42rem]">
               {TANIM_CUMLESI} İlk çıkış şehri {sehirIsim}; kapsam tüm Türkiye.
             </p>
           </Reveal>
@@ -39,23 +39,21 @@ export default async function AnaSayfa() {
             <IstatistikBandi
               className="mt-12"
               ogeler={[
+                ...(yerSayisi > 0 ? [{ deger: yerSayisi, etiket: "İşaretli yer" }] : []),
                 {
-                  deger: yerSayisi > 0 ? yerSayisi.toLocaleString("tr-TR") : "—",
-                  etiket: "İşaretli yer",
+                  deger: 1,
+                  etiket: "Açık şehir",
+                  baglam: `${sehirIsim}'da başladık`,
                 },
-                { deger: "1", etiket: "Açık şehir" },
-                {
-                  deger: String(DENEYIM_EKSENLERI.length),
-                  etiket: "Deneyim ekseni",
-                },
+                { deger: DENEYIM_EKSENLERI.length, etiket: "Deneyim ekseni" },
               ]}
             />
           </Reveal>
         </div>
       </section>
 
-      <section className="bg-kagit-koyu/50 px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-6xl">
+      <section className="bolum bg-kagit-koyu/60">
+        <div className="kabuk">
           <Reveal>
             <BolumBasligi
               etiket="Ne yapar?"
@@ -66,50 +64,54 @@ export default async function AnaSayfa() {
           <RevealListe className="mt-10 grid gap-5 md:grid-cols-3">
             {[
               {
-                baslik: "Keşfet",
+                baslik: "Nereye gidilir?",
                 metin: "Gezilecek yerleri deneyim eksenlerine göre sıralı gör.",
                 href: `/sehir/${sehirAnahtar}`,
+                cta: "Keşfe başla",
               },
               {
-                baslik: "Bölgeler",
+                baslik: "Hangi bölge sana göre?",
                 metin: "İlçelerin tanıtımı ve ziyaretçi izlenimi, yan yana.",
                 href: `/sehir/${sehirAnahtar}/bolgeler`,
+                cta: "Bölgeyi tanı",
               },
               {
-                baslik: "Rota",
+                baslik: "Kaç günün var?",
                 metin: "Kaç günün varsa planı kur; her durağın gerekçesi açık.",
                 href: `/sehir/${sehirAnahtar}/rota`,
+                cta: "Rotanı kur",
               },
             ].map((o) => (
               <RevealOge key={o.baslik}>
-                <div className="kart-isik border-deniz/10 flex h-full flex-col rounded-2xl border bg-white p-6">
-                  <h3 className="font-display text-deniz-derin text-2xl">{o.baslik}</h3>
-                  <p className="text-ink/70 mt-3 flex-1 text-sm leading-relaxed">
-                    {o.metin}
-                  </p>
-                  <div className="mt-6">
-                    <Dugme href={o.href} varyant="hayalet">
-                      İncele
+                <article className="kart-kabuk flex h-full flex-col p-6">
+                  <h3 className="yazi-alt text-bordo">{o.baslik}</h3>
+                  <p className="yazi-govde text-ink/70 mt-3 flex-1">{o.metin}</p>
+                  <div className="relative z-10 mt-6">
+                    <Dugme href={o.href} varyant="bolum">
+                      {o.cta}
                     </Dugme>
                   </div>
-                </div>
+                  <span className="su-hatti" />
+                </article>
               </RevealOge>
             ))}
           </RevealListe>
         </div>
       </section>
 
-      <section className="bg-kagit px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-6xl">
+      <section className="bolum bg-kagit">
+        <div className="kabuk">
           <Reveal>
             <BolumBasligi
-              etiket="Şehir"
+              etiket="Nereye gidilir?"
               baslik="Açık şehir"
               ozet="Yeni şehir eklemek tasarımı değiştirmez; veri gelir, işaretlenir."
+              aksiyon={{ href: `/sehir/${sehirAnahtar}`, etiket: "Keşfe başla" }}
             />
           </Reveal>
           <Reveal delay={0.1} className="mt-10">
             <SehirKarti
+              varyant="vitrin"
               isim={sehirIsim}
               anahtar={sehirAnahtar}
               yerSayisi={yerSayisi || undefined}
@@ -119,21 +121,11 @@ export default async function AnaSayfa() {
         </div>
       </section>
 
-      <section className="bg-deniz-derin text-kopuk relative overflow-hidden px-5 py-24 md:px-8">
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(600px 240px at 80% 20%, #d6402c44, transparent 60%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl text-center">
+      <section className="doku-koyu bg-bordo text-kagit bolum-doruk relative overflow-hidden">
+        <div className="kabuk relative text-center">
           <Reveal>
-            <h2 className="font-display text-4xl tracking-[-0.02em] md:text-6xl">
-              Rotanı kur, şehri oku.
-            </h2>
-            <p className="text-kopuk/70 mx-auto mt-4 max-w-lg">
+            <h2 className="yazi-bolum">Rotanı kur, şehri oku.</h2>
+            <p className="yazi-govde text-kagit/75 mx-auto mt-4 max-w-lg">
               Kaç günün ve ne aradığın belli olsun; gerisini skor kırılımı taşır.
             </p>
             <div className="mt-8 flex justify-center">

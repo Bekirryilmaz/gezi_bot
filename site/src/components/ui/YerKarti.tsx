@@ -1,63 +1,79 @@
 import Link from "next/link";
-import Image from "next/image";
+import type { ReactNode } from "react";
 import { cn } from "cn";
+import { KART_KABUK } from "@/lib/kart-sinif";
 import { altKategoriEtiketi, kategoriEtiketi } from "@/lib/sabitler";
 import type { YerOzet } from "@/lib/types";
-import { Rozet } from "./Rozet";
+import { Plaka } from "./Plaka";
+import { Rozet, RozetKati } from "./Rozet";
 
-export function YerKarti({ yer, className }: { yer: YerOzet; className?: string }) {
+export function YerKarti({
+  yer,
+  href,
+  ozet,
+  sponsorlu = false,
+  klasik = false,
+  className,
+}: {
+  yer: YerOzet;
+  href?: string;
+  ozet?: string;
+  sponsorlu?: boolean;
+  klasik?: boolean;
+  className?: string;
+}) {
+  const baglanti = href ?? `/yer/${yer.id}`;
   const puan =
     yer.kaynakta_puan_ortalamasi != null
       ? yer.kaynakta_puan_ortalamasi.toFixed(1)
       : yer.duygu_skoru_ortalama != null
         ? (yer.duygu_skoru_ortalama * 5).toFixed(1)
         : null;
+  const ozetMetin = ozet ?? altKategoriEtiketi(yer.alt_kategori);
+  const rozetler: ReactNode[] = [];
+  if (sponsorlu) {
+    rozetler.push(
+      <Rozet key="sp" tur="sponsorlu">
+        Sponsorlu
+      </Rozet>,
+    );
+  }
+  if (klasik) {
+    rozetler.push(
+      <Rozet key="kl" tur="klasik">
+        Şehrin Klasiği
+      </Rozet>,
+    );
+  }
+  rozetler.push(
+    <Rozet key="kat" tur="kategori">
+      {kategoriEtiketi(yer.ana_kategori)}
+    </Rozet>,
+  );
 
   return (
-    <Link
-      href={`/yer/${yer.id}`}
-      className={cn(
-        "group kart-isik border-deniz/10 focus-visible:ring-samandira relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_-18px_rgba(6,54,66,0.35)] focus-visible:ring-2 focus-visible:outline-none",
-        className,
-      )}
-    >
-      <div className="from-deniz to-deniz-derin relative aspect-[16/9] overflow-hidden bg-gradient-to-br">
-        {yer.kapak_fotografi_url?.startsWith("/") ? (
-          <Image
-            src={yer.kapak_fotografi_url}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div
-            className="absolute inset-0 opacity-40"
-            style={{
-              background:
-                "radial-gradient(circle at 70% 20%, #d6402c55, transparent 45%), linear-gradient(160deg, #0a4d5c, #063642)",
-            }}
-            aria-hidden="true"
-          />
-        )}
-        {puan ? (
-          <span className="bg-kagit/95 text-deniz-derin absolute top-3 right-3 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums">
-            {puan}
-          </span>
-        ) : null}
-      </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="font-display text-deniz-derin group-hover:text-deniz text-xl leading-snug tracking-[-0.01em]">
-          {yer.isim}
+    <article className={cn(KART_KABUK, className)}>
+      <Plaka
+        kaynak={yer.kapak_fotografi_url}
+        alt=""
+        oran="kart"
+        kategori={yer.ana_kategori}
+        rozet={puan ? <Rozet tur="skor">{puan}</Rozet> : null}
+      />
+      <div className="flex min-w-0 flex-1 flex-col gap-2 p-4">
+        <h3 className="min-w-0">
+          <Link
+            href={baglanti}
+            className="yazi-kart text-bordo group-hover:decoration-bordo/40 group-hover:underline group-hover:underline-offset-2 after:absolute after:inset-0"
+          >
+            {yer.isim}
+          </Link>
         </h3>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5">
-          <Rozet ton="sis">{kategoriEtiketi(yer.ana_kategori)}</Rozet>
-          {yer.ilce ? <Rozet ton="deniz">{yer.ilce}</Rozet> : null}
-          <span className="text-ink/45 text-[11px]">
-            {altKategoriEtiketi(yer.alt_kategori)}
-          </span>
-        </div>
+        <p className="yazi-indeks text-ink/55 min-h-5 truncate">{yer.ilce ?? "\u00a0"}</p>
+        <p className="yazi-indeks text-ink/70 line-clamp-2 min-h-[2.5em]">{ozetMetin}</p>
+        <RozetKati ogeler={rozetler} />
       </div>
-    </Link>
+      <span className="su-hatti" />
+    </article>
   );
 }

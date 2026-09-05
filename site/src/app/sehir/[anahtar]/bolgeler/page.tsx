@@ -38,34 +38,35 @@ export default async function BolgelerSayfasi({ params }: Props) {
         ozet="Önce tanıtım, sonra orada yaşayanların ve gidenlerin ortak izlenimi."
       />
 
-      <div className="mx-auto max-w-6xl space-y-10 px-5 py-12 md:px-8">
+      <div className="kabuk space-y-10 py-12">
         {bolgeler.length === 0 ? (
-          <BosDurum cta={{ href: `/sehir/${anahtar}`, etiket: "Keşfe dön" }} />
+          <BosDurum
+            tip="hazirlaniyor"
+            cta={{ href: `/sehir/${anahtar}`, etiket: "Keşfe dön" }}
+          />
         ) : (
           bolgeler.map((bolge, i) => (
             <Reveal key={bolge.bolge_adi} delay={Math.min(i * 0.04, 0.2)}>
-              <article className="border-deniz/10 rounded-2xl border bg-white p-6 md:p-8">
+              <article className="kart-kabuk p-6 md:p-8">
                 <div className="flex flex-wrap items-baseline justify-between gap-3">
-                  <h2 className="font-display text-deniz text-3xl tracking-[-0.02em] capitalize">
+                  <h2 className="yazi-alt text-bordo capitalize">
                     {bolge.bolge_adi}
                     <span className="text-ink/45 ml-3 font-sans text-base font-normal">
-                      {bolge.ilce_mi ? "ilçe" : "şehir geneli"}
+                      {bolge.ilce_mi ? " ilçe" : " şehir geneli"}
                     </span>
                   </h2>
                   <Dugme
                     href={`/sehir/${anahtar}/rota?konaklama_bolge=${encodeURIComponent(bolge.bolge_adi)}`}
-                    varyant="hayalet"
+                    varyant="bolum"
                   >
                     Bu bölgeden rota kur
                   </Dugme>
                 </div>
 
                 <section className="mt-8">
-                  <h3 className="text-ink/45 text-[11px] font-medium tracking-[0.24em] uppercase">
-                    Tanıtım
-                  </h3>
+                  <h3 className="etiket text-ink/45">Tanıtım</h3>
                   {bolge.tanitim_metni ? (
-                    <p className="text-ink/85 mt-2 max-w-3xl text-lg leading-relaxed">
+                    <p className="yazi-govde text-ink/85 mt-2 max-w-[42rem]">
                       {bolge.tanitim_metni}
                     </p>
                   ) : (
@@ -76,9 +77,7 @@ export default async function BolgelerSayfasi({ params }: Props) {
                 </section>
 
                 <section className="mt-8">
-                  <h3 className="text-ink/45 text-[11px] font-medium tracking-[0.24em] uppercase">
-                    Kullanıcı deneyimleri
-                  </h3>
+                  <h3 className="etiket text-ink/45">Kullanıcı deneyimleri</h3>
                   {bolge.duygu_ozeti ? (
                     <DuyguOzeti
                       className="mt-3"
@@ -91,6 +90,7 @@ export default async function BolgelerSayfasi({ params }: Props) {
                     </p>
                   )}
                 </section>
+                <span className="su-hatti" />
               </article>
             </Reveal>
           ))

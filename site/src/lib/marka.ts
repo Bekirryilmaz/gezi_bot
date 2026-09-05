@@ -35,6 +35,25 @@ export const HATA_PUSULA = "Pusula şaştı — sayfayı yenileyip tekrar dener 
 
 export const SAYFA_404_BASLIK = "Sayfa bulunamadı — pusula şaştı";
 
+export const SAYFA_404_METIN =
+  "Bu adres bir işaret değil. Ana sayfaya dön veya keşfe başla.";
+
+export const BOS_VERI = "Burayı henüz işaretlemedik.";
+
+export const BOS_HAZIRLANIYOR = "Bu bölüm hazırlanıyor.";
+
+export const BOS_FILTRE_BASLIK = "Kıyıda köşede bir şey kalmadı";
+
+export const CTA_ANA_SAYFA = "Ana sayfa";
+
+export const CTA_FILTRE_TEMIZLE = "Filtreleri temizle";
+
+export const CTA_YENILE = "Yenile";
+
+export const CTA_SAMSUN = "Şimdilik Samsun'a bak";
+
+export const DUYGU_KUNYE = "ziyaretçi yorumlarından derlenmiştir";
+
 /** Logo: isaret min 16px; kelime kilidi min 24px isaret. */
 export const LOGO_MIN_ISARET = 16;
 export const LOGO_MIN_KILIT = 24;

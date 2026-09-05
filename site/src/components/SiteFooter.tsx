@@ -10,6 +10,7 @@ import {
 import { KelimeKilidi } from "@/components/marka/KelimeKilidi";
 
 const SAYFALAR = [
+  { href: "/", ad: "Ana sayfa" },
   { href: "/sehir/samsun", ad: "Keşfet" },
   { href: "/sehir/samsun/bolgeler", ad: "Bölgeler" },
   { href: "/sehir/samsun/rota", ad: "Rota planlayıcı" },
@@ -17,22 +18,26 @@ const SAYFALAR = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-deniz-derin text-kopuk">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-4 md:px-8">
-        <div className="md:col-span-1">
-          <KelimeKilidi yaziSinif="text-[22px] text-kopuk" className="text-kopuk" />
-          <p className="text-kopuk/70 mt-3 text-sm">{SLOGAN}</p>
-          <p className="text-kopuk/80 mt-3 text-xs leading-relaxed">{TANIM_CUMLESI}</p>
+    <footer className="doku-koyu bg-bordo text-kagit">
+      <div className="kabuk grid gap-10 py-16 md:grid-cols-4">
+        <div>
+          <KelimeKilidi
+            boyut={40}
+            yaziSinif="text-[22px] text-kagit"
+            className="text-kagit"
+          />
+          <p className="text-kagit/80 mt-4 text-sm">{SLOGAN}</p>
+          <p className="yazi-indeks text-kagit/70 mt-3 max-w-sm">{TANIM_CUMLESI}</p>
         </div>
 
         <div>
-          <p className="text-kumsal text-[11px] tracking-[0.24em] uppercase">Sayfalar</p>
-          <ul className="mt-3 space-y-2 text-sm">
+          <p className="etiket text-kagit/55">Sayfalar</p>
+          <ul className="mt-4 space-y-2 text-sm">
             {SAYFALAR.map((s) => (
               <li key={s.href}>
                 <Link
                   href={s.href}
-                  className="text-kopuk/80 hover:text-kopuk focus-visible:ring-samandira cursor-pointer focus-visible:ring-2 focus-visible:outline-none"
+                  className="text-kagit/85 hover:text-kagit focus-visible:ring-samandira decoration-kagit/0 hover:decoration-kagit/50 cursor-pointer underline underline-offset-4 transition-[text-decoration-color] duration-[var(--sure-hizli)] focus-visible:ring-2 focus-visible:outline-none"
                 >
                   {s.ad}
                 </Link>
@@ -42,21 +47,22 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <p className="text-kumsal text-[11px] tracking-[0.24em] uppercase">Stüdyo</p>
-          <p className="text-kopuk/80 mt-3 text-sm">{STUDYO}</p>
-          <p className="text-kopuk/80 mt-2 text-xs leading-relaxed">
-            Yasal sayfalar (gizlilik, iletişim) yayın öncesi eklenecek — ölü bağlantı yok.
+          <p className="etiket text-kagit/55">Yasal</p>
+          <p className="text-kagit/80 mt-4 text-sm">{STUDYO}</p>
+          <p className="yazi-indeks text-kagit/65 mt-3">
+            Gizlilik, kullanım koşulları ve iletişim sayfaları yayınlanınca burada yer
+            alır.
           </p>
         </div>
 
         <div>
-          <p className="text-kumsal text-[11px] tracking-[0.24em] uppercase">Güven</p>
-          <p className="text-kopuk/80 mt-3 text-sm leading-relaxed">{GUVEN_CUMLESI}</p>
-          <p className="text-kopuk/75 mt-4 text-[11px] leading-relaxed">{OSM_ATFI}</p>
+          <p className="etiket text-kagit/55">Güven</p>
+          <p className="yazi-govde text-kagit/85 mt-4 text-[15px]">{GUVEN_CUMLESI}</p>
+          <p className="text-kagit/65 mt-6 text-[11px] leading-relaxed">{OSM_ATFI}</p>
         </div>
       </div>
-      <div className="border-t border-white/10">
-        <p className="text-kopuk/70 mx-auto max-w-6xl px-5 py-4 text-[11px] md:px-8">
+      <div className="border-kagit/14 border-t">
+        <p className="kabuk text-kagit/60 py-4 text-[11px]">
           {MARKA_WORDMARK} · {STUDYO}
         </p>
       </div>

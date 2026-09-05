@@ -68,7 +68,7 @@ function SheetContent({
       >
         {children}
         {showCloseButton && (
-          <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none">
+          <SheetPrimitive.Close className="focus-visible:ring-samandira hover:bg-kagit-koyu absolute top-3 right-3 inline-flex size-11 cursor-pointer items-center justify-center rounded-[8px] opacity-80 hover:opacity-100 focus-visible:ring-2 focus-visible:outline-none">
             <XIcon className="size-4" />
             <span className="sr-only">Kapat</span>
           </SheetPrimitive.Close>

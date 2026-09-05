@@ -40,7 +40,7 @@ export default async function RotaSayfasi({ params, searchParams }: Props) {
         ozet="Kaç günün ve ne aradığın belli olsun. Konaklama bölgen varsa oradan başla; yoksa alternatiflerden birini seç."
       />
 
-      <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">
+      <div className="kabuk py-12">
         <RotaSihirbazi
           sehirAnahtari={anahtar}
           sehirIsim={isim}

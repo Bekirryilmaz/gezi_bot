@@ -9,13 +9,14 @@ import "./globals.css";
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "600"],
+  weight: ["400", "500", "600"],
 });
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin", "latin-ext"],
-  weight: ["600", "700"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -51,7 +52,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="tr" className={`${sora.variable} ${fraunces.variable} h-full`}>
+    <html
+      lang="tr"
+      data-scroll-behavior="smooth"
+      className={`${sora.variable} ${fraunces.variable} h-full`}
+    >
       <body className="flex min-h-full flex-col antialiased">
         <HareketSaglayici>
           <SiteHeader />

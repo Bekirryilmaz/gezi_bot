@@ -3,6 +3,7 @@ import { SayfaHero } from "@/components/layout/SayfaHero";
 import { BosDurum } from "@/components/ui/BosDurum";
 import { Dugme } from "@/components/ui/Dugme";
 import { DuyguOzeti } from "@/components/ui/DuyguOzeti";
+import { Plaka } from "@/components/ui/Plaka";
 import { Rozet } from "@/components/ui/Rozet";
 import { SkorKirilim } from "@/components/ui/SkorKirilim";
 import { yerDetayiGetir } from "@/lib/api";
@@ -39,12 +40,15 @@ export default async function YerDetaySayfasi({ params }: Props) {
     yer = await yerDetayiGetir(id);
   } catch {
     return (
-      <main className="px-5 pt-28 pb-16">
-        <BosDurum
-          baslik="Yer bulunamadı"
-          metin="Pusula şaştı — keşfe dönüp başka bir işaret seçebilirsin."
-          cta={{ href: "/sehir/samsun", etiket: "Keşfe dön" }}
-        />
+      <main className="bg-kagit px-5 pt-28 pb-16">
+        <div className="kabuk">
+          <BosDurum
+            tip="hata"
+            baslik="Yer bulunamadı"
+            metin="Pusula şaştı — keşfe dönüp başka bir işaret seçebilirsin."
+            cta={{ href: "/sehir/samsun", etiket: "Keşfe dön" }}
+          />
+        </div>
       </main>
     );
   }
@@ -64,25 +68,25 @@ export default async function YerDetaySayfasi({ params }: Props) {
         ozet={`${altKategoriEtiketi(yer.alt_kategori)} — skorlar türetilmiş metrik; ham yorum metni yok.`}
       />
 
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 py-12 md:grid-cols-[1.4fr_1fr] md:px-8">
+      <div className="kabuk grid gap-12 py-12 md:grid-cols-[1.4fr_1fr]">
         <div className="space-y-12">
+          <Plaka
+            kaynak={yer.kapak_fotografi_url ?? yer.fotograf_urlleri[0]}
+            alt=""
+            oran="genis"
+            kategori={yer.ana_kategori}
+          />
           <section>
-            <h2 className="font-display text-deniz text-2xl tracking-[-0.01em] md:text-3xl">
-              Tanıtım
-            </h2>
+            <h2 className="yazi-alt text-bordo">Tanıtım</h2>
             {tanitim ? (
-              <p className="text-ink/85 mt-4 text-lg leading-relaxed">{tanitim}</p>
+              <p className="yazi-govde text-ink/85 mt-4">{tanitim}</p>
             ) : (
-              <p className="text-ink/55 mt-4">
-                Bu yer için henüz derlenmiş bir tanıtım metni yok.
-              </p>
+              <p className="text-ink/55 mt-4">Bu yer için henüz yeterli izlenim yok.</p>
             )}
           </section>
 
           <section>
-            <h2 className="font-display text-deniz text-2xl tracking-[-0.01em] md:text-3xl">
-              Kullanıcı deneyimleri
-            </h2>
+            <h2 className="yazi-alt text-bordo">Kullanıcı deneyimleri</h2>
             {yer.duygu_ozeti ? (
               <DuyguOzeti className="mt-4" metin={yer.duygu_ozeti} />
             ) : (
@@ -94,9 +98,7 @@ export default async function YerDetaySayfasi({ params }: Props) {
 
           {Object.keys(yer.deneyim_puanlari ?? {}).length > 0 ? (
             <section>
-              <h2 className="font-display text-deniz text-2xl tracking-[-0.01em] md:text-3xl">
-                Skor kırılımı
-              </h2>
+              <h2 className="yazi-alt text-bordo">Skor kırılımı</h2>
               <p className="text-ink/55 mt-2 text-sm">
                 Her önerinin nedeni açık: eksenler ayrı puanlanır.
               </p>
@@ -107,16 +109,16 @@ export default async function YerDetaySayfasi({ params }: Props) {
           ) : null}
         </div>
 
-        <aside className="space-y-6 text-sm">
+        <aside className="yazi-indeks space-y-6">
           {yer.kaynakta_puan_ortalamasi != null && (
             <div>
-              <p className="text-ink/45">Puan</p>
-              <p className="font-display text-yosun text-3xl tabular-nums">
+              <p className="etiket text-ink/45">Puan</p>
+              <p className="yazi-sayi text-bordo mt-1 text-4xl">
                 {yer.kaynakta_puan_ortalamasi.toFixed(1)}
               </p>
             </div>
           )}
-          <Rozet ton="deniz">{kategoriEtiketi(yer.ana_kategori)}</Rozet>
+          <Rozet tur="kategori">{kategoriEtiketi(yer.ana_kategori)}</Rozet>
           {profil.fiyat_algisi?.deger &&
             profil.fiyat_algisi.deger !== "bilgi_yetersiz" && (
               <div>
@@ -150,7 +152,7 @@ export default async function YerDetaySayfasi({ params }: Props) {
               href={yer.web_sitesi}
               target="_blank"
               rel="noreferrer"
-              className="text-yosun inline-block cursor-pointer hover:underline"
+              className="text-bordo decoration-deniz cursor-pointer underline decoration-1 underline-offset-4 hover:decoration-2"
             >
               Web sitesi
             </a>
@@ -159,7 +161,7 @@ export default async function YerDetaySayfasi({ params }: Props) {
             href={googleMapsUrl(yer.enlem, yer.boylam, yer.isim)}
             target="_blank"
             rel="noreferrer"
-            className="text-yosun block cursor-pointer hover:underline"
+            className="text-bordo decoration-deniz block cursor-pointer underline decoration-1 underline-offset-4 hover:decoration-2"
           >
             Haritada aç
           </a>
@@ -171,7 +173,7 @@ export default async function YerDetaySayfasi({ params }: Props) {
           </Dugme>
           <Link
             href="/sehir/samsun"
-            className="text-deniz block cursor-pointer text-sm hover:underline"
+            className="text-bordo decoration-deniz block cursor-pointer text-sm underline decoration-1 underline-offset-4 hover:decoration-2"
           >
             Keşfe dön
           </Link>

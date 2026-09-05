@@ -8,6 +8,7 @@ import { DENEYIM_EKSENLERI, altKategoriEtiketi } from "@/lib/sabitler";
 import type { BolgeProfili, RotaCevap } from "@/lib/types";
 import { Dugme } from "@/components/ui/Dugme";
 import { BosDurum } from "@/components/ui/BosDurum";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Senaryo = "bolge_belli" | "bolge_degil";
 type Adim = "senaryo" | "tercihler" | "alternatifler" | "sonuc";
@@ -24,14 +25,14 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
   return (
     <div className="space-y-10">
       {rota.rota_tavsiyesi && (
-        <p className="border-deniz/10 text-ink/80 rounded-2xl border bg-white p-5 text-sm leading-relaxed">
+        <p className="border-bordo/12 text-ink/80 bg-tuz rounded-[12px] border p-5 text-sm leading-relaxed">
           {rota.rota_tavsiyesi}
         </p>
       )}
       {rota.konaklama_bolgesi_onerisi && (
-        <div className="border-deniz/10 rounded-2xl border bg-white p-5">
+        <div className="border-bordo/12 bg-tuz rounded-[12px] border p-5">
           <p className="text-ink/50 text-sm">Önerilen konaklama bölgesi</p>
-          <p className="font-display text-deniz mt-1 text-2xl">
+          <p className="font-display text-bordo mt-1 text-2xl">
             {rota.konaklama_bolgesi_onerisi.bolge_adi}
           </p>
           {rota.konaklama_bolgesi_onerisi.gerekce && (
@@ -46,7 +47,7 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
                 <li key={k.id}>
                   <Link
                     href={`/yer/${k.id}`}
-                    className="hover:text-deniz hover:underline"
+                    className="text-bordo decoration-deniz underline-offset-4 hover:underline hover:decoration-2"
                   >
                     {k.isim}
                   </Link>
@@ -58,7 +59,7 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
       )}
       {rota.gunler.map((gun) => (
         <section key={gun.gun_no}>
-          <h3 className="font-display text-deniz text-2xl">{gun.gun_no}. gün</h3>
+          <h3 className="font-display text-bordo text-2xl">{gun.gun_no}. gün</h3>
           <p className="text-ink/50 mt-1 text-sm">
             {(gun.toplam_mesafe_metre / 1000).toFixed(1)} km · ~{gun.toplam_sure_dakikasi}{" "}
             dk
@@ -68,11 +69,11 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
               <li key={`${gun.gun_no}-${durak.sira}`}>
                 <Link
                   href={`/yer/${durak.yer.id}`}
-                  className="group border-deniz/10 focus-visible:ring-samandira flex cursor-pointer gap-3 border-b pb-3 focus-visible:ring-2 focus-visible:outline-none"
+                  className="group border-bordo/12 focus-visible:ring-samandira flex cursor-pointer gap-3 border-b pb-3 focus-visible:ring-2 focus-visible:outline-none"
                 >
                   <span className="font-display text-yosun text-xl">{durak.sira}</span>
                   <span>
-                    <span className="text-ink group-hover:text-deniz block font-medium">
+                    <span className="text-ink group-hover:text-bordo block font-medium">
                       {durak.yer.isim}
                     </span>
                     <span className="text-ink/50 text-sm">
@@ -211,9 +212,9 @@ export function RotaSihirbazi({
                 setSenaryo("bolge_belli");
                 setAdim("tercihler");
               }}
-              className="border-deniz/10 hover:bg-kagit focus-visible:ring-samandira block w-full cursor-pointer rounded-2xl border bg-white px-5 py-4 text-left transition focus-visible:ring-2 focus-visible:outline-none"
+              className="border-bordo/12 hover:border-bordo/40 focus-visible:ring-samandira bg-tuz block w-full cursor-pointer rounded-[12px] border px-5 py-4 text-left transition-[border-color,background-color] duration-[var(--sure-hizli)] focus-visible:ring-2 focus-visible:outline-none"
             >
-              <span className="font-display text-deniz text-xl">
+              <span className="font-display text-bordo text-xl">
                 Konaklama bölgem belli
               </span>
               <span className="text-ink/60 mt-1 block text-sm">
@@ -226,9 +227,9 @@ export function RotaSihirbazi({
                 setSenaryo("bolge_degil");
                 setAdim("tercihler");
               }}
-              className="border-deniz/10 hover:bg-kagit focus-visible:ring-samandira block w-full cursor-pointer rounded-2xl border bg-white px-5 py-4 text-left transition focus-visible:ring-2 focus-visible:outline-none"
+              className="border-bordo/12 hover:border-bordo/40 focus-visible:ring-samandira bg-tuz block w-full cursor-pointer rounded-[12px] border px-5 py-4 text-left transition-[border-color,background-color] duration-[var(--sure-hizli)] focus-visible:ring-2 focus-visible:outline-none"
             >
-              <span className="font-display text-deniz text-xl">
+              <span className="font-display text-bordo text-xl">
                 Henüz karar vermedim
               </span>
               <span className="text-ink/60 mt-1 block text-sm">
@@ -253,7 +254,7 @@ export function RotaSihirbazi({
                 <select
                   value={bolgeAdi}
                   onChange={(e) => setBolgeAdi(e.target.value)}
-                  className="border-deniz/15 mt-2 min-h-11 w-full cursor-pointer rounded-xl border bg-white px-3 py-2 text-sm"
+                  className="border-bordo/12 bg-tuz mt-2 min-h-11 w-full cursor-pointer rounded-[8px] border px-3 py-2 text-sm"
                   required
                 >
                   <option value="">Seç…</option>
@@ -279,10 +280,10 @@ export function RotaSihirbazi({
                     key={g}
                     type="button"
                     onClick={() => setGunSayisi(g)}
-                    className={`focus-visible:ring-samandira inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-sm font-medium transition focus-visible:ring-2 focus-visible:outline-none ${
+                    className={`focus-visible:ring-samandira inline-flex size-11 cursor-pointer items-center justify-center rounded-[8px] text-base font-medium transition-[background-color,color] duration-[var(--sure-hizli)] focus-visible:ring-2 focus-visible:outline-none ${
                       gunSayisi === g
-                        ? "bg-deniz text-white"
-                        : "text-ink hover:bg-kagit bg-white"
+                        ? "bg-samandira text-base font-semibold text-white"
+                        : "text-ink hover:bg-kagit-koyu border-bordo/12 bg-tuz border"
                     }`}
                   >
                     {g}
@@ -341,14 +342,19 @@ export function RotaSihirbazi({
               <Dugme varyant="hayalet" onClick={() => setAdim("senaryo")}>
                 Geri
               </Dugme>
-              <Dugme varyant="birincil" type="submit" disabled={bekliyor}>
+              <Dugme
+                varyant="birincil"
+                type="submit"
+                disabled={bekliyor}
+                yukleniyor={bekliyor}
+              >
                 {bekliyor
                   ? "Hazırlanıyor…"
                   : senaryo === "bolge_belli"
                     ? `${sehirIsim} rotasını oluştur`
                     : "Alternatif rotaları göster"}
               </Dugme>
-              {bekliyor ? <span className="sonar-halka" aria-hidden="true" /> : null}
+              {bekliyor ? <Spinner className="text-bordo" /> : null}
             </div>
             {hata && (
               <p className="text-samandira-koyu text-sm whitespace-pre-wrap">{hata}</p>
@@ -367,9 +373,9 @@ export function RotaSihirbazi({
                 type="button"
                 disabled={bekliyor}
                 onClick={() => alternatifSec(alt)}
-                className="border-deniz/10 hover:bg-kagit focus-visible:ring-samandira block w-full cursor-pointer rounded-2xl border bg-white px-5 py-4 text-left transition focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
+                className="border-bordo/12 hover:border-bordo/40 focus-visible:ring-samandira bg-tuz block w-full cursor-pointer rounded-[12px] border px-5 py-4 text-left transition-[border-color,background-color] duration-[var(--sure-hizli)] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
               >
-                <span className="font-display text-deniz text-xl">
+                <span className="font-display text-bordo text-xl">
                   {alt.alternatif_etiketi ?? `Alternatif ${i + 1}`}
                 </span>
                 <span className="text-ink/60 mt-1 block text-sm">
@@ -408,8 +414,10 @@ export function RotaSihirbazi({
       <div>
         {!rota && adim !== "alternatifler" ? (
           <BosDurum
+            tip="hazirlaniyor"
             baslik="Plan henüz yok"
             metin="Senaryonu ve tercihlerini seçtiğinde gün gün rota burada belirecek."
+            ctalar={[]}
           />
         ) : adim === "alternatifler" && !rota ? (
           <div className="space-y-8">
