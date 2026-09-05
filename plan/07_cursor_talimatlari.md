@@ -1,19 +1,23 @@
-# Şamandıra — Cursor Talimat Paketi (T-00 … T-15 + Backlog)
-**Tarih:** 2026-09-05 · Format: brif §14'teki şablon (Amaç / Katman / Dosyalar / Yapılmayacaklar / Doğrulama)
+# Şamandıra — Cursor Talimat Paketi (T-00 … T-16 + Backlog)
+**Tarih:** 2026-09-05 · Güncelleme: 2026-09-05 (T-16 = `yon.md` P1–P6) · Format: brif §14'teki şablon (Amaç / Katman / Dosyalar / Yapılmayacaklar / Doğrulama)
+
+**Karar kaynağı (tek metin):** `plan/00_brief_eki.md` §3. Çelişkide o madde + `plan/tasarim/yon.md` kazanır.
 
 ## Kullanım ritüeli (her görevde)
-1. **Hazırlık (bir kez, manuel):** Bu `samandira/` klasörünün tamamını repoya **`plan/`** adıyla kopyalayın (00-07 + logo/). Cursor ajanı böylece şartnameleri kendisi okuyabilir; talimatlar kısa kalır.
+1. **Hazırlık (bir kez, manuel):** Bu `samandira/` klasörünün tamamını repoya **`plan/`** adıyla kopyalayın (00-07 + `logo/` + `tasarim/`). Cursor ajanı böylece şartnameleri kendisi okuyabilir; talimatlar kısa kalır.
 2. Yeni Cursor sohbeti aç → şunu yapıştır: *"Önce `plan/BRIF.md` ve `plan/00_brief_eki.md` dosyalarını oku (proje brifi + güncel kararlar)."* (Brif artık repo içinde — elle yapıştırma gerekmez.)
 3. Sonra ilgili görev metnini (aşağıdan kopyala) yapıştır. **Tek sohbette tek görev** — bağlam şişmesin.
 4. Görev bittiğinde ajana commit YAPTIRMAYIN; diff'i inceleyin, testi siz koşun, commit'i siz atın (brif kuralı).
 
 ## Bağımlılık sırası
 ```
-T-00 → T-01 → T-02 → T-03 → T-04 → T-12(deploy, robots kapalı) → T-05 → T-06 → (robots aç + GSC)
+T-00 → T-01 → T-02 → T-03 (K8 üretim = T-16 P1)
+                 → T-16 P2–P6 (yon.md; P1 kapandı)
+                 → T-04 → T-12(deploy, robots kapalı) → T-05 → T-06 → (robots aç + GSC)
                                                         → T-07, T-08, T-09, T-10, T-11 (paralel yürür)
                                                         → T-13, T-14 → T-15 → Backlog
 ```
-Not: T-12 erken yapılır ki dev tunnel'dan kurtulun; **GSC gönderimi T-06 bitmeden YAPILMAZ** (yarım site indekslenmesin) — T-12 sonrası robots.txt geçici olarak `Disallow: /` kalır, T-06'da açılır.
+Not: T-12 erken yapılır ki dev tunnel'dan kurtulun; **GSC gönderimi T-06 bitmeden YAPILMAZ** (yarım site indekslenmesin) — T-12 sonrası robots.txt geçici olarak `Disallow: /` kalır, T-06'da açılır. T-16 görsel makyajı SEO görevleriyle paralel yürüyebilir; P4 (hero sekansı) Unsplash/çekim künyesi ister.
 
 ---
 
@@ -39,15 +43,16 @@ Not: T-12 erken yapılır ki dev tunnel'dan kurtulun; **GSC gönderimi T-06 bitm
 **Yapılmayacaklar:** kod tanımlayıcıları, dosya yolları, DB içerikleri, git geçmişi, `plan/` dokümanlarındaki tarihsel atıflar değişmez.
 **Doğrulama:** `grep -ri "rotam" site/src sunucu --include="*.tsx" --include="*.ts" --include="*.py"` → kullanıcıya görünen dosyalarda 0 sonuç; tarayıcıda `/` ve `/docs` başlıklarını göster.
 
-## T-03A — İPTAL (2026-09-06)
-Logo + slogan keşfi **T-16 Faz 1**'e taşındı; bu başlık altında ayrı görev YOK. Diğer görevlerdeki "T-03A" atıfları "T-16 Faz 1" olarak okunur.
+## T-03A — İPTAL
+Logo + slogan keşfi kapandı. Final logo K8 (`plan/logo/secili/logo.png`). Diğer görevlerdeki "T-03A" / "T-16 Faz 1 logo" atıfları K8 olarak okunur.
 
-## T-03 — Logo, tema tokenları, favicon, 404
-**Amaç:** Görsel kimliğin kurulması (şamandıra teması).
+## T-03 — Logo üretim varlıkları, 404, bölge-nötr metin
+**Amaç:** K8 karosunun sitede durması; İngilizce 404 ve bölge kilitli cümlelerin bitmesi.
 **Katman:** site (+ public varlıklar).
-**Yapılacaklar:** (1) Benim seçtiğim konseptin PNG referansını (`plan/logo/` içinde, T-16 Faz 1 çıktısı final konsept PNG) temiz vektör çizime (SVG) SEN yeniden çiz: playwright ile referansla yan yana koyup çizgiler oturana kadar yinele; tam renk + tek renk beyaz + tek renk koyu varyantlarını üret ve `site/public/logo/` altına koy. (2) Favicon seti: `favicon.ico` (16/32/48), `apple-touch-icon.png` (180), PWA `icon-192.png`, `icon-512.png` + `manifest` kayıtları. (3) `globals.css` `@theme` içine `plan/04_marka_ve_tema.md` §3'teki tokenları ekle (`--color-samandira: #D6402C` vb.) — mevcut deniz/kopuk/kumsal/gunes tokenlarına DOKUNMA. (4) Header'a kompakt logo (mobil: yalnız mark), footer'a logo + §7 güven/atıf satırları. (5) Branded Türkçe `not-found.tsx` (404): şamandıra illüstrasyonu + "Sayfa bulunamadı — pusula şaştı" + Keşfet/Rota CTA'ları (şu an İngilizce Next default dönüyor). (6) Statik `og-default.png` üret (next/og ile `opengraph-image.tsx` T-07'de). (7) Geçici `/tasarim-secim` sayfasını ve tasarım turu kalıntılarını sil. (8) **K6 bölge-nötrleştirme:** "Karadeniz'in kişisel gezi rehberi" gibi bölgeye kilitli marka cümlelerini tüm yüzeylerden temizle (`layout.tsx` title/description varsayılanı, manifest, OG, footer tagline, hero metni) — yerine T-16 Faz 1'de seçilen bölge-nötr konumlanma cümlesini koy; şehir vurgusu yalnız veri katmanından gelir.
-**Yapılmayacaklar:** sayfa düzenlerini yeniden tasarlama; renk paletinde mevcut tokenları değiştirme; rota motoru/taksonomi.
-**Doğrulama:** Playwright MCP ile `/`, `/sehir/samsun`, `/yer/{herhangi}` ve olmayan bir URL'de 375px + 1280px ekran görüntüleri; sekme faviconu görünüyor.
+**Şartname:** `plan/00_brief_eki.md` §3.8 (K8), `plan/04_marka_ve_tema.md` §4, `plan/tasarim/yon.md` §1.6.
+**Yapılacaklar:** (1) `plan/logo/secili/logo.png` **sabit** — çizgi/kompozisyon/renk değiştirme. Yalnız üretim: şeffaf + açık zemin PNG, favicon 16/32/48 + `.ico`, apple-touch 180, PWA 192/512 + maskable, header kilidi (karo + `şamandıra`), `og-default.png`. Script: `site/scripts/logo_uretim.mjs`. (2) Header/footer `KelimeKilidi` + `LogoKaro` (`next/image`). Ufuk SVG/bileşen yok. (3) Türkçe `not-found.tsx`. (4) `/tasarim-secim` yok. (5) **K6:** "Karadeniz'in kişisel gezi rehberi" yüzeylerden temiz.
+**Yapılmayacaklar:** logoyu yeniden çizmek; vektör "yorumu"; rota motoru.
+**Doğrulama:** sekme faviconu; `/` header kilidi 375+1280; 404 Türkçe.
 
 ## T-04 — Prod build disiplini
 **Amaç:** `npm run dev` ile yayının bitmesi; prod build'in temiz çıkması.
@@ -135,14 +140,31 @@ Logo + slogan keşfi **T-16 Faz 1**'e taşındı; bu başlık altında ayrı gö
 
 ---
 
-## T-16 — Sinematik site makyajı (3 faz, seçim kapılı)
-**Amaç:** Kullanıcı çıtası (K5, K6, K7): sinematik, göz alıcı, ajans işi tasarım — "gören oha desin". Tüm yüzeyler: hero, header/navbar, footer, gövde, kartlar, CTA'lar, yönlendirmeler; logo + slogan keşfi dahil (T-03A'yı absorbe eder).
-**Katman:** site + `plan/logo/` çıktıları.
-**FAZ 1 — Keşif (DUR kapısı):** (1) **Araştırma:** kaynak havuzu: designprompts.dev (hazır tasarım promptları), awwwards.com (ödüllü siteler), lapa.ninja (landing galerisi), 21st.dev (bileşen/hero galerileri), animations.dev (animasyon desenleri), figma.com/community (tasarım dosyaları), Godly.website, Mobbin, Land-book, Behance, Typewolf; en az 8 kaynak/site incele; desenleri çıkar (hero kurgusu, scroll koreografisi, tipografi ölçeği, renk kullanımı, kart anatomisi, CTA dili) → `plan/logo/arastirma.md` dosyasına en az 12 madde + URL listesi. **Benzemezlik kuralı:** ilham desen düzeyinde, benzetme yasak; hedef benzersiz, bize özgü, ajansların örnek göstereceği iş. (2) **ui-ux-pro-max** skill'i ile tasarım sistemi yönü (stil, palet ruhu, tipografi, boşluk, hareket dili) → aynı dosyaya. (3) **Logo:** 4 konsept SVG; geometrik kurulum + optik düzeltme; mockup duvarı: header açık/koyu, uygulama ikonu, kartvizit, harita markırı, favicon 16/32px (HTML mockup + playwright ekran görüntüsü); konsept başına ≥2 iyileştirme yinelemesi + 16px/tek renk/silüet testi + benzersizlik testi (referanslara benziyorsa yeniden çiz). (4) **Slogan:** gerekçeli 10 aday; ≤5 kelime, bölge kilidi YOK (K6); **baş kriter SEO + GEO (K7):** aranabilir kategori kelimesi + AI asistanlarının alıntılayabileceği kesin tanım cümlesi; en iyi 3'ü kullanım örnekleriyle (header, OG, footer, meta). (5) **Sergi:** `/tasarim-secim` (noindex): mockup duvarları + slogan kartları + tasarım yönü özeti. **DUR:** sergi adresini raporla; kullanıcı seçimi olmadan Faz 2'ye GEÇME.
-**FAZ 2 — Makyaj (seçim sonrası):** (6) **Tasarım sistemi:** `globals.css` @theme tokenları (renk/tipografi ölçeği/boşluk/radius/gölge/hareket zamanlaması); bileşen kütüphanesi `site/src/components/ui/`: kart ailesi (yer kartı, şehir kartı, rehber kartı), CTA butonları (birincil/ikincil/hayalet), rozetler, bölüm başlığı, istatistik bandı, duygu özeti bloğu, boş durumlar; tüm bileşen + varyantları listeleyen /tasarim-sistemi vitrin sayfası (noindex) — gelecekte eklenecek her şey bu kütüphaneden üretilecek. (7) **Bilgi mimarisi + navbar + footer:** raporda navbar IA önerisi (sayfa, route, amaç: Keşfet, Şehirler, Rota Planlayıcı, Rehber, Hakkımızda; yasal linkler footer'da); navbar uygulaması: sticky, kaydırdıkça dolan zemin, mobilde sheet menü; footer 4 kolon: marka+slogan, sayfalar, yasal, OSM atfı + güven cümlesi; henüz var olmayan sayfalara ÖLÜ link koyma (görevi gelince eklenir). (8) **Sayfa makyajları:** ana sayfa = sinematik hero (animasyonlu deniz ufku + süzülen şamandıra + büyük Fraunces başlık + çift CTA) + scroll koreografisi (istatistik bandı, kategori kartları, şehir tanıtımı, duygu teasers, CTA bandı); şehir sayfası = hero bandı + kategori ızgarası + skor sıralı yer kartları; yer detay = duygu özeti bloğu + skor kırılım görseli; rota sonucu sayfası; hepsinde whileInView reveal + paralaks katmanlar + mikro etkileşimler; animasyonlar yalnız transform/opacity. (9) **Hareket dili:** animations.dev desenlerinden: scroll-triggered reveal, kademeli kart girişleri, hover'da yükselme + şamandıra ışığı parlaması, kategori marquee bandı, yükleme sonar halkası; `prefers-reduced-motion` → tamamen statik. (10) **K6:** bölge/şehir-bağımsız metin ve bileşenler; **K7:** "önce cevap" paragrafları ve tanım cümlesi yerleşimleri bozulmayacak.
-**FAZ 3 — Rapor:** tüm sayfaların playwright ekran görüntüleri 375px + 1280px (üst/orta/alt); Lighthouse mobil (Perf ≥ 80, SEO ≥ 95, A11y ≥ 90, BP ≥ 90); reduced-motion testi; değişen dosya listesi.
-**Yapılmayacaklar:** yeni bağımlılık (motion kurulu); 21st.dev vb. yerlerden kopyala-yapıştır kod (ilham yalnız); rota motoru/veri katmanı; ölü link; bölge kilitli metin; Lighthouse'u düşüren animasyon.
-**Doğrulama:** faz kapıları yukarıda; görev ancak kullanıcı onayıyla kapanır.
+## T-16 — Sinematik makyaj (P1–P6, `yon.md`)
+**Amaç:** K5/K6/K7 + K8/K9. Şartname: `plan/tasarim/yon.md`. Model: Grok 4.6 extra high (K10). Auto yasak.
+**Katman:** site + `plan/tasarim/` + public varlıklar.
+**Lint anayasası (her pakette):** iç gezinme `next/link`; görseller `next/image`; render sırasında ref okuma yok; effect gövdesinde senkron `setState` yok (kaydırma CSS `animation-timeline` veya olay dinleyicisi); diyalog/sheet Escape ile kapanır.
+
+**P1 — Marka varlıkları** (ön koşul: yok; **kapandı**)
+K8 logosundan üretim seti (`site/scripts/logo_uretim.mjs`); vektörleştirme yok (kaynak PNG sabittir). Ufuk varlık/bileşen yok; header kilidi karo + wordmark. Doğrulama: favicon + `/` kilidi.
+
+**P2 — Tokenlar** (ön koşul: P1)
+`yon.md` §1.2 palet (bordo rampı, `tuz`), §1.3 tipografi ölçeği, §1.4 boşluk, §1.6 köşe (kontrol 8 px, kart 12 px, plaka 0/4), §4.1 zamanlama. `.dalga` / `.serit-kaydir` / `.sonar-halka` / `.samandira-suz` kaldır. `deniz` veri katmanına iner. Doğrulama: tokenlar `@theme`'de; kontrast tablosu §1.2.
+
+**P3 — Bileşen kütüphanesi** (ön koşul: P2)
+`yon.md` §3 davranış tanımları: sticky header, footer 4 kolon, `Plaka`, kart/CTA/rozet/bölüm başlığı/istatistik/boş durum/iskelet. `/tasarim-sistemi` vitrini (noindex) bu sözleşmeyi listeler. Ölü link yok. Doğrulama: vitrin 375+1280; boş ve dolu kart yüksekliği aynı.
+
+**P4 — Hero sekansı** (ön koşul: P3)
+`yon.md` §2: asimetrik split; Faz A/B; Yol B (Unsplash plaka kurgusu) köprü, künye `plan/tasarim/gorsel-kaynak.md`. Video yok. `prefers-reduced-motion` → statik kapak. Bütçe ≤ 900 KB / ≤ 380 KB. Doğrulama: ağ sekmesi bayt; reduced-motion kare indirmiyor.
+
+**P5 — Sayfa makyajı** (ön koşul: P4)
+`yon.md` §4.2 koreografi + §6 yerleşim eşikleri. Ana, keşif, yer, bölgeler, sihirbaz, 404. Bölüm adları kullanıcı sorusu. Mini CTA + doruk CTA. Doğrulama: tarayıcı akışı (tek ekran kanıt değil).
+
+**P6 — Doğrulama** (ön koşul: P5)
+`yon.md` §8 on kapı: Lighthouse mobil Perf≥80 SEO≥95 A11y≥90 BP≥90; CLS≤0,02; reduced-motion 0 hidrasyon uyarısı; ölü link taraması; "Rotam" yok.
+
+**Yapılmayacaklar:** yeni bağımlılık (motion kurulu; sharp yalnız üretim script'i); 21st.dev kopyala-yapıştır; rota motoru/veri; logoyu yeniden çizmek; marquee; ağır tema; Auto mod.
+**Doğrulama:** paket kapıları yukarıda; görev kullanıcı onayıyla kapanır.
 
 ---
 
@@ -167,4 +189,4 @@ Logo + slogan keşfi **T-16 Faz 1**'e taşındı; bu başlık altında ayrı gö
 5. GSC + Bing Webmaster (T-06 sonrası), UptimeRobot, Oracle bütçe alarmı.
 6. Sosyal hesaplar: Instagram/X/TikTok/YouTube `@samandira...` (handle ASCII) + TÜRKPATENT marka ön araştırması (`plan/04` §9).
 7. Fotoğraf çekim planı: ilk 30 yer (kendiniz çekin — en özgün içerik; hafta sonu 2 tur yeter).
-8. Logo konsept seçimi (A/B/C — `logo/onizleme.html`) ve slogan anketi.
+8. Logo FİNAL (K8, 2026-09-05): `plan/logo/secili/logo.png`. Slogan + GEO tanım cümlesi kilit. Eski turlar: `plan/logo/arsiv/`. Yön: `plan/tasarim/yon.md`.

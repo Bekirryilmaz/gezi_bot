@@ -1,10 +1,12 @@
-# T-16 Faz 1 — Keşif ve Araştırma Dosyası
+# T-16 Faz 1 — Keşif ve Araştırma Dosyası (tarihçe)
 
-**Tarih:** 2026-09-05 · **Görev:** `plan/07_cursor_talimatlari.md` → T-16 Faz 1 · **Durum:** Faz 1 tamamlandı, seçim kapısı bekliyor.
+**Tarih:** 2026-09-05 · **Görev (o gün):** T-16 Faz 1 keşif · **Durum:** tarihçe.
 
-Bu dosya T-16 Faz 1'in araştırma çıktısıdır: kaynak havuzu taraması, çıkarılan desenler, `ui-ux-pro-max` tasarım sistemi yönü, logo konsept gerekçeleri ve SEO+GEO odaklı slogan stratejisi. Ekran görüntüleri `plan/logo/arastirma/` klasöründedir (21 dosya, 1280×900, Playwright MCP ile alındı).
+> **K8 bu dosyayı geçersiz kılar (logo).** Kullanıcı illüstrasyonu `plan/logo/secili/logo.png` FİNAL'dir; §6–§7'deki Ufuk / Sonar / Rota / Demir seçimi uygulanmaz. **Slogan + GEO tanım cümlesi (§5 / §7) geçerlidir.** Güncel karar: `plan/00_brief_eki.md` §3. Güncel yön: `plan/tasarim/yon.md`. Sergi `/tasarim-secim` kapatıldı.
 
-**Bağlam / kısıt:** K5 (tasarım çıtası "oha"), K6 (bölge kilidi YOK — tüm Türkiye), K7 (baş kriter SEO + GEO). Marka paleti (`deniz/kopuk/kumsal/gunes` + `samandira #D6402C`) ve fontlar (Fraunces + Sora) `plan/04_marka_ve_tema.md` ile kilitlidir; araştırma bu kilidi değiştirmek için değil, **ölçek/hareket/kompozisyon** kararlarını beslemek için yapıldı.
+Bu dosya T-16 Faz 1'in araştırma çıktısıdır: kaynak havuzu taraması, çıkarılan desenler, `ui-ux-pro-max` notları, reddedilen logo gerekçeleri ve SEO+GEO slogan stratejisi. Ekran görüntüleri `plan/logo/arastirma/` klasöründedir.
+
+**Bağlam / kısıt (o gün):** K5, K6, K7. Palet o sırada `deniz/kopuk/kumsal/gunes` + `samandira #D6402C` idi; **güncel palet `yon.md` §1.2** (bordo mürekkep). Fontlar Fraunces + Sora kilit kaldı.
 
 ---
 
@@ -118,7 +120,7 @@ K7 gereği slogan bir "reklam cümlesi" değil, **iki ayrı işi** yapan bir çi
 
 GEO filtreleri: aranan kategori kelimesi (`gezi rehberi`, `rota planlayıcı`, `gezilecek yerler`) slogan veya tanım cümlesinde **birebir** geçmeli; tanım cümlesi bağlamdan bağımsız tek başına doğru olmalı ("önce cevap" ilkesi, `02_seo_mimarisi.md` §11); marka adı cümlenin öznesi olmalı ki alıntıda kaybolmasın.
 
-Adaylar, gerekçeleri ve en iyi üçün kullanım örnekleri `/tasarim-secim` sergisindeki slogan kartlarında sunulmuştur (10 aday).
+Adaylar, gerekçeleri ve en iyi üçün kullanım örnekleri bu dosyanın §5'indedir (10 aday). `/tasarim-secim` sergisi kapatıldı.
 
 ---
 
@@ -168,25 +170,22 @@ Kalan bilinen kusur (düzeltilmedi, kapsam dışı): arşiv bölümündeki 45 ba
 
 ---
 
-## 7. SEÇİM — Faz 1 karar kapısı (kullanıcı onayı alındı)
+## 7. SEÇİM — Faz 1 kapısı (kısmen superseded)
 
-**Tarih:** 2026-09-05 · Sergi (`/tasarim-secim`) üzerinden onaylandı.
+**Tarih:** 2026-09-05 · Sergi (`/tasarim-secim`, kapatıldı) üzerinden o gün onaylandı.
 
-| Karar | Seçim | Not |
+| Karar | O günkü seçim | 2026-09-05 sonrası |
 |---|---|---|
-| **Logo konsepti** | **Ufuk** — halka + iki parçalı ufuk çizgisi + yansıma | Dört testin (16px / tek renk / silüet / benzersizlik) dördünü de geçen tek konsept; kapanmayan sınırı yok. Kaynak: `plan/logo/kesif/ufuk.svg`. |
-| **Slogan** | **Aday 01 — "Gezilecek yerleri işaretler."** | 3 kelime, bölge-nötr. En yüksek hacimli anahtar kelime ("gezilecek yerler") birebir içinde; "işaretlemek" şamandıranın fiili olduğu için marka bağı doğal. |
-| **GEO tanım cümlesi** | Aday 01'in tanım cümlesi | Slogan tek başına ürünün rota tarafını anlatmıyor; GEO katı bu açığı kapatıyor. Sergideki slogan kartında tam metin var. |
-| **Tasarım yönü** | **Onaylandı** | Kâğıt zemin tokenı, tipografi ölçeği ve dört bölümlü kaydırma anlatısı olduğu gibi Faz 2'ye geçiyor. |
+| **Logo** | Ufuk (`plan/logo/arsiv/ufuk.svg`) | **GEÇERSİZ — K8:** `plan/logo/secili/logo.png` |
+| **Slogan** | Aday 01 — "Gezilecek yerleri işaretler." | **Geçerli** (`00_brief_eki.md` §3.5) |
+| **GEO tanım cümlesi** | Aday 01 tanımı | **Geçerli** (`04_marka_ve_tema.md` §1) |
+| **Tasarım yönü** | Kâğıt zemin + ufuk→sığlık→rota→demir anlatısı | Yön **`yon.md`**: "Mürekkep ve Tuz"; bölüm adları kullanıcı sorusu; denizcilik anlatısı düşer |
 
-Reddedilen üç konsept (Sonar / Rota / Demir) ve beş turluk yineleme kaydı §6.1'de duruyor — ileride kimlik genişletmesi gerekirse gerekçeleriyle birlikte hazır.
+Reddedilen üç konsept (Sonar / Rota / Demir) §6.1 ve `plan/logo/arsiv/` tarihçesidir.
 
-### Faz 2 için ilk iş: Ufuk'un üretim varlıkları (T-03)
+### Üretim (K8, Ufuk değil)
 
-- Favicon seti (16 / 32 / 48 / 180 / 512) + `favicon.ico` + maskable ikon.
-- Üç renk varyantı: tam renk (deniz + şamandıra kırmızısı), tek renk (currentColor), silüet.
-- Kelime işareti kilidi: işaret ile "şamandıra" arasındaki boşluk ve minimum boyut kuralı.
-- `plan/04_marka_ve_tema.md` §4'teki A/B/C konsept taslakları Ufuk ile değiştirilir.
+Favicon / apple-touch / PWA / maskable / OG / şeffaf+açık karo: `plan/04_marka_ve_tema.md` §4, script `site/scripts/logo_uretim.mjs`. Çizgi/kompozisyon/renk değişmez.
 
 ---
 

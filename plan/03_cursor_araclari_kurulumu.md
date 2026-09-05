@@ -1,6 +1,8 @@
 # Cursor Araçları & Skill'leri — Kurulum Rehberi (Şamandıra)
 **Tarih:** 2026-09-05 · Amaç: Cursor ajanını bu projede **güvenilir, hızlı ve proje kurallarına sadık** çalıştıracak donanımı kurmak.
 
+> **Karar kaynağı:** `plan/00_brief_eki.md` §3. Bu dosya araç kurulumudur; marka/logo kararı burada yok.
+
 > 2026 Cursor ekosisteminde 5 katman var: (1) `AGENTS.md` — repo bağlamı, (2) `.cursor/rules/*.mdc` — her zaman/koşullu uygulanan kurallar, (3) `.cursor/commands/` — tekrarlayan görev şablonları, (4) **MCP sunucuları** (`.cursor/mcp.json`) — dış araç erişimi, (5) **SKILL.md** becerileri — taşınabilir, gerektikçe yüklenen prosedürler. Aşağıdaki kurulum bu katmanları bilinçli kullanır: az ama isabetli.
 
 ---
@@ -239,7 +241,7 @@ Benzerleri: `/seo-denetle` (sayfa URL'i ver → title/desc/JSON-LD/canonical/img
 
 ## 8. GitHub tarafı
 
-- Repo `gezi_bot` → **`samandira`** olarak yeniden adlandır (GitHub otomatik redirect verir); açıklama: "Şamandıra — Karadeniz'in kişisel gezi rehberi ve rota planlayıcısı (Next.js + FastAPI + PostGIS)".
+- Repo `gezi_bot` → **`samandira`** olarak yeniden adlandır (GitHub otomatik redirect verir); açıklama: "Şamandıra — gezilecek yerler ve rota planlayıcısı (Next.js + FastAPI + PostGIS)".
 - `main` branch koruması: PR zorunlu, 1 onay (iki kişilik ekipte birbirinizin PR'ı), status check: lint+test.
 - **GitHub Projects** board: Buzdolabı / Bu hafta / Cursor'da / İnceleme / Bitti.
 - İki profil de bu repoyu **pin'lesin** (mevcut pin'ler zayıf; mezuniyet vitrini için kritik).

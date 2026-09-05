@@ -1,6 +1,8 @@
 # Şamandıra — Oracle Cloud'a Canlıya Alma (şamandıra.com)
 **Tarih:** 2026-09-05 · Hedef: dev tunnel'dan kalıcı, hızlı, güvenli yayına geçiş · Süre: ~1 tam gün (manuel adımlar dahil)
 
+> **Karar kaynağı:** `plan/00_brief_eki.md` §3. Bu dosya deploy şartnamesidir.
+
 > Karar doğrulandı: Oracle **Always Free** Ampere A1 kotası (4 OCPU / 24 GB RAM / 200 GB blok / 10 TB egress) **PAYG hesaplarında ücretsiz kalıyor**; Haziran 2026'daki kısıtlama yalnızca Free Tier (PAYG'ye yükseltilmemiş) hesapları etkiledi. PAYG'ye yükseltmiş olmanız doğru hamleydi — ayrıca PAYG'de "boşta kaldı diye instance'ı geri alma" (idle reclaim) riski de yok. Yine de bütçe alarmı kurun (aşağıda).
 
 ---
@@ -102,11 +104,11 @@ deploy/
 
 **Caddyfile** (IDN → punycode ile yazılır):
 ```
-www.xn--amandra.com-3zb60d {
-    redir https://xn--amandra.com-3zb60d{uri} permanent
+www.xn--amandra-vfb22b.com {
+    redir https://xn--amandra-vfb22b.com{uri} permanent
 }
 
-xn--amandra.com-3zb60d {
+xn--amandra-vfb22b.com {
     encode zstd gzip
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -118,7 +120,7 @@ xn--amandra.com-3zb60d {
     reverse_proxy site:3000
 }
 
-api.xn--amandra.com-3zb60d {
+api.xn--amandra-vfb22b.com {
     encode gzip
     reverse_proxy api:8125
 }
@@ -141,7 +143,7 @@ services:
     build: {context: .., dockerfile: deploy/api/Dockerfile}
     environment:
       VERITABANI_URL: postgresql+psycopg://gezi_kullanici:${DB_PASSWORD}@db:5432/gezi_veritabani
-      API_IZINLI_ORIGINLER: https://xn--amandra.com-3zb60d,https://şamandıra.com
+      API_IZINLI_ORIGINLER: https://xn--amandra-vfb22b.com,https://şamandıra.com
     depends_on: [db]
     restart: unless-stopped
 
@@ -167,7 +169,7 @@ volumes: {pgdata: {}, caddy_data: {}, caddy_config: {}}
 ```
 
 Kritik env notları:
-- **CORS Origin punycode olur:** tarayıcılar IDN sitelerde `Origin: https://xn--amandra.com-3zb60d` gönderir → `API_IZINLI_ORIGINLER`'de punycode **zorunlu** (Unicode varyantı eklemek zararsız).
+- **CORS Origin punycode olur:** tarayıcılar IDN sitelerde `Origin: https://xn--amandra-vfb22b.com` gönderir → `API_IZINLI_ORIGINLER`'de punycode **zorunlu** (Unicode varyantı eklemek zararsız).
 - `NEXT_PUBLIC_*` değişkenleri **build anında** gömülür: site imajı `http://api:8125` ile build edilir (SSR docker içinden çözer); tarayıcı tarafı her zaman göreceli `/backend/*` kullanmalı (mevcut mimari zaten böyle — T-12'de doğrulanacak).
 - `next.config.ts`: `output: 'standalone'` eklenir; `/backend` rewrite hedefi env'den (`BACKEND_INTERNAL_URL`, default `http://127.0.0.1:8125`; docker'da `http://api:8125`).
 
@@ -175,12 +177,12 @@ Kritik env notları:
 
 | Kayıt | Tür | Değer |
 |---|---|---|
-| `@` (xn--amandra.com-3zb60d) | A | `<REZERVE_IP>` |
+| `@` (xn--amandra-vfb22b.com) | A | `<REZERVE_IP>` |
 | `www` | A | `<REZERVE_IP>` (Caddy 301'ler) |
 | `api` | A | `<REZERVE_IP>` |
 | `_google-site-verification` | TXT | GSC doğrulama değeri |
 
-GoDaddy panelinde alan adı zaten IDN olarak görünür; kayıt ekranında `www` gibi ASCII alt adlar yeterli. DNS yayılması 5 dk–24 saat; `nslookup xn--amandra.com-3zb60d` ile doğrulayın. Sertifika: DNS çözüldükten sonra Caddy Let's Encrypt'ten otomatik alır (HTTP-01; 80 açık olmalı).
+GoDaddy panelinde alan adı zaten IDN olarak görünür; kayıt ekranında `www` gibi ASCII alt adlar yeterli. DNS yayılması 5 dk–24 saat; `nslookup xn--amandra-vfb22b.com` ile doğrulayın. Sertifika: DNS çözüldükten sonra Caddy Let's Encrypt'ten otomatik alır (HTTP-01; 80 açık olmalı).
 
 ## 6. İlk açılış (sunucuda)
 
@@ -189,7 +191,7 @@ git clone https://github.com/<hesap>/samandira.git && cd samandira/deploy
 cp .env.example .env && nano .env        # DB_PASSWORD üret: openssl rand -hex 24
 docker compose build && docker compose up -d
 docker compose ps                         # hepsi healthy/up
-curl -I https://xn--amandra.com-3zb60d    # 200 beklenir
+curl -I https://xn--amandra-vfb22b.com    # 200 beklenir
 # pg_restore (§3) → alembic upgrade head (api konteynerinde) → /healthz kontrolü
 ```
 

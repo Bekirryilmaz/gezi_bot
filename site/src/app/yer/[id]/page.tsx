@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
+import { SayfaHero } from "@/components/layout/SayfaHero";
+import { BosDurum } from "@/components/ui/BosDurum";
+import { Dugme } from "@/components/ui/Dugme";
+import { DuyguOzeti } from "@/components/ui/DuyguOzeti";
+import { Rozet } from "@/components/ui/Rozet";
+import { SkorKirilim } from "@/components/ui/SkorKirilim";
 import { yerDetayiGetir } from "@/lib/api";
 import { altKategoriEtiketi, kategoriEtiketi } from "@/lib/sabitler";
 
@@ -11,7 +16,12 @@ export async function generateMetadata({ params }: Props) {
   const { id } = await params;
   try {
     const yer = await yerDetayiGetir(id);
-    return { title: yer.isim };
+    return {
+      title: yer.isim,
+      description:
+        yer.duygu_ozeti?.slice(0, 155) ||
+        `${yer.isim} — ${kategoriEtiketi(yer.ana_kategori)}. Şamandıra gezilecek yerler rehberi.`,
+    };
   } catch {
     return { title: "Yer" };
   }
@@ -29,11 +39,12 @@ export default async function YerDetaySayfasi({ params }: Props) {
     yer = await yerDetayiGetir(id);
   } catch {
     return (
-      <main className="atmosfer min-h-screen px-5 py-24">
-        <p>Yer bulunamadı veya API’ye ulaşılamadı.</p>
-        <Link href="/sehir/samsun" className="mt-4 inline-block text-yosun">
-          ← Keşfe dön
-        </Link>
+      <main className="px-5 pt-28 pb-16">
+        <BosDurum
+          baslik="Yer bulunamadı"
+          metin="Pusula şaştı — keşfe dönüp başka bir işaret seçebilirsin."
+          cta={{ href: "/sehir/samsun", etiket: "Keşfe dön" }}
+        />
       </main>
     );
   }
@@ -43,77 +54,81 @@ export default async function YerDetaySayfasi({ params }: Props) {
     ulasim_kolayligi?: { deger?: string };
   };
 
-  const tanitim =
-    yer.tanitim_metni ||
-    yer.aciklama ||
-    null;
+  const tanitim = yer.tanitim_metni || yer.aciklama || null;
 
   return (
-    <main className="atmosfer min-h-screen">
-      <div className="relative bg-deniz-derin pb-14 pt-24 text-white">
-        <SiteHeader />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
-          <Link href="/sehir/samsun" className="text-sm text-white/60 hover:text-white">
-            ← Samsun keşif
-          </Link>
-          <h1 className="mt-4 font-display text-4xl leading-tight md:text-6xl">
-            {yer.isim}
-          </h1>
-          <p className="mt-3 text-white/75">
-            {kategoriEtiketi(yer.ana_kategori)} · {altKategoriEtiketi(yer.alt_kategori)}
-            {yer.ilce ? ` · ${yer.ilce}` : ""}
-          </p>
-        </div>
-      </div>
+    <main>
+      <SayfaHero
+        etiket={[kategoriEtiketi(yer.ana_kategori), yer.ilce].filter(Boolean).join(" · ")}
+        baslik={yer.isim}
+        ozet={`${altKategoriEtiketi(yer.alt_kategori)} — skorlar türetilmiş metrik; ham yorum metni yok.`}
+      />
 
       <div className="mx-auto grid max-w-6xl gap-12 px-5 py-12 md:grid-cols-[1.4fr_1fr] md:px-8">
         <div className="space-y-12">
           <section>
-            <h2 className="font-display text-2xl text-deniz md:text-3xl">Tanıtım</h2>
+            <h2 className="font-display text-deniz text-2xl tracking-[-0.01em] md:text-3xl">
+              Tanıtım
+            </h2>
             {tanitim ? (
-              <p className="mt-4 text-lg leading-relaxed text-ink/85">{tanitim}</p>
+              <p className="text-ink/85 mt-4 text-lg leading-relaxed">{tanitim}</p>
             ) : (
-              <p className="mt-4 text-ink/55">
+              <p className="text-ink/55 mt-4">
                 Bu yer için henüz derlenmiş bir tanıtım metni yok.
               </p>
             )}
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-deniz md:text-3xl">
+            <h2 className="font-display text-deniz text-2xl tracking-[-0.01em] md:text-3xl">
               Kullanıcı deneyimleri
             </h2>
             {yer.duygu_ozeti ? (
-              <p className="mt-4 text-lg leading-relaxed text-ink/85">{yer.duygu_ozeti}</p>
+              <DuyguOzeti className="mt-4" metin={yer.duygu_ozeti} />
             ) : (
-              <p className="mt-4 text-ink/55">
+              <p className="text-ink/55 mt-4">
                 Bu yer için henüz kullanıcı deneyimi özeti oluşturulmadı.
               </p>
             )}
           </section>
+
+          {Object.keys(yer.deneyim_puanlari ?? {}).length > 0 ? (
+            <section>
+              <h2 className="font-display text-deniz text-2xl tracking-[-0.01em] md:text-3xl">
+                Skor kırılımı
+              </h2>
+              <p className="text-ink/55 mt-2 text-sm">
+                Her önerinin nedeni açık: eksenler ayrı puanlanır.
+              </p>
+              <div className="mt-5 max-w-md">
+                <SkorKirilim kirilim={yer.deneyim_puanlari} />
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <aside className="space-y-6 text-sm">
           {yer.kaynakta_puan_ortalamasi != null && (
             <div>
               <p className="text-ink/45">Puan</p>
-              <p className="font-display text-3xl text-yosun">
+              <p className="font-display text-yosun text-3xl tabular-nums">
                 {yer.kaynakta_puan_ortalamasi.toFixed(1)}
               </p>
             </div>
           )}
+          <Rozet ton="deniz">{kategoriEtiketi(yer.ana_kategori)}</Rozet>
           {profil.fiyat_algisi?.deger &&
             profil.fiyat_algisi.deger !== "bilgi_yetersiz" && (
               <div>
                 <p className="text-ink/45">Fiyat algısı</p>
-                <p className="mt-1 capitalize text-ink">{profil.fiyat_algisi.deger}</p>
+                <p className="text-ink mt-1 capitalize">{profil.fiyat_algisi.deger}</p>
               </div>
             )}
           {profil.ulasim_kolayligi?.deger &&
             profil.ulasim_kolayligi.deger !== "bilgi_yetersiz" && (
               <div>
                 <p className="text-ink/45">Ulaşım</p>
-                <p className="mt-1 capitalize text-ink">
+                <p className="text-ink mt-1 capitalize">
                   {profil.ulasim_kolayligi.deger}
                 </p>
               </div>
@@ -121,13 +136,13 @@ export default async function YerDetaySayfasi({ params }: Props) {
           {yer.adres && (
             <div>
               <p className="text-ink/45">Adres</p>
-              <p className="mt-1 text-ink">{yer.adres}</p>
+              <p className="text-ink mt-1">{yer.adres}</p>
             </div>
           )}
           {yer.telefon && (
             <div>
               <p className="text-ink/45">Telefon</p>
-              <p className="mt-1 text-ink">{yer.telefon}</p>
+              <p className="text-ink mt-1">{yer.telefon}</p>
             </div>
           )}
           {yer.web_sitesi && !yer.web_sitesi.includes("google.com/search") && (
@@ -135,24 +150,30 @@ export default async function YerDetaySayfasi({ params }: Props) {
               href={yer.web_sitesi}
               target="_blank"
               rel="noreferrer"
-              className="inline-block text-yosun hover:underline"
+              className="text-yosun inline-block cursor-pointer hover:underline"
             >
-              Web sitesi →
+              Web sitesi
             </a>
           )}
           <a
             href={googleMapsUrl(yer.enlem, yer.boylam, yer.isim)}
             target="_blank"
             rel="noreferrer"
-            className="block text-yosun hover:underline"
+            className="text-yosun block cursor-pointer hover:underline"
           >
-            Haritada aç →
+            Haritada aç
           </a>
-          <Link
+          <Dugme
             href={`/sehir/samsun/rota?konaklama_yer_id=${yer.id}`}
-            className="block rounded-full bg-gunes px-4 py-2 text-center font-semibold text-deniz-derin"
+            varyant="birincil"
           >
             Burayı konaklama üssü yap
+          </Dugme>
+          <Link
+            href="/sehir/samsun"
+            className="text-deniz block cursor-pointer text-sm hover:underline"
+          >
+            Keşfe dön
           </Link>
         </aside>
       </div>

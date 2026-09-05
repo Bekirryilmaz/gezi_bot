@@ -10,7 +10,8 @@ C:\Users\ebube\OneDrive\Desktop\buyuk_gezi_projesi\gezi_bot\   ← repo kökü
 │   ├── BASLA.md             (bu dosya)
 │   ├── 00_brief_eki.md      (her Cursor sohbetine yapıştırılacak güncel bağlam)
 │   ├── 01..07_*.md          (strateji, SEO, araçlar, marka, deploy, mobil, talimatlar)
-│   └── logo\                (SVG konseptler + onizleme.html + hero görsel)
+│   ├── tasarim\             (yon.md — görsel yön, P1–P6)
+│   └── logo\                (secili/ K8 final · arastirma/ tarama · arsiv/ reddedilen SVG)
 │
 ├── .cursor\                 ← ADIM 2-4: skill'ler + MCP buraya kurulur
 │   ├── skills\              (ui-ux-pro-max, react-best-practices, seo-audit)
@@ -150,12 +151,12 @@ git add -A && git commit -m "chore: Cursor araç kurulumu + plan klasörü (T-00
 `plan/07_cursor_talimatlari.md`'deki bağımlılık sırası:
 
 ```
-T-00 → T-01 (README gerçeği) → T-02 (Rotam→Şamandıra metinleri) → T-03 (logo/tema/404)
-     → T-04 (prod build) → T-12 (deploy paketi) → T-05 (slug) → T-06 (SEO çekirdeği) → GSC'ye aç
+T-00 → T-01 (README gerçeği) → T-02 (Rotam→Şamandıra metinleri) → T-03 (K8 üretim / 404)
+     → T-16 P2–P6 (yon.md) · T-04 (prod build) → T-12 (deploy paketi) → T-05 (slug) → T-06 (SEO) → GSC
      → T-07/T-08/T-09/T-10/T-11 (paralel) → T-13/T-14 → T-15
 ```
 
-**T-03'ten önce tek ev ödevin var:** `plan/logo/onizleme.html`'i aç, A/B/C konseptlerinden birini ve sloganı Hiranur'la seç (benim önerim: ana logo C, harita markırı B, favicon A; slogan "Rotanı şamandıra ile bul."). Seçimi T-03 talimatının başına yaz.
+**Karar kaynağı:** `plan/00_brief_eki.md` §3 (Arena taslakları + Faz 1 notları burada birleşir). Logo **K8:** `plan/logo/secili/logo.png` (çizgi/renk değişmez). Slogan: "Gezilecek yerleri işaretler." GEO tanım: `plan/04_marka_ve_tema.md` §1. Yön: `plan/tasarim/yon.md`.
 
 Her görev için ritüel aynı: yeni sohbet → brif + "plan/00_brief_eki.md oku" → görev metnini yapıştır → doğrulamayı kendin çalıştır → sen commit at.
 

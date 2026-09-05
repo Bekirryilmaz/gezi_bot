@@ -1,6 +1,9 @@
-import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
-import { YerSatiri } from "@/components/YerSatiri";
+import { SayfaHero } from "@/components/layout/SayfaHero";
+import { BosDurum } from "@/components/ui/BosDurum";
+import { Dugme } from "@/components/ui/Dugme";
+import { FiltreCip } from "@/components/ui/FiltreCip";
+import { YerKarti } from "@/components/ui/YerKarti";
+import { RevealListe, RevealOge } from "@/components/hareket/Reveal";
 import { sehirleriGetir, yerleriGetir } from "@/lib/api";
 import { ANA_KATEGORILER } from "@/lib/sabitler";
 
@@ -13,8 +16,10 @@ export async function generateMetadata({ params }: Props) {
   const { anahtar } = await params;
   const sehirler = await sehirleriGetir().catch(() => []);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
+  const isim = sehir?.isim ?? anahtar;
   return {
-    title: sehir ? `${sehir.isim} keşif` : "Keşif",
+    title: `${isim} gezilecek yerler`,
+    description: `${isim} gezilecek yerleri deneyim eksenlerine göre işaretli. Kategoriye göre süz, skor kırılımını oku, gün gün rota kur.`,
   };
 }
 
@@ -30,78 +35,63 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
     }).catch(() => ({ yerler: [], toplam_sayi: 0 })),
   ]);
   const yerler = liste.yerler;
-
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
   const baslik = sehir?.isim ?? anahtar;
 
   return (
-    <main className="atmosfer min-h-screen">
-      <div className="relative bg-deniz-derin pb-16 pt-24 text-white">
-        <SiteHeader sehirAnahtari={anahtar} />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
-          <p className="text-sm uppercase tracking-[0.2em] text-white/55">Keşfet</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl">{baslik}</h1>
-          <p className="mt-4 max-w-xl text-white/75">
-            Kategoriye göre süz, bir yere tıkla; yorumlardan çıkan duygu özetini oku.
-          </p>
-        </div>
-      </div>
+    <main>
+      <SayfaHero
+        etiket="Keşfet"
+        baslik={`${baslik} gezilecek yerler`}
+        ozet="Önce cevap: bu listedeki yerler deneyim eksenlerine göre sıralanır. Kategori süz, bir karta gir, kırılımı oku."
+      />
 
-      <div className="mx-auto max-w-6xl px-5 py-10 md:px-8">
+      <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">
         <div className="flex flex-wrap gap-2">
-          <Link
+          <FiltreCip
             href={`/sehir/${anahtar}`}
-            className={`rounded-full px-4 py-2 text-sm transition ${
-              !kategori
-                ? "bg-deniz text-white"
-                : "bg-white/70 text-ink hover:bg-white"
-            }`}
+            aktif={!kategori}
+            sayi={liste.toplam_sayi}
           >
             Tümü
-          </Link>
+          </FiltreCip>
           {ANA_KATEGORILER.filter((k) => k.deger !== "konaklama").map((k) => (
-            <Link
+            <FiltreCip
               key={k.deger}
               href={`/sehir/${anahtar}?kategori=${k.deger}`}
-              className={`rounded-full px-4 py-2 text-sm transition ${
-                kategori === k.deger
-                  ? "bg-deniz text-white"
-                  : "bg-white/70 text-ink hover:bg-white"
-              }`}
+              aktif={kategori === k.deger}
             >
               {k.etiket}
-            </Link>
+            </FiltreCip>
           ))}
         </div>
 
-        <div className="mt-8">
-          <p className="mb-2 text-sm text-ink/50">{liste.toplam_sayi} yer</p>
-          {yerler.length === 0 ? (
-            <p className="py-12 text-ink/60">
-              Yer bulunamadı. API çalışıyor mu? ({process.env.NEXT_PUBLIC_API_URL})
-            </p>
-          ) : (
-            <div className="rounded-2xl bg-white/60 px-4 md:px-6">
-              {yerler.map((yer) => (
-                <YerSatiri key={yer.id} yer={yer} />
-              ))}
-            </div>
-          )}
-        </div>
+        <p className="text-ink/50 mt-8 text-sm tabular-nums">
+          {liste.toplam_sayi} yer işaretli
+        </p>
 
-        <div className="mt-12 flex flex-wrap gap-4">
-          <Link
-            href={`/sehir/${anahtar}/rota`}
-            className="rounded-full bg-gunes px-5 py-2.5 text-sm font-semibold text-deniz-derin"
-          >
+        {yerler.length === 0 ? (
+          <BosDurum
+            className="mt-6"
+            cta={{ href: `/sehir/${anahtar}/rota`, etiket: "Rotanı kur" }}
+          />
+        ) : (
+          <RevealListe className="kart-liste mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {yerler.map((yer) => (
+              <RevealOge key={yer.id}>
+                <YerKarti yer={yer} />
+              </RevealOge>
+            ))}
+          </RevealListe>
+        )}
+
+        <div className="mt-12 flex flex-wrap gap-3">
+          <Dugme href={`/sehir/${anahtar}/rota`} varyant="birincil">
             Bu şehir için rota kur
-          </Link>
-          <Link
-            href={`/sehir/${anahtar}/bolgeler`}
-            className="rounded-full border border-deniz/30 px-5 py-2.5 text-sm text-deniz"
-          >
+          </Dugme>
+          <Dugme href={`/sehir/${anahtar}/bolgeler`} varyant="hayalet">
             İlçe profilleri
-          </Link>
+          </Dugme>
         </div>
       </div>
     </main>

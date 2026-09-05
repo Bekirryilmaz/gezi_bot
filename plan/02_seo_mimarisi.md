@@ -1,6 +1,8 @@
 # Şamandıra — SEO Mimarisi ve Uygulama Planı
 **Tarih:** 2026-09-05 · Durum: Canlı denetim yapıldı (dev tunnel), bulgular güncel
 
+> **Karar kaynağı:** `plan/00_brief_eki.md` §3 (K7 SEO+GEO kilit). Çelişkide o madde kazanır.
+
 > İlke: **"Sitenin daha baştayken güzel kurgulanması"** = URL'ler, şema (JSON-LD), metadata ve içerik mimarisi ilk 6 haftada doğru kurulur; sonra değiştirmek 301 yükü ve otorite kaybı demek. Bu doküman o temelin şartnamesidir.
 
 ---
@@ -25,9 +27,9 @@
 
 ## 2. Alan adı ve host kuralları
 
-- **Canonical host:** `https://şamandıra.com` (punycode: `xn--amandra.com-3zb60d`)
+- **Canonical host:** `https://şamandıra.com` (punycode: `xn--amandra-vfb22b.com`)
 - `www.şamandıra.com`, `http://*`, punycode varyantları → **301** ile canonical'a.
-- Sertifikada her iki form: `xn--amandra.com-3zb60d` + `www.xn--amandra.com-3zb60d` (Let's Encrypt/Caddy otomatik halleder; Caddyfile'da site adresini punycode yazın).
+- Sertifikada her iki form: `xn--amandra-vfb22b.com` + `www.xn--amandra-vfb22b.com` (Let's Encrypt/Caddy otomatik halleder; Caddyfile'da site adresini punycode yazın).
 - Kod/env'de her zaman **punycode** saklanır; kullanıcıya gösterimde Unicode (IDN kuralı: DB'de ASCII, ekranda Unicode).
 - `NEXT_PUBLIC_SITE_URL=https://şamandıra.com` (veya punycode — canonical üretiminde tek biçim kullanın; öneri: canonical'ları punycode üret, Google ikisini de aynı host sayar).
 - GSC/Bing'e alan adını eklerken punycode görünür — normal, endişe yok.
@@ -75,7 +77,7 @@
 
 | Sayfa | title (≤60 kr) | description (≤155 kr) |
 |---|---|---|
-| Ana | `Şamandıra — Samsun Gezi Rehberi ve Rota Planlayıcı` | `Samsun'u keşfet: gezilecek yerler, ilçe rehberleri, yorumlardan duygu özetleri ve sana özel gün gün rota. Şamandıra, Karadeniz'in kişisel gezi rehberi.` |
+| Ana | `Şamandıra — Gezilecek Yerler ve Rota Planlayıcı` | `Şamandıra, bir şehirdeki gezilecek yerleri deneyim eksenlerine göre puanlayan ve gün gün rota kuran bir gezi rehberidir.` |
 | Şehir hub | `Samsun Gezi Rehberi 2026: Gezilecek Yerler, Rotalar` | `Samsun'da gezilecek {n} yer, {ilçe} ilçe rehberi, yorum bazlı değerlendirmeler ve gün gün rota planı. Şamandıra ile Samsun'u keşfet.` |
 | Kategori | `Samsun {Kategori} — En İyi {n} Mekan (2026)` | veri güdümlü: kategori + öne çıkan 2-3 yer adı + CTA |
 | Yer detay | `{Yer Adı} — {İlçe}, Samsun | Ziyaret Rehberi` | duygu özeti + kategori + pratik bilgi (süre/fiyat) şablondan; yer bazlı **benzersiz** |
@@ -189,7 +191,7 @@ Kurallar: her yazı ≥1.200 kelime, özgün fotoğraf (Samsun'da yaşıyorsunuz
 ## 11. GEO — Üretken Motor Optimizasyonu (yapay zekâ asistanlarınca alıntılanma)
 **İlke (K7):** ChatGPT, Perplexity, Gemini gibi asistanlar; **kesin, kısa, yapısal ve tutarlı** sayfaları alıntılar. Amaç: "Samsun'da gezilecek yerler / Şamandıra nedir" tarzı sorularda yanıtın içinde biz olmak.
 
-1. **Tek tanım cümlesi (standart):** "Şamandıra, Türkiye'nin kişisel gezi rehberidir: görülmeye değer yerleri işaretler, gün gün rota kurar." (Nihai lafız T-03A seçimiyle sabitlenir.) Bu cümle ana sayfa, `/hakkimizda`, Organization JSON-LD, `llms.txt` ve sosyal profillerde **kelimesi kelimesine aynı** yer alır.
+1. **Tek tanım cümlesi (kilit, 2026-09-05):** "Şamandıra, bir şehirdeki gezilecek yerleri deneyim eksenlerine göre puanlayan ve gün gün rota kuran bir gezi rehberidir." Bu cümle ana sayfa, `/hakkimizda`, Organization JSON-LD, `llms.txt` ve sosyal profillerde **kelimesi kelimesine aynı** yer alır. Slogan katı ayrıdır: "Gezilecek yerleri işaretler."
 2. **Önce cevap paragrafı:** her sayfa türünde ilk 40-60 kelime, sayfanın arama sorusunu doğrudan yanıtlar (tanım/liste/karşılaştırma); detay sonra gelir.
 3. **`llms.txt`:** kökte; site tanımı + ana sayfalar listesi (şehirler, kategori indeksleri, rehber indeksi).
 4. **SSS blokları:** en sorulu 3 sayfa türünde görünür S/S + FAQPage JSON-LD ("X'te gezilecek yerler neler?", "Rota nasıl kurulur?", "Skorlar güvenilir mi?").

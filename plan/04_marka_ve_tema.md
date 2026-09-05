@@ -1,5 +1,7 @@
 # Şamandıra — Marka ve Tema Sistemi
-**Tarih:** 2026-09-05 · K3 kararına göre: yüzey + repo/doküman rebrand · Logo konseptleri: `logo/` klasörü
+**Tarih:** 2026-09-05 · Güncelleme: 2026-09-05 (K8 logo FİNAL + `yon.md` paleti) · K3: yüzey + repo/doküman rebrand
+
+**Karar kaynağı (tek metin):** `plan/00_brief_eki.md` §3. Görsel yön / hero / hareket: `plan/tasarim/yon.md`. Tarihçe (Faz 1 Ufuk turu, reddedilen konseptler): `plan/logo/arastirma.md` + `plan/logo/arsiv/`. Final işaret: `plan/logo/secili/logo.png`.
 
 ---
 
@@ -7,98 +9,107 @@
 
 Şamandıra, denizcilikte **yol gösteren işaret**tir: sığlığı, güvenli geçidi, dönüş noktasını haber verir. Kaptan şamandıraları izleyerek rotasını bulur. Ürün tam olarak bunu yapıyor: şehrin gürültüsü içinde **görülmeye değer yerleri işaretliyor**, bölgeleri tanıtıyor ve gün gün **rotayı çiziyor**.
 
-Metafor eşlemesi (tasarımda tutarlı kullanılır):
+Metafor ürün ve ses tonunda kalır; **yüzeye yayılmaz** (K8). Görsel gönderme yalnız `plan/tasarim/yon.md` §5 kapalı listesidir.
 
-| Denizcilik | Ürün |
+| Denizcilik | Ürün (dil / veri, süs değil) |
 |---|---|
 | Şamandıra (işaret) | Öne çıkan yer / öneri kartı / harita markırı |
 | Rota hattı | Günlük gezi planı (slot zinciri) |
-| Deniz | Karadeniz — arka plan, palet |
-| Fener | Rehber yazıları (yön veren uzun içerik) |
+| Deniz | Keşif alanı |
+| Fener | Rehber yazıları |
 | Pusula | Tercih sliderları (rota sihirbazı) |
 | Demir atmak | Kaydedilen/paylaşılan rota |
 
-**Konumlanma cümlesi:** "Şamandıra, Türkiye'nin kişisel gezi rehberi — keşfet, oku, gün gün rotanı kur." (K6: bölge-nötr; ilk şehir Samsun. Eski "Karadeniz'in kişisel gezi rehberi" cümlesi 2026-09-05 itibarıyla geçersizdir — T-03 madde 8 ile tüm yüzeylerden temizlenir.)
+**Konumlanma (kilit, 2026-09-05):** slogan + GEO tanım cümlesi birlikte kullanılır; ikisi de bölge-nötrdür (K6). Şehir adı yalnız veri katmanından (açık şehir) gelir.
+
+- Slogan: **Gezilecek yerleri işaretler.**
+- Tanım: **Şamandıra, bir şehirdeki gezilecek yerleri deneyim eksenlerine göre puanlayan ve gün gün rota kuran bir gezi rehberidir.**
+
+Eski "Karadeniz'in kişisel gezi rehberi" cümlesi geçersizdir.
 
 ## 2. İsim ve slogan kullanımı
 
 - Yazım: **Şamandıra** (baş harf büyük, Türkçe karakterli). Logo wordmark'ta küçük harf: **şamandıra**.
-- Kod/URL/e-posta gibi ASCII gereken her yerde: **samandira** (Türkçe karaktersiz — mevcut proje kuralıyla uyumlu).
-- Slogan adayları (anket yapın — Instagram hikâyesi bile yeterli):
-  **Durum (2026-09-05):** Aşağıdaki v1 listesi, v2 listesi ve Cursor'ın ilk turu kullanıcı tarafından reddedildi ("can alıcı değil"). Slogan, T-03A keşif turunda Cursor tarafından araştırma destekli yeniden üretilecek; filtreler: ≤5 kelime, bölge kilidi YOK (K6), marka/rota bağı, akılda kalıcılık.
-  1. **"Rotanı şamandıra ile bul."** (önerilen — eylem + marka bir arada, SEO başlıklarına uyar)
-  2. "Şehri işaretleyen rehber."
-  3. "Yönün belli, rotan hazır."
-  4. "Karadeniz'in rota işareti."
-- Title kalıbı: `Şamandıra — {sayfa konusu}` yerine konu önce: `{Konu} | Şamandıra` (SEO'da ilk 30 karakter altın). Ana sayfa: `Şamandıra — Samsun Gezi Rehberi ve Rota Planlayıcı`.
+- Kod/URL/e-posta gibi ASCII gereken her yerde: **samandira**.
+- **Slogan (kilit):** "Gezilecek yerleri işaretler." — header, footer, OG, hero H1 (noktasız). Aday listesi ve GEO gerekçesi: `plan/logo/arastirma.md` §5 (tarihçe) — seçim kilit.
+- **GEO tanım cümlesi (kilit):** yukarıdaki tanım; ana sayfa, meta description, Organization JSON-LD, `llms.txt` ve `/hakkimizda` kelimesi kelimesine aynı kalır (`02_seo_mimarisi.md` §11).
+- **CTA:** "Rotanı kur" (birincil), "Keşfe başla" (ikincil).
+- Title: konu önce, marka sonda `{Konu} · Şamandıra`. Ana sayfa: `Şamandıra — Gezilecek Yerler ve Rota Planlayıcı`.
 
 ## 3. Renk sistemi
 
-Mevcut tema (deniz/kopuk/kumsal/gunes) korunur; **şamandıra kırmızısı** vurgu rengi olarak eklenir. Gerçek deniz şamandıraları kırmızı/yeşildir; mevcut deniz yeşili paletiyle kırmızı-turuncu vurgu kontrastı güçlü ve denizcilik açısından doğru.
+Kaynak: logodan ölçülen **bordo `#6C0000`** + mevcut `samandira` rampı. Tam tablo, kontrast çiftleri ve alan payları: **`plan/tasarim/yon.md` §1.2**. Özet:
 
-| Token | Hex (öneri) | Kullanım |
+| Token | Hex | Rol |
 |---|---|---|
-| `deniz-derin` (mevcut) | korunur | arka plan, footer, gece modu yüzeyler |
-| `deniz` / `deniz-yuzey` (mevcut) | korunur | birincil yüzey, linkler |
-| `kopuk` (mevcut) | korunur | metin, kart zemini |
-| `kumsal` (mevcut) | korunur | ikincil zemin, bölüm ayraçları |
-| `gunes` (mevcut) | korunur | ikincil vurgu, rozetler, hover |
-| **`samandira` (YENİ)** | **#D6402C** | **birincil CTA, harita markırları, aktif durum, logo vurgusu** |
-| `samandira-koyu` (YENİ) | #A92E1E | CTA hover/pressed |
-| `signal` (YENİ, opsiyonel) | #F2B138 | uyarı/rozet ("Sponsorlu", "Klasik") |
-| `yosun` (mevcut varsa korunur) | — | başarı/doğa etiketleri |
+| `bordo-950` | `#2E0405` | en derin yüzey, scrim dibi |
+| `bordo-900` | `#4A0708` | koyu blok, CTA bandı |
+| **`bordo`** | **`#6C0000`** | logo karosu, koyu yüzey, **başlık mürekkebi** (kağıtta 11,2:1) |
+| `bordo-700` | `#8E1710` | koyu hover / hairline |
+| `samandira` | `#D6402C` | birincil CTA, aktif durum, markır — **%10** |
+| `samandira-koyu` | `#A92E1E` | CTA hover/pressed |
+| `signal` | `#F2B138` | "Sponsorlu" rozeti, fener parlaması |
+| `kagit` | `#F4EFE7` | sayfa zemini |
+| `kagit-koyu` | `#EBE3D6` | ikinci zemin |
+| `tuz` | `#FBF8F3` | kart yüzeyi (saf beyaz yerine) |
+| `ink` | `#142126` | gövde metni |
+| `deniz` / `deniz-derin` | `#0A4D5C` / `#063642` | veri katmanı: rota/harita/grafik — birincil zemin değil |
+| `yosun` / `kumsal` / `gunes` / `kopuk` | mevcut | grafik serileri, ince zeminler |
 
-Kurallar: **60-30-10** — %60 nötr (kopuk/kumsal), %30 deniz tonları, %10 şamandıra kırmızısı (yalnız CTA + markır + logo). Kırmızıyı metin rengi olarak kullanma. Kontrast: `#D6402C` üzerine beyaz metin AA uyumlu (4.5:1 ≈ kontrol edildi, sınırda — buton metni kalın/büyükse geçer; gerekirse `samandira-koyu` kullan).
+**60-25-10-5:** %60 nötr (kagit+tuz+kagit-koyu) · %25 bordo ailesi · %10 `samandira` · %5 deniz/signal. `samandira` **gövde metni rengi olarak yasak** (kağıtta 3,96:1). Buton üstü beyaz ≥16 px ve ≥600 ağırlık.
 
-Tailwind v4'te token tanımı (`site/src/app/globals.css` içinde `@theme`):
-```css
-@theme {
-  --color-samandira: #D6402C;
-  --color-samandira-koyu: #A92E1E;
-  --color-signal: #F2B138;
-}
-```
+Saf beyaz yalnız logo çizgisi ve fotoğraf üstü metin. Kart zemini `tuz`.
 
-## 4. Logo
+## 4. Logo (K8 — FİNAL)
 
-Üç konsept üretildi (`logo/` klasörü, SVG — ölçeklenebilir, düzenlenebilir):
+Kaynak dosya **sabittir:** `plan/logo/secili/logo.png` — bordo karo (`#6C0000`) üzerine beyaz çizgi şamandıra (kafes kule, fener, anemometre, bağlama halkaları, dalga). Köşe yarıçapı kenarın **%14,6'sı**. Cursor çizgiyi, kompozisyonu, oranı ve renkleri **değiştirmez**; yalnız üretim varlıkları üretir.
 
-- **Konsept A — `marka_a_samandira.svg`:** Geometrik şamandıra markı. Direk + tepe ışığı, kırmızı-beyaz gövde, altında iki dalga çizgisi. Favicon/app ikonu için en dayanıklısı.
-- **Konsept B — `marka_b_pin_samandira.svg`:** Harita pini × şamandıra hibrit. "Yer" kavramını anında okutur; harita markırlarında ve keşif bağlamında güçlü.
-- **Konsept C — `marka_c_kelime.svg`:** Yatay kilit — A markı + `şamandıra` wordmark (Fraunces) + slogan alt satırı. Header, OG kartı, sunum kapağı için.
+Ufuk / Sonar / Rota / Demir ve A-B-C turları tarihçedir (`plan/logo/arsiv/`).
+
+Üretim (site): `site/public/logo/karo-seffaf.png`, `karo-acik.png`, `karo.png`; `icon-16/32/48.png` + `favicon.ico`; `icon-180.png` / `apple-touch-icon.png`; `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`; `site/public/og-default.png`.
 
 Kullanım matrisi:
 
-| Yer | Konsept |
+| Yer | Varyant |
 |---|---|
-| Favicon / apple-touch / PWA ikonu | A (tek renk beyaz varyantı `deniz-derin` zeminde) |
-| Site header | C (kompakt: mark + wordmark) — mobilde yalnız A |
-| OG kart / paylaşım | C + deniz degrade zemin |
-| Harita markırı | B (mini şamandıra pinleri — jenerik pin YERİNE; ayırt edici imza) |
-| App ikonu (ileride) | A, yuvarlatılmış kare, `deniz-derin` zemin |
-| E-posta imzası / sunum | C |
+| Üst bant (masaüstü) | karo 32 px + wordmark `şamandıra` (Fraunces, küçük harf, −0,02em) |
+| Üst bant (mobil) | yalnız karo 28 px |
+| Alt bant | karo 40 px + wordmark |
+| Favicon 16/32/48 + `.ico` | aynı karo, bordo zemin, ölçek (kompozisyon değişmez) |
+| Apple-touch 180 / PWA 192 / 512 | tam karo, bordo zemin |
+| Maskable 512 | aynı, güvenli bölge ≥ %18 kenar payı |
+| OG kart / paylaşım | bordo zemin + karo + wordmark + slogan + GEO tanım (`og-default.png`) |
+| Harita markırı | jenerik damla pin yasak; logodan halka + nokta (`yon.md` §5.7) |
+| Açık zemin (e-posta, slayt) | `karo-acik.png` (kağıt üstüne karo) |
+| Şeffaf kenar | `karo-seffaf.png` (dış köşeler alfa; illüstrasyon aynı) |
 
-Kurallar: logo etrafında en az mark yüksekliği kadar boşluk; `deniz-derin` zeminde beyaz/kırmızı versiyon, açık zeminde orijinal; logoyu fotoğraf üstüne doğrudan koyma (degrade scrim kullan); asla gölge/outline ekleme.
+**Kelime kilidi:** karo + wordmark; boşluk ≈ karo kenarının 0,35 em'i. Minimum: karo ≥ 16 px tek başına; kilitte ≥ 24 px. Bileşen: `KelimeKilidi` + `LogoKaro` (`next/image`).
 
-**Karar süreci önerisi:** `logo/onizleme.html`'i açın → A/B/C'yi yan yana görün → ikisini eleyip seçileni Hiranur'la netleştirin. Seçimden sonra: seçili konseptin (1) tam renk, (2) tek renk beyaz, (3) tek renk koyu varyantları + favicon seti (16/32/48/180/192/512) üretilir (T-03 talimatı).
+Kurallar: logo etrafında en az karo yüksekliğinin %35'i kadar boşluk; fotoğraf üstüne doğrudan konmaz (scrim veya karo zemini); gölge / outline / eğim / renk kaydırma **yasak**.
 
 ## 5. Tipografi
 
-- **Fraunces** (display — mevcut): başlıklar, logo wordmark, büyük sayılar. Karakter: sıcak, editoryal, "rehber" hissi.
-- **Sora** (UI — mevcut): gövde, butonlar, etiketler. 
-- Yeni kural: sayısal veri (puanlar, mesafeler, gün sayıları) Sora tabular-nums ile; duygu özeti blokları Fraunces italic alıntıyla açılabilir (öznel/nesnel ayrımını tipografi de anlatsın — brif'in "iki metin türü karışmasın" kuralına görsel destek).
-- Her iki fontta latin-ext var (ş, ı, ğ sorunsuz). `next/font` mevcut kurulum korunur.
+Ölçek tablosu: `plan/tasarim/yon.md` §1.3. Aile kilidi:
+
+- **Fraunces** (display): başlıklar, logo wordmark, büyük sayılar.
+- **Sora** (UI): gövde, butonlar, etiketler.
+- Display 40px+: `letter-spacing: -0.02em` (kapak −0,03em), satır 0,98–1,1.
+- Etiket katı: 11px, `uppercase`, `tracking-[0.24em]`.
+- Sayısal veri: Sora `tabular-nums`; duygu özeti Fraunces italic alıntıyla açılabilir.
+- Her iki fontta latin-ext var. `next/font` kurulumu korunur. Üçüncü font ana yönde yok.
 
 ## 6. Görsel dil ve motifler
 
-- **Dalga ayraçlar:** bölümler arası ince SVG dalga çizgisi (kumsal→deniz geçişleri).
-- **Rota hattı:** kesikli çizgi + düğüm noktalarında mini şamandıra (liste numaralandırması bile şamandıra düğümüyle: "1. durak" yerine küçük marka ikonu + sayı).
-- **Işık/parlama:** tepe ışığında küçük `gunes` parlaması — hero'da deniz üstünde uzak fener silueti (illüstrasyon, fotoğraf değil).
-- **Fotoğraf stili:** gerçek Samsun fotoğrafları, gün ışığı, hafif soğuk deniz tonu; filtre tutarlılığı için tek LUT/preset (Lightroom'da tek ayar, tüm fotoğraflara aynı).
-- **İllüstrasyon:** şimdilik yok; gerekirse düz vektör, 2 renk (deniz + şamandıra).
-- **Boş durum metinleri (tone of voice):** samimi, kısa, Karadeniz sıcaklığı, emoji yok:
+Uygulama şartnamesi: **`plan/tasarim/yon.md`**. Kısa kilit:
+
+- Ana yön **"Mürekkep ve Tuz"**; yedek **"Fener Nöbeti"** (`yon.md` §1.1 / §1.7).
+- Hero = fotoğraf sekansı (K9), video yok; görsel kaynak kapalı liste (`yon.md` §2.6).
+- Ağır denizcilik teması **yasak**. Gönderme yalnız 11 ufak trik (`yon.md` §5).
+- Marquee / dalga bandı / sonar halkası / süzülen şamandıra **emekli**.
+- **Boş durum metinleri (tone of voice):** samimi, kısa, bölge-nötr, emoji yok:
   - Boş liste: "Bu filtreyle kıyıda köşede bir şey kalmadı. Filtreleri gevşetip tekrar bakalım mı?"
   - Hata: "Pusula şaştı — sayfayı yenileyip tekrar dener misin?"
+  - 404: "Sayfa bulunamadı — pusula şaştı"
   - CTA kalıbı: "Rotanı kur", "Keşfe başla", "Bölgeyi tanı" (emir kipinde ama nazik).
 
 ## 7. "Sponsorlu" ve güven rozetleri
@@ -110,13 +121,14 @@ Kurallar: logo etrafında en az mark yüksekliği kadar boşluk; `deniz-derin` z
 
 ## 8. Üretilecek marka varlıkları (checklist)
 
-- [ ] Logo kararı (A/B/C) — kullanıcı + Hiranur
-- [ ] Seçili logonun 3 renk varyantı (tam / beyaz / koyu) — SVG
-- [ ] Favicon seti: `favicon.ico` (16/32/48), `apple-touch-icon.png` (180), PWA `icon-192/512.png`, `manifest.json`
-- [ ] `og-default.png` (1200×630): deniz degrade + C kilit + slogan (next/og ile dinamik sürüm T-07'de; statik fallback bu)
-- [ ] X/Twitter + Instagram profil görseli (1:1 A markı) ve kapak (C + deniz)
+- [x] Logo kararı — **K8:** `plan/logo/secili/logo.png`
+- [x] Slogan + GEO tanım cümlesi kilidi
+- [x] Şeffaf + açık zemin karo PNG
+- [x] Favicon seti: `favicon.ico` (16/32/48), `apple-touch-icon.png` (180), PWA `icon-192/512.png` + maskable, `manifest`
+- [x] `og-default.png` (1200×630): bordo zemin + kilit + slogan + tanım
+- [ ] X/Twitter + Instagram profil görseli (1:1 karo) ve kapak — manuel
 - [ ] Tek sayfalık marka rehberi PDF (B2B/sponsorluk görüşmeleri için — Faz 5)
-- [ ] E-posta imza şablonu (ASCII adres, logo PNG)
+- [ ] E-posta imza şablonu (ASCII adres, `karo-acik.png`)
 
 ## 9. TÜRKPATENT marka ön araştırması (manuel, ~1 saat)
 

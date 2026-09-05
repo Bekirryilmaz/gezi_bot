@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { konaklamaBolgesiOner, rotaAlternatifleriOlustur, rotaOlustur } from "@/lib/api";
+import { HATA_PUSULA } from "@/lib/marka";
 import { DENEYIM_EKSENLERI, altKategoriEtiketi } from "@/lib/sabitler";
 import type { BolgeProfili, RotaCevap } from "@/lib/types";
+import { Dugme } from "@/components/ui/Dugme";
+import { BosDurum } from "@/components/ui/BosDurum";
 
 type Senaryo = "bolge_belli" | "bolge_degil";
 type Adim = "senaryo" | "tercihler" | "alternatifler" | "sonuc";
@@ -21,12 +24,12 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
   return (
     <div className="space-y-10">
       {rota.rota_tavsiyesi && (
-        <p className="text-ink/80 rounded-2xl bg-white/70 p-5 text-sm leading-relaxed">
+        <p className="border-deniz/10 text-ink/80 rounded-2xl border bg-white p-5 text-sm leading-relaxed">
           {rota.rota_tavsiyesi}
         </p>
       )}
       {rota.konaklama_bolgesi_onerisi && (
-        <div className="rounded-2xl bg-white/70 p-5">
+        <div className="border-deniz/10 rounded-2xl border bg-white p-5">
           <p className="text-ink/50 text-sm">Önerilen konaklama bölgesi</p>
           <p className="font-display text-deniz mt-1 text-2xl">
             {rota.konaklama_bolgesi_onerisi.bolge_adi}
@@ -65,7 +68,7 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
               <li key={`${gun.gun_no}-${durak.sira}`}>
                 <Link
                   href={`/yer/${durak.yer.id}`}
-                  className="group flex gap-3 border-b border-[var(--cizgi)] pb-3"
+                  className="group border-deniz/10 focus-visible:ring-samandira flex cursor-pointer gap-3 border-b pb-3 focus-visible:ring-2 focus-visible:outline-none"
                 >
                   <span className="font-display text-yosun text-xl">{durak.sira}</span>
                   <span>
@@ -119,10 +122,6 @@ export function RotaSihirbazi({
     for (const b of bolgeler) {
       if (b.bolge_adi) adlar.add(b.bolge_adi);
     }
-    // Bilinen ilçeler (API boşsa bile)
-    for (const adi of ["Atakum", "İlkadım", "Canik", "Tekkeköy", "Bafra", "Çarşamba"]) {
-      adlar.add(adi);
-    }
     return Array.from(adlar).sort((a, b) => a.localeCompare(b, "tr"));
   }, [bolgeler]);
 
@@ -160,7 +159,7 @@ export function RotaSihirbazi({
       setAdim("sonuc");
     } catch (err) {
       setRota(null);
-      setHata(err instanceof Error ? err.message : "Rota oluşturulamadı");
+      setHata(err instanceof Error ? err.message : HATA_PUSULA);
     } finally {
       setBekliyor(false);
     }
@@ -178,7 +177,7 @@ export function RotaSihirbazi({
       setAdim("alternatifler");
     } catch (err) {
       setAlternatifler([]);
-      setHata(err instanceof Error ? err.message : "Alternatifler üretilemedi");
+      setHata(err instanceof Error ? err.message : HATA_PUSULA);
     } finally {
       setBekliyor(false);
     }
@@ -212,7 +211,7 @@ export function RotaSihirbazi({
                 setSenaryo("bolge_belli");
                 setAdim("tercihler");
               }}
-              className="block w-full rounded-2xl bg-white/70 px-5 py-4 text-left transition hover:bg-white"
+              className="border-deniz/10 hover:bg-kagit focus-visible:ring-samandira block w-full cursor-pointer rounded-2xl border bg-white px-5 py-4 text-left transition focus-visible:ring-2 focus-visible:outline-none"
             >
               <span className="font-display text-deniz text-xl">
                 Konaklama bölgem belli
@@ -227,7 +226,7 @@ export function RotaSihirbazi({
                 setSenaryo("bolge_degil");
                 setAdim("tercihler");
               }}
-              className="block w-full rounded-2xl bg-white/70 px-5 py-4 text-left transition hover:bg-white"
+              className="border-deniz/10 hover:bg-kagit focus-visible:ring-samandira block w-full cursor-pointer rounded-2xl border bg-white px-5 py-4 text-left transition focus-visible:ring-2 focus-visible:outline-none"
             >
               <span className="font-display text-deniz text-xl">
                 Henüz karar vermedim
@@ -254,7 +253,7 @@ export function RotaSihirbazi({
                 <select
                   value={bolgeAdi}
                   onChange={(e) => setBolgeAdi(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-[var(--cizgi)] bg-white/80 px-3 py-2 text-sm"
+                  className="border-deniz/15 mt-2 min-h-11 w-full cursor-pointer rounded-xl border bg-white px-3 py-2 text-sm"
                   required
                 >
                   <option value="">Seç…</option>
@@ -280,10 +279,10 @@ export function RotaSihirbazi({
                     key={g}
                     type="button"
                     onClick={() => setGunSayisi(g)}
-                    className={`h-10 w-10 rounded-full text-sm font-medium transition ${
+                    className={`focus-visible:ring-samandira inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-sm font-medium transition focus-visible:ring-2 focus-visible:outline-none ${
                       gunSayisi === g
                         ? "bg-deniz text-white"
-                        : "text-ink bg-white/70 hover:bg-white"
+                        : "text-ink hover:bg-kagit bg-white"
                     }`}
                   >
                     {g}
@@ -318,7 +317,7 @@ export function RotaSihirbazi({
             </div>
 
             <div className="flex flex-wrap gap-4 text-sm">
-              <label className="flex items-center gap-2">
+              <label className="flex min-h-11 cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={ucuz}
@@ -327,7 +326,7 @@ export function RotaSihirbazi({
                 />
                 Bütçe dostu tercih et
               </label>
-              <label className="flex items-center gap-2">
+              <label className="flex min-h-11 cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   checked={sakin}
@@ -338,28 +337,21 @@ export function RotaSihirbazi({
               </label>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => setAdim("senaryo")}
-                className="text-ink/70 rounded-full bg-white/70 px-5 py-3 text-sm"
-              >
+            <div className="flex flex-wrap items-center gap-3">
+              <Dugme varyant="hayalet" onClick={() => setAdim("senaryo")}>
                 Geri
-              </button>
-              <button
-                type="submit"
-                disabled={bekliyor}
-                className="bg-gunes text-deniz-derin rounded-full px-6 py-3 text-sm font-semibold transition hover:brightness-105 disabled:opacity-60"
-              >
+              </Dugme>
+              <Dugme varyant="birincil" type="submit" disabled={bekliyor}>
                 {bekliyor
                   ? "Hazırlanıyor…"
                   : senaryo === "bolge_belli"
                     ? `${sehirIsim} rotasını oluştur`
                     : "Alternatif rotaları göster"}
-              </button>
+              </Dugme>
+              {bekliyor ? <span className="sonar-halka" aria-hidden="true" /> : null}
             </div>
             {hata && (
-              <p className="text-sm whitespace-pre-wrap text-red-700/90">{hata}</p>
+              <p className="text-samandira-koyu text-sm whitespace-pre-wrap">{hata}</p>
             )}
           </form>
         )}
@@ -375,7 +367,7 @@ export function RotaSihirbazi({
                 type="button"
                 disabled={bekliyor}
                 onClick={() => alternatifSec(alt)}
-                className="block w-full rounded-2xl bg-white/70 px-5 py-4 text-left transition hover:bg-white disabled:opacity-60"
+                className="border-deniz/10 hover:bg-kagit focus-visible:ring-samandira block w-full cursor-pointer rounded-2xl border bg-white px-5 py-4 text-left transition focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
               >
                 <span className="font-display text-deniz text-xl">
                   {alt.alternatif_etiketi ?? `Alternatif ${i + 1}`}
@@ -390,39 +382,35 @@ export function RotaSihirbazi({
                 </span>
               </button>
             ))}
-            <button
-              type="button"
-              onClick={() => setAdim("tercihler")}
-              className="text-ink/70 rounded-full bg-white/70 px-5 py-3 text-sm"
-            >
+            <Dugme varyant="hayalet" onClick={() => setAdim("tercihler")}>
               Geri
-            </button>
+            </Dugme>
             {hata && (
-              <p className="text-sm whitespace-pre-wrap text-red-700/90">{hata}</p>
+              <p className="text-samandira-koyu text-sm whitespace-pre-wrap">{hata}</p>
             )}
           </div>
         )}
 
         {adim === "sonuc" && (
-          <button
-            type="button"
+          <Dugme
+            varyant="hayalet"
             onClick={() => {
               setRota(null);
               setAlternatifler([]);
               setAdim("senaryo");
             }}
-            className="text-ink/70 rounded-full bg-white/70 px-5 py-3 text-sm"
           >
             Yeni rota
-          </button>
+          </Dugme>
         )}
       </div>
 
       <div>
         {!rota && adim !== "alternatifler" ? (
-          <p className="text-ink/50">
-            Senaryonu ve tercihlerini seçtiğinde plan burada belirecek.
-          </p>
+          <BosDurum
+            baslik="Plan henüz yok"
+            metin="Senaryonu ve tercihlerini seçtiğinde gün gün rota burada belirecek."
+          />
         ) : adim === "alternatifler" && !rota ? (
           <div className="space-y-8">
             {alternatifler.map((alt) => (

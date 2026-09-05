@@ -1,5 +1,7 @@
 # Şamandıra — Ürün Analizi ve Strateji
-**Tarih:** 2026-09-05 · **Hazırlayan:** Ürün/planlama asistanı (Arena) · **Ekip:** Alegre Group — Bekir Yılmaz & Hiranur Doğan (OMÜ Bilgisayar Müh. 4. sınıf)
+**Tarih:** 2026-09-05 · **Hazırlayan:** Ürün/planlama asistanı (Arena, taslak) · **Ekip:** Alegre Group — Bekir Yılmaz & Hiranur Doğan (OMÜ Bilgisayar Müh. 4. sınıf)
+
+> **Karar kaynağı (tek metin):** Arena'nın bu taslağı ve T-16 Faz 1 notları `plan/00_brief_eki.md` §3'te birleşir. Çelişkide **§3 + `plan/tasarim/yon.md` kazanır.** Bu dosya pazar/risk/yol haritası analizi olarak kalır; logo/tasarım kararı burada aranmaz.
 
 > Bu doküman objektif bir durum tespitidir. Övgü yok, makyaj yok. Amaç: mezuniyete (~Haziran 2027) kadar hem **ticari** hem **akademik** olarak güçlü bir ürün çıkarmak.
 
@@ -44,12 +46,12 @@
 
 | Alan adı | Durum |
 |---|---|
-| `şamandıra.com` (IDN) | ✅ **Sizde.** DNS GoDaddy park IP'lerine (13.248.243.5 / 76.223.105.230) bakıyor → kayıtlı, park halinde. Punycode: `xn--amandra.com-3zb60d` |
+| `şamandıra.com` (IDN) | ✅ **Sizde.** DNS GoDaddy park IP'lerine (13.248.243.5 / 76.223.105.230) bakıyor → kayıtlı, park halinde. Punycode: `xn--amandra-vfb22b.com` |
 | `samandira.com` (ASCII) | ❌ Başkasında — **HugeDomains'ta satılık** (aftermarket, genelde 4 haneli USD). Alınamayacak varsayın. |
 | `samandira.com.tr` | ❌ Başka bir sunucuya çözülüyor (85.159.66.62) — dolu. |
 | `şamandıra.com.tr` | Boş görünüyor (DNS çözülmüyor) — ileride savunma amaçlı düşünülebilir. |
 
-**IDN değerlendirmesi (objectif):** Google, IDN alan adlarını ASCII ile **eşit** değerlendirir; bilinen bir SEO cezası yok. Gerçek riskler: (1) bazı araçlar/ekranlarda `xn--amandra.com-3zb60d` görünür, (2) **e-posta** tarafında IDN sorunludur (`info@şamandıra.com` deliverability riski), (3) sözlü iletişimde "ş mı, s mi, ı mı i mi" sürtünmesi. Karar önerisi: **canonical = `https://şamandıra.com`**; tüm altyapı (DNS, sertifika, env.) punycode `xn--amandra.com-3zb60d` ile yönetilir; e-posta için ASCII bir alias kullanılır (örn. Gmail/Workspace `alegregroup@gmail.com` veya ileride ASCII bir `.app/.co` alan adı).
+**IDN değerlendirmesi (objectif):** Google, IDN alan adlarını ASCII ile **eşit** değerlendirir; bilinen bir SEO cezası yok. Gerçek riskler: (1) bazı araçlar/ekranlarda `xn--amandra-vfb22b.com` görünür, (2) **e-posta** tarafında IDN sorunludur (`info@şamandıra.com` deliverability riski), (3) sözlü iletişimde "ş mı, s mi, ı mı i mi" sürtünmesi. Karar önerisi: **canonical = `https://şamandıra.com`**; tüm altyapı (DNS, sertifika, env.) punycode `xn--amandra-vfb22b.com` ile yönetilir; e-posta için ASCII bir alias kullanılır (örn. Gmail/Workspace `alegregroup@gmail.com` veya ileride ASCII bir `.app/.co` alan adı).
 
 **Marka çakışması notu:** "Şamandıra" Türkiye'de (a) İstanbul/Sancaktepe'de bir semt, (b) Fenerbahçe Can Bartu Tesisleri'nin bulunduğu yer olarak güçlü bir futbol çağrışımına sahip. Jenerik "şamandıra" aramalarında bu içeriklerle karışma riski var. Azaltma: "şamandıra gezi", "şamandıra rota", "şamandıra samsun" gibi birleşik marka aramalarını beslemek + TÜRKPATENT'te marka ön araştırması (sınıf 39 "seyahat düzenleme", 42 "yazılım/SaaS", 41 "yayıncılık") yapmak. İsim yine de iyi: denizcilik/yön bulma metaforu Karadeniz + rota ürünüyle birebir örtüşüyor, Türkçe, akılda kalıcı ve `.com`'u sizde.
 
@@ -61,7 +63,7 @@
 Samsun için: (1) keşif listesi, (2) bölge/ilçe rehberi + duygu özeti, (3) ilgi ağırlıklarına göre gün gün rota. Konaklama vitrinde gizli; otel dayatmayan alternatifli rota akışı (Senaryo 2) gerçekten iyi bir ürün fikri.
 
 ### 2.2 Önerilen pozisyonlama
-> **"Şamandıra — Karadeniz'in kişisel gezi rehberi. Keşfet, oku, gün gün rotanı kur."**
+> **"Şamandıra — Gezilecek yerleri işaretler."** Tanım: "Şamandıra, bir şehirdeki gezilecek yerleri deneyim eksenlerine göre puanlayan ve gün gün rota kuran bir gezi rehberidir." (K6 bölge-nötr; 2026-09-05 kilit.)
 
 - **Ne:** Veri destekli şehir rehberi + rota planlayıcı (editoryal blog değil, OTA değil).
 - **Kimin için:** Samsun'a gezi planlayanlar (şehir dışı), hafta sonu kaçamağı arayan yerel halk, öğrenciler; genişlemede Karadeniz rotacıları.
@@ -132,7 +134,7 @@ Samsun için: (1) keşif listesi, (2) bölge/ilçe rehberi + duygu özeti, (3) i
 | # | Risk | Etki | Azaltma |
 |---|---|---|---|
 | 1 | **Veri kaynağı hukuku:** Google Maps scraping ToS ihlali; Ekşi yorumlarının sitede gösterimi telif + KVKK (yorumcu takma adı bile kişisel veri sayılabilir) | Ticarileşme, hibe ve mezuniyet jürisinde en çok sorgulanacak konu; Cease&desist riski | (a) Sitede **ham yorum metni değil** şablon duygu özeti göster (büyük ölçüde zaten böyle — `ornek_ifadeler` alıntılarını kısalt/atıfla), (b) yorumcu adı/takma adı gösterme, (c) vitrin verisini kademeli **resmî kaynaklara** taşı: Google Places API (ücretli, yasal; yorum başına 5 adet döner), OSM (ODbL atıfla serbest), belediye/kültür envanterleri, (d) scraping hattını Ar-Ge/analiz amacıyla sınırla ve dokümante et, (e) siteye Künye/Gizlilik/KVKK aydınlatma sayfaları |
-| 2 | **IDN alan adı** (`xn--amandra.com-3zb60d`) | E-posta deliverability, bazı araçlarda punycode görünümü, sözlü iletişim | Canonical tek: `https://şamandıra.com`; tüm varyantlar 301; e-posta ASCII alias; sertifika punycode host için alınır (Let's Encrypt destekler) |
+| 2 | **IDN alan adı** (`xn--amandra-vfb22b.com`) | E-posta deliverability, bazı araçlarda punycode görünümü, sözlü iletişim | Canonical tek: `https://şamandıra.com`; tüm varyantlar 301; e-posta ASCII alias; sertifika punycode host için alınır (Let's Encrypt destekler) |
 | 3 | **Marka çakışması** (Sancaktepe/Şamandıra semti + Fenerbahçe tesisleri) | Marka aramalarının karışması | Birleşik sorguları besle ("şamandıra gezi rehberi"), footer/meta'da "Şamandıra — gezi rehberi" kalıbı, TÜRKPATENT marka araştırması + başvuru (39/42/41) |
 | 4 | **İçerik kalitesi:** 0 fotoğraf, 60 kayıtlık liste, cami/park gürültüsü, alfabetik sıralama | Kullanıcı güveni + Google "thin content" riski — SEO'nun 1 numaralı düşmanı | Kürasyon sprinti (doküman #02 ve #06): skor bazlı sıralama, alt-kategori filtreleri, "turistik değer" eşiği, fotoğraf kaynakları (Places API, belediye basın bültenleri, kendi çekimleriniz — Samsun'da yaşıyorsunuz, en büyük avantajınız) |
 | 5 | **Tek makine bağımlılığı:** veri `veri/cikti/` git'te değil, DB yerelde, yayın dev tunnel'da | Veri kaybı = 6 aylık emek gider; yayın her an kopabilir | Oracle'a geçiş + `pg_dump` cron + yedeklerin ikinci kopyası (rclone → Oracle Object Storage / B2); JSONL ham verinin arşivlenmesi |
@@ -149,7 +151,7 @@ Samsun için: (1) keşif listesi, (2) bölge/ilçe rehberi + duygu özeti, (3) i
 - Çıktı: ajan verimli çalışıyor, repo gerçeği anlatıyor.
 
 **Faz 1 — Şamandıra rebrand + SEO temeli (2-6. haftalar)**
-- Marka: isim, logo, favicon, OG şablonu, renk diline "şamandıra" motifinin işlenmesi (doküman #04).
+- Marka: K8 karo (`plan/logo/secili/logo.png`) + üretim varlıkları (T-03 / T-16 P1); görsel yön `plan/tasarim/yon.md` (T-16 P2–P6). Ağır denizcilik motifi yok.
 - SEO: slug sistemi (DB migration 0005 + API + site), sayfa bazlı metadata, JSON-LD, sitemap/robots, canonical/OG, prod build (doküman #02).
 - Çıktı: `şamandıra.com`'a kurulabilir, indexlenebilir site.
 

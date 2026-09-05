@@ -1,5 +1,8 @@
-import Link from "next/link";
-import { SiteHeader } from "@/components/SiteHeader";
+import { SayfaHero } from "@/components/layout/SayfaHero";
+import { BosDurum } from "@/components/ui/BosDurum";
+import { Dugme } from "@/components/ui/Dugme";
+import { DuyguOzeti } from "@/components/ui/DuyguOzeti";
+import { Reveal } from "@/components/hareket/Reveal";
 import { bolgeleriGetir, sehirleriGetir } from "@/lib/api";
 import { duyguEtiketi } from "@/lib/sabitler";
 
@@ -11,7 +14,11 @@ export async function generateMetadata({ params }: Props) {
   const { anahtar } = await params;
   const sehirler = await sehirleriGetir().catch(() => []);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
-  return { title: sehir ? `${sehir.isim} bölgeleri` : "Bölgeler" };
+  const isim = sehir?.isim ?? anahtar;
+  return {
+    title: `${isim} bölgeleri`,
+    description: `${isim} ilçe ve bölge profilleri: tanıtım ile ziyaretçi izlenimi yan yana. Konaklama üssü seçip rota kur.`,
+  };
 }
 
 export default async function BolgelerSayfasi({ params }: Props) {
@@ -21,87 +28,77 @@ export default async function BolgelerSayfasi({ params }: Props) {
     bolgeleriGetir(anahtar).catch(() => []),
   ]);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
+  const isim = sehir?.isim ?? anahtar;
 
   return (
-    <main className="atmosfer min-h-screen">
-      <div className="relative bg-deniz-derin pb-14 pt-24 text-white">
-        <SiteHeader sehirAnahtari={anahtar} />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
-          <p className="text-sm uppercase tracking-[0.2em] text-white/55">Bölgeler</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl">
-            {sehir?.isim ?? anahtar} ve ilçeleri
-          </h1>
-          <p className="mt-4 max-w-xl text-white/75">
-            Önce tanıtım, sonra orada yaşayanların ve gidenlerin ortak izlenimi.
-          </p>
-        </div>
-      </div>
+    <main>
+      <SayfaHero
+        etiket="Bölgeler"
+        baslik={`${isim} ve ilçeleri`}
+        ozet="Önce tanıtım, sonra orada yaşayanların ve gidenlerin ortak izlenimi."
+      />
 
-      <div className="mx-auto max-w-6xl space-y-14 px-5 py-12 md:px-8">
+      <div className="mx-auto max-w-6xl space-y-10 px-5 py-12 md:px-8">
         {bolgeler.length === 0 ? (
-          <p className="text-ink/60">Bölge profili bulunamadı.</p>
+          <BosDurum cta={{ href: `/sehir/${anahtar}`, etiket: "Keşfe dön" }} />
         ) : (
-          bolgeler.map((bolge) => (
-            <article
-              key={bolge.bolge_adi}
-              className="border-b border-[var(--cizgi)] pb-12"
-            >
-              <div className="flex flex-wrap items-baseline justify-between gap-3">
-                <h2 className="font-display text-3xl text-deniz capitalize">
-                  {bolge.bolge_adi}
-                  <span className="ml-3 text-base font-sans font-normal text-ink/45">
-                    {bolge.ilce_mi ? "ilçe" : "şehir geneli"}
-                  </span>
-                </h2>
-                <Link
-                  href={`/sehir/${anahtar}/rota?konaklama_bolge=${encodeURIComponent(bolge.bolge_adi)}`}
-                  className="text-sm font-medium text-yosun hover:underline"
-                >
-                  Bu bölgeden rota kur →
-                </Link>
-              </div>
+          bolgeler.map((bolge, i) => (
+            <Reveal key={bolge.bolge_adi} delay={Math.min(i * 0.04, 0.2)}>
+              <article className="border-deniz/10 rounded-2xl border bg-white p-6 md:p-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-3">
+                  <h2 className="font-display text-deniz text-3xl tracking-[-0.02em] capitalize">
+                    {bolge.bolge_adi}
+                    <span className="text-ink/45 ml-3 font-sans text-base font-normal">
+                      {bolge.ilce_mi ? "ilçe" : "şehir geneli"}
+                    </span>
+                  </h2>
+                  <Dugme
+                    href={`/sehir/${anahtar}/rota?konaklama_bolge=${encodeURIComponent(bolge.bolge_adi)}`}
+                    varyant="hayalet"
+                  >
+                    Bu bölgeden rota kur
+                  </Dugme>
+                </div>
 
-              <section className="mt-8">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-ink/45">
-                  Tanıtım
-                </h3>
-                {bolge.tanitim_metni ? (
-                  <p className="mt-2 max-w-3xl text-lg leading-relaxed text-ink/85">
-                    {bolge.tanitim_metni}
-                  </p>
-                ) : (
-                  <p className="mt-2 text-ink/55">
-                    Bu bölge için henüz derlenmiş bir tanıtım metni yok.
-                  </p>
-                )}
-              </section>
+                <section className="mt-8">
+                  <h3 className="text-ink/45 text-[11px] font-medium tracking-[0.24em] uppercase">
+                    Tanıtım
+                  </h3>
+                  {bolge.tanitim_metni ? (
+                    <p className="text-ink/85 mt-2 max-w-3xl text-lg leading-relaxed">
+                      {bolge.tanitim_metni}
+                    </p>
+                  ) : (
+                    <p className="text-ink/55 mt-2">
+                      Bu bölge için henüz derlenmiş bir tanıtım metni yok.
+                    </p>
+                  )}
+                </section>
 
-              <section className="mt-8">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-ink/45">
-                  Kullanıcı deneyimleri
-                </h3>
-                {bolge.duygu_ozeti ? (
-                  <p className="mt-2 max-w-3xl text-lg leading-relaxed text-ink/85">
-                    {bolge.duygu_ozeti}
-                  </p>
-                ) : (
-                  <p className="mt-2 text-ink/55">
-                    Bu bölge için henüz kullanıcı deneyimi özeti yok.
-                  </p>
-                )}
-                <p className="mt-3 text-sm text-ink/45">
-                  {duyguEtiketi(bolge.genel_duygu_etiketi)}
-                  {" · "}
-                  {bolge.kullanilan_yorum_sayisi} yoruma dayalı
-                </p>
-              </section>
-            </article>
+                <section className="mt-8">
+                  <h3 className="text-ink/45 text-[11px] font-medium tracking-[0.24em] uppercase">
+                    Kullanıcı deneyimleri
+                  </h3>
+                  {bolge.duygu_ozeti ? (
+                    <DuyguOzeti
+                      className="mt-3"
+                      metin={bolge.duygu_ozeti}
+                      etiket={duyguEtiketi(bolge.genel_duygu_etiketi)}
+                    />
+                  ) : (
+                    <p className="text-ink/55 mt-2">
+                      Bu bölge için henüz kullanıcı deneyimi özeti yok.
+                    </p>
+                  )}
+                </section>
+              </article>
+            </Reveal>
           ))
         )}
 
-        <Link href={`/sehir/${anahtar}`} className="inline-block text-yosun hover:underline">
-          ← Keşfe dön
-        </Link>
+        <Dugme href={`/sehir/${anahtar}`} varyant="ikincil">
+          Keşfe dön
+        </Dugme>
       </div>
     </main>
   );

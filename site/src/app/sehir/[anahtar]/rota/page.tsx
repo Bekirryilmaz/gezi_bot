@@ -1,4 +1,4 @@
-import { SiteHeader } from "@/components/SiteHeader";
+import { SayfaHero } from "@/components/layout/SayfaHero";
 import { RotaSihirbazi } from "@/components/RotaSihirbazi";
 import { bolgeleriGetir, sehirleriGetir } from "@/lib/api";
 
@@ -14,7 +14,12 @@ export async function generateMetadata({ params }: Props) {
   const { anahtar } = await params;
   const sehirler = await sehirleriGetir().catch(() => []);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
-  return { title: sehir ? `${sehir.isim} rota` : "Rota" };
+  const isim = sehir?.isim ?? anahtar;
+  return {
+    title: `${isim} rota planlayıcı`,
+    description: `${isim} için gün gün rota kur. Konaklama bölgen belli olsun veya alternatiflerden seç; her durağın skor kırılımı açık.`,
+    robots: { index: false, follow: true },
+  };
 }
 
 export default async function RotaSayfasi({ params, searchParams }: Props) {
@@ -28,20 +33,12 @@ export default async function RotaSayfasi({ params, searchParams }: Props) {
   const isim = sehir?.isim ?? anahtar;
 
   return (
-    <main className="atmosfer min-h-screen">
-      <div className="relative bg-deniz-derin pb-14 pt-24 text-white">
-        <SiteHeader sehirAnahtari={anahtar} />
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
-          <p className="text-sm uppercase tracking-[0.2em] text-white/55">Rota</p>
-          <h1 className="mt-3 font-display text-4xl md:text-6xl">
-            {isim} için rotan
-          </h1>
-          <p className="mt-4 max-w-xl text-white/75">
-            Konaklama bölgen belliyse oradan başla; değilse alternatif rotalardan
-            birini seç — ardından bölge önerisi ve kısa tavsiye gelir.
-          </p>
-        </div>
-      </div>
+    <main>
+      <SayfaHero
+        etiket="Rota"
+        baslik={`${isim} için rotan`}
+        ozet="Kaç günün ve ne aradığın belli olsun. Konaklama bölgen varsa oradan başla; yoksa alternatiflerden birini seç."
+      />
 
       <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">
         <RotaSihirbazi

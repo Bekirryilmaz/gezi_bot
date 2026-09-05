@@ -1,6 +1,8 @@
 # Şamandıra — Harita (Web) ve Mobil Yol Haritası
 **Tarih:** 2026-09-05 · Sıra: önce web haritası → PWA → (mezuniyet sonrası) native app
 
+> **Karar kaynağı:** `plan/00_brief_eki.md` §3; markır: `plan/tasarim/yon.md` §5.7.
+
 > İlke: kullanıcı planı "web → Android → App Store" doğru; ama app'in değeri **önce web'de kanıtlanmış mobil trafiğe** bağlı. Bu doküman sırayı ve karar kapılarını tanımlar.
 
 ---
@@ -12,7 +14,7 @@ Harita şu an en büyük ürün eksiği (brifte de işaretli: "yer detayında sa
 **Teknoloji seçimi: MapLibre GL JS** (açık kaynak, ücretsiz) — Google Maps JS API **değil**:
 - Maliyet: Google Maps faturası büyür; MapLibre + ücretsiz tile (OpenFreeMap / Carto basemap) $0 başlar.
 - Hukuk: K2 kararıyla uyumlu — Google ekosistemine yeni bağımlılık eklemeyiz.
-- Marka: kendi şamandıra markırlarımızı (Konsept B pinleri) basabiliriz; Google pinleri jenerik.
+- Marka: kendi şamandıra markırlarımız (`yon.md` §5.7: halka + nokta, damla pin yasak); Google pinleri jenerik.
 - "Google Maps'te aç" linki **kalır** (kullanıcı alışkanlığı; ücretsiz).
 
 Uygulama adımları (backlog B-02, doküman #07):

@@ -8,10 +8,15 @@
   --kumsal: #d4a574;
   --gunes: #f2c14e;
   --yosun: #1f7a6b;
+  --samandira: #d6402c;
+  --samandira-koyu: #a92e1e;
+  --signal: #f2b138;
+  --kagit: #f4efe7;
+  --kagit-koyu: #ebe3d6;
   --ink: #142126;
   --sis: #f3f7f6;
   --cizgi: rgba(10, 77, 92, 0.12);
-  --background: var(--sis);
+  --background: var(--kagit);
   --foreground: var(--ink);
   --radius: 0.625rem;
   --card: #ffffff;
@@ -43,6 +48,10 @@
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--cizgi);
   --sidebar-ring: var(--deniz);
+  --sure-hizli: 180ms;
+  --sure-orta: 280ms;
+  --sure-yavas: 550ms;
+  --ease-cikis: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
@@ -54,6 +63,11 @@
   --color-kumsal: var(--kumsal);
   --color-gunes: var(--gunes);
   --color-yosun: var(--yosun);
+  --color-samandira: var(--samandira);
+  --color-samandira-koyu: var(--samandira-koyu);
+  --color-signal: var(--signal);
+  --color-kagit: var(--kagit);
+  --color-kagit-koyu: var(--kagit-koyu);
   --color-ink: var(--ink);
   --color-sis: var(--sis);
   --color-card: var(--card);
@@ -101,6 +115,25 @@ html {
   scroll-behavior: smooth;
 }
 
+.site-header {
+  background: color-mix(in oklab, var(--kagit) 92%, transparent);
+}
+
+@supports (animation-timeline: scroll()) {
+  .site-header[data-ana="1"] {
+    background: transparent;
+    animation: header-zemin linear both;
+    animation-timeline: scroll();
+    animation-range: 0 64px;
+  }
+}
+
+@keyframes header-zemin {
+  to {
+    background: color-mix(in oklab, var(--kagit) 92%, transparent);
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -109,7 +142,7 @@ body {
 }
 
 ::selection {
-  background: color-mix(in oklab, var(--yosun) 35%, white);
+  background: color-mix(in oklab, var(--samandira) 35%, white);
   color: var(--deniz-derin);
 }
 
@@ -117,67 +150,161 @@ body {
   font-family: var(--font-fraunces), Georgia, serif;
 }
 
-.atmosfer {
-  background:
-    radial-gradient(1200px 600px at 12% -10%, rgba(31, 122, 107, 0.28), transparent 55%),
-    radial-gradient(900px 500px at 90% 0%, rgba(212, 165, 116, 0.22), transparent 50%),
-    linear-gradient(165deg, #f7fbfa 0%, #e7f1f0 45%, #d9ebe8 100%);
+.gok-isik {
+  background: radial-gradient(
+    70% 80% at 50% 0%,
+    rgba(242, 193, 78, 0.18),
+    transparent 70%
+  );
 }
 
-.hero-dalga {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(6, 54, 66, 0.35) 0%,
-      rgba(6, 54, 66, 0.72) 55%,
-      rgba(6, 54, 66, 0.88) 100%
-    ),
-    url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=80")
-      center / cover no-repeat;
+.dalga {
+  position: absolute;
+  inset-inline: -20%;
+  height: 140%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  opacity: 0.35;
+  animation: dalga-kaydir 18s linear infinite;
 }
 
-@keyframes yukselt {
+.dalga-a {
+  bottom: -10%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 200' preserveAspectRatio='none'%3E%3Cpath fill='%230A4D5C' d='M0 80 Q 180 20 360 80 T 720 80 T 1080 80 T 1440 80 V200 H0 Z'/%3E%3C/svg%3E");
+  animation-duration: 22s;
+}
+
+.dalga-b {
+  bottom: -18%;
+  opacity: 0.45;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 200' preserveAspectRatio='none'%3E%3Cpath fill='%23063642' d='M0 100 Q 240 40 480 100 T 960 100 T 1440 100 V200 H0 Z'/%3E%3C/svg%3E");
+  animation-duration: 16s;
+  animation-direction: reverse;
+}
+
+.dalga-c {
+  bottom: -28%;
+  opacity: 0.7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 200' preserveAspectRatio='none'%3E%3Cpath fill='%2302181e' d='M0 120 Q 200 70 400 120 T 800 120 T 1200 120 T 1440 120 V200 H0 Z'/%3E%3C/svg%3E");
+  animation-duration: 28s;
+}
+
+@keyframes dalga-kaydir {
   from {
-    opacity: 0;
-    transform: translateY(18px);
+    transform: translateX(0);
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-8%);
   }
 }
 
-@keyframes nefes {
+.samandira-suz {
+  animation: samandira-suz 4.2s ease-in-out infinite;
+}
+
+@keyframes samandira-suz {
   0%,
   100% {
-    transform: scale(1);
+    transform: translateY(0);
   }
   50% {
-    transform: scale(1.03);
+    transform: translateY(-6px);
   }
 }
 
-.anim-yukselt {
-  animation: yukselt 0.8s ease-out both;
+.samandira-isik {
+  filter: drop-shadow(0 0 14px color-mix(in oklab, var(--samandira) 65%, transparent));
 }
 
-.anim-yukselt-gec {
-  animation: yukselt 0.9s ease-out 0.15s both;
+.kart-isik {
+  position: relative;
 }
 
-.anim-yukselt-daha-gec {
-  animation: yukselt 1s ease-out 0.3s both;
+.kart-isik::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity var(--sure-orta) var(--ease-cikis);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--samandira) 35%, transparent);
 }
 
-.anim-nefes {
-  animation: nefes 7s ease-in-out infinite;
+.kart-isik:hover::after {
+  opacity: 1;
+}
+
+.serit-kaydir {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.serit-ic {
+  display: inline-block;
+  animation: serit 32s linear infinite;
+}
+
+@keyframes serit {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.sonar-halka {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.sonar-halka::before,
+.sonar-halka::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid var(--samandira);
+  animation: sonar 1.8s var(--ease-cikis) infinite;
+}
+
+.sonar-halka::after {
+  animation-delay: 0.6s;
+}
+
+@keyframes sonar {
+  from {
+    transform: scale(0.4);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.kart-liste > * {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 280px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-yukselt,
-  .anim-yukselt-gec,
-  .anim-yukselt-daha-gec,
-  .anim-nefes {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .dalga,
+  .serit-ic,
+  .sonar-halka::before,
+  .sonar-halka::after,
+  .samandira-suz,
+  .site-header[data-ana="1"] {
     animation: none;
+  }
+
+  .site-header[data-ana="1"] {
+    background: color-mix(in oklab, var(--kagit) 92%, transparent);
   }
 }
