@@ -2,11 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import {
-  konaklamaBolgesiOner,
-  rotaAlternatifleriOlustur,
-  rotaOlustur,
-} from "@/lib/api";
+import { konaklamaBolgesiOner, rotaAlternatifleriOlustur, rotaOlustur } from "@/lib/api";
 import { DENEYIM_EKSENLERI, altKategoriEtiketi } from "@/lib/sabitler";
 import type { BolgeProfili, RotaCevap } from "@/lib/types";
 
@@ -25,27 +21,30 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
   return (
     <div className="space-y-10">
       {rota.rota_tavsiyesi && (
-        <p className="rounded-2xl bg-white/70 p-5 text-sm leading-relaxed text-ink/80">
+        <p className="text-ink/80 rounded-2xl bg-white/70 p-5 text-sm leading-relaxed">
           {rota.rota_tavsiyesi}
         </p>
       )}
       {rota.konaklama_bolgesi_onerisi && (
         <div className="rounded-2xl bg-white/70 p-5">
-          <p className="text-sm text-ink/50">Önerilen konaklama bölgesi</p>
-          <p className="mt-1 font-display text-2xl text-deniz">
+          <p className="text-ink/50 text-sm">Önerilen konaklama bölgesi</p>
+          <p className="font-display text-deniz mt-1 text-2xl">
             {rota.konaklama_bolgesi_onerisi.bolge_adi}
           </p>
           {rota.konaklama_bolgesi_onerisi.gerekce && (
-            <p className="mt-2 text-sm text-ink/70">
+            <p className="text-ink/70 mt-2 text-sm">
               {rota.konaklama_bolgesi_onerisi.gerekce}
             </p>
           )}
           {rota.konaklama_bolgesi_onerisi.ornek_konaklamalar?.length > 0 && (
-            <ul className="mt-4 space-y-1 text-sm text-ink/60">
+            <ul className="text-ink/60 mt-4 space-y-1 text-sm">
               <li className="text-ink/40">Bu bölgede örnek tesisler (zorunlu değil):</li>
               {rota.konaklama_bolgesi_onerisi.ornek_konaklamalar.slice(0, 3).map((k) => (
                 <li key={k.id}>
-                  <Link href={`/yer/${k.id}`} className="hover:text-deniz hover:underline">
+                  <Link
+                    href={`/yer/${k.id}`}
+                    className="hover:text-deniz hover:underline"
+                  >
                     {k.isim}
                   </Link>
                 </li>
@@ -56,9 +55,10 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
       )}
       {rota.gunler.map((gun) => (
         <section key={gun.gun_no}>
-          <h3 className="font-display text-2xl text-deniz">{gun.gun_no}. gün</h3>
-          <p className="mt-1 text-sm text-ink/50">
-            {(gun.toplam_mesafe_metre / 1000).toFixed(1)} km · ~{gun.toplam_sure_dakikasi} dk
+          <h3 className="font-display text-deniz text-2xl">{gun.gun_no}. gün</h3>
+          <p className="text-ink/50 mt-1 text-sm">
+            {(gun.toplam_mesafe_metre / 1000).toFixed(1)} km · ~{gun.toplam_sure_dakikasi}{" "}
+            dk
           </p>
           <ol className="mt-4 space-y-3">
             {gun.duraklar.map((durak) => (
@@ -67,12 +67,12 @@ function RotaGunleri({ rota }: { rota: RotaCevap }) {
                   href={`/yer/${durak.yer.id}`}
                   className="group flex gap-3 border-b border-[var(--cizgi)] pb-3"
                 >
-                  <span className="font-display text-xl text-yosun">{durak.sira}</span>
+                  <span className="font-display text-yosun text-xl">{durak.sira}</span>
                   <span>
-                    <span className="block font-medium text-ink group-hover:text-deniz">
+                    <span className="text-ink group-hover:text-deniz block font-medium">
                       {durak.yer.isim}
                     </span>
-                    <span className="text-sm text-ink/50">
+                    <span className="text-ink/50 text-sm">
                       {altKategoriEtiketi(durak.yer.alt_kategori)} · ~
                       {durak.tahmini_ziyaret_suresi_dk} dk
                     </span>
@@ -120,14 +120,7 @@ export function RotaSihirbazi({
       if (b.bolge_adi) adlar.add(b.bolge_adi);
     }
     // Bilinen ilçeler (API boşsa bile)
-    for (const adi of [
-      "Atakum",
-      "İlkadım",
-      "Canik",
-      "Tekkeköy",
-      "Bafra",
-      "Çarşamba",
-    ]) {
+    for (const adi of ["Atakum", "İlkadım", "Canik", "Tekkeköy", "Bafra", "Çarşamba"]) {
       adlar.add(adi);
     }
     return Array.from(adlar).sort((a, b) => a.localeCompare(b, "tr"));
@@ -154,8 +147,7 @@ export function RotaSihirbazi({
     const talep = {
       ...tercihGovdesi(),
       konaklama_yer_id: baslangicKonaklamaYerId || undefined,
-      konaklama_bolge_adi:
-        !baslangicKonaklamaYerId && bolgeAdi ? bolgeAdi : undefined,
+      konaklama_bolge_adi: !baslangicKonaklamaYerId && bolgeAdi ? bolgeAdi : undefined,
     };
     if (!talep.konaklama_yer_id && !talep.konaklama_bolge_adi) {
       setHata("Konaklama bölgesi seç.");
@@ -213,7 +205,7 @@ export function RotaSihirbazi({
       <div className="space-y-8">
         {adim === "senaryo" && (
           <div className="space-y-4">
-            <p className="text-sm text-ink/50">Nasıl başlamak istersin?</p>
+            <p className="text-ink/50 text-sm">Nasıl başlamak istersin?</p>
             <button
               type="button"
               onClick={() => {
@@ -222,8 +214,10 @@ export function RotaSihirbazi({
               }}
               className="block w-full rounded-2xl bg-white/70 px-5 py-4 text-left transition hover:bg-white"
             >
-              <span className="font-display text-xl text-deniz">Konaklama bölgem belli</span>
-              <span className="mt-1 block text-sm text-ink/60">
+              <span className="font-display text-deniz text-xl">
+                Konaklama bölgem belli
+              </span>
+              <span className="text-ink/60 mt-1 block text-sm">
                 İlçe veya bölge seç; rota o merkez etrafında kurulsun.
               </span>
             </button>
@@ -235,8 +229,10 @@ export function RotaSihirbazi({
               }}
               className="block w-full rounded-2xl bg-white/70 px-5 py-4 text-left transition hover:bg-white"
             >
-              <span className="font-display text-xl text-deniz">Henüz karar vermedim</span>
-              <span className="mt-1 block text-sm text-ink/60">
+              <span className="font-display text-deniz text-xl">
+                Henüz karar vermedim
+              </span>
+              <span className="text-ink/60 mt-1 block text-sm">
                 2–3 alternatif rota gör; sonra konaklama bölgesi önerilsin.
               </span>
             </button>
@@ -254,7 +250,7 @@ export function RotaSihirbazi({
           >
             {senaryo === "bolge_belli" && !baslangicKonaklamaYerId && (
               <div>
-                <label className="text-sm text-ink/50">Konaklama bölgesi</label>
+                <label className="text-ink/50 text-sm">Konaklama bölgesi</label>
                 <select
                   value={bolgeAdi}
                   onChange={(e) => setBolgeAdi(e.target.value)}
@@ -271,13 +267,13 @@ export function RotaSihirbazi({
               </div>
             )}
             {baslangicKonaklamaYerId && (
-              <p className="text-sm text-ink/60">
+              <p className="text-ink/60 text-sm">
                 Konaklama üssü olarak seçtiğin yer kullanılacak.
               </p>
             )}
 
             <div>
-              <label className="text-sm text-ink/50">Kaç gün?</label>
+              <label className="text-ink/50 text-sm">Kaç gün?</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {[1, 2, 3, 4, 5].map((g) => (
                   <button
@@ -287,7 +283,7 @@ export function RotaSihirbazi({
                     className={`h-10 w-10 rounded-full text-sm font-medium transition ${
                       gunSayisi === g
                         ? "bg-deniz text-white"
-                        : "bg-white/70 text-ink hover:bg-white"
+                        : "text-ink bg-white/70 hover:bg-white"
                     }`}
                   >
                     {g}
@@ -297,13 +293,13 @@ export function RotaSihirbazi({
             </div>
 
             <div>
-              <p className="text-sm text-ink/50">İlgi alanların</p>
+              <p className="text-ink/50 text-sm">İlgi alanların</p>
               <div className="mt-3 space-y-4">
                 {DENEYIM_EKSENLERI.map((eksen) => (
                   <label key={eksen.deger} className="block">
                     <span className="flex justify-between text-sm">
                       <span>{eksen.etiket}</span>
-                      <span className="tabular-nums text-ink/45">
+                      <span className="text-ink/45 tabular-nums">
                         {Math.round((eksikler[eksen.deger] ?? 0) * 100)}%
                       </span>
                     </span>
@@ -313,10 +309,8 @@ export function RotaSihirbazi({
                       max={1}
                       step={0.1}
                       value={eksikler[eksen.deger] ?? 0}
-                      onChange={(e) =>
-                        eksenDegistir(eksen.deger, Number(e.target.value))
-                      }
-                      className="mt-1 w-full accent-yosun"
+                      onChange={(e) => eksenDegistir(eksen.deger, Number(e.target.value))}
+                      className="accent-yosun mt-1 w-full"
                     />
                   </label>
                 ))}
@@ -348,31 +342,33 @@ export function RotaSihirbazi({
               <button
                 type="button"
                 onClick={() => setAdim("senaryo")}
-                className="rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
+                className="text-ink/70 rounded-full bg-white/70 px-5 py-3 text-sm"
               >
                 Geri
               </button>
               <button
                 type="submit"
                 disabled={bekliyor}
-                className="rounded-full bg-gunes px-6 py-3 text-sm font-semibold text-deniz-derin transition hover:brightness-105 disabled:opacity-60"
+                className="bg-gunes text-deniz-derin rounded-full px-6 py-3 text-sm font-semibold transition hover:brightness-105 disabled:opacity-60"
               >
                 {bekliyor
                   ? "Hazırlanıyor…"
                   : senaryo === "bolge_belli"
-                    ? `${sehirIsim} rotamı oluştur`
+                    ? `${sehirIsim} rotasını oluştur`
                     : "Alternatif rotaları göster"}
               </button>
             </div>
             {hata && (
-              <p className="text-sm text-red-700/90 whitespace-pre-wrap">{hata}</p>
+              <p className="text-sm whitespace-pre-wrap text-red-700/90">{hata}</p>
             )}
           </form>
         )}
 
         {adim === "alternatifler" && (
           <div className="space-y-4">
-            <p className="text-sm text-ink/50">Bir rota seç; ardından konaklama bölgesi önerilecek.</p>
+            <p className="text-ink/50 text-sm">
+              Bir rota seç; ardından konaklama bölgesi önerilecek.
+            </p>
             {alternatifler.map((alt, i) => (
               <button
                 key={alt.id}
@@ -381,10 +377,10 @@ export function RotaSihirbazi({
                 onClick={() => alternatifSec(alt)}
                 className="block w-full rounded-2xl bg-white/70 px-5 py-4 text-left transition hover:bg-white disabled:opacity-60"
               >
-                <span className="font-display text-xl text-deniz">
+                <span className="font-display text-deniz text-xl">
                   {alt.alternatif_etiketi ?? `Alternatif ${i + 1}`}
                 </span>
-                <span className="mt-1 block text-sm text-ink/60">
+                <span className="text-ink/60 mt-1 block text-sm">
                   {alt.gunler.length} gün ·{" "}
                   {alt.gunler.reduce((a, g) => a + g.duraklar.length, 0)} durak ·{" "}
                   {(
@@ -397,12 +393,12 @@ export function RotaSihirbazi({
             <button
               type="button"
               onClick={() => setAdim("tercihler")}
-              className="rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
+              className="text-ink/70 rounded-full bg-white/70 px-5 py-3 text-sm"
             >
               Geri
             </button>
             {hata && (
-              <p className="text-sm text-red-700/90 whitespace-pre-wrap">{hata}</p>
+              <p className="text-sm whitespace-pre-wrap text-red-700/90">{hata}</p>
             )}
           </div>
         )}
@@ -415,7 +411,7 @@ export function RotaSihirbazi({
               setAlternatifler([]);
               setAdim("senaryo");
             }}
-            className="rounded-full bg-white/70 px-5 py-3 text-sm text-ink/70"
+            className="text-ink/70 rounded-full bg-white/70 px-5 py-3 text-sm"
           >
             Yeni rota
           </button>
@@ -431,7 +427,7 @@ export function RotaSihirbazi({
           <div className="space-y-8">
             {alternatifler.map((alt) => (
               <div key={alt.id} className="opacity-80">
-                <p className="mb-3 text-sm text-ink/45">
+                <p className="text-ink/45 mb-3 text-sm">
                   {alt.alternatif_etiketi ?? "Önizleme"}
                 </p>
                 <RotaGunleri rota={alt} />

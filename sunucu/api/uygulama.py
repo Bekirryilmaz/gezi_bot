@@ -19,9 +19,11 @@ from sunucu.api.rotalar_router import yonlendirici as rotalar_yonlendirici
 from sunucu.api.yerler_router import yonlendirici as yerler_yonlendirici
 
 uygulama = FastAPI(
-    title="Gezi Platformu API",
-    description="Samsun (ve zamanla diger Karadeniz sehirleri) icin gezilecek yer, "
-    "konaklama, yeme-icme verisi ve kisisellestirilmis rota olusturma API'si.",
+    title="Şamandıra API",
+    description=(
+        "Karadeniz'in kisisel gezi rehberi — kesfet, oku, gun gun rotani kur. "
+        "Yer, bolge ve kisisellestirilmis rota olusturma. Once Samsun, sonra tum kiyi."
+    ),
     version="0.1.0",
 )
 
@@ -50,4 +52,4 @@ uygulama.include_router(rotalar_yonlendirici)
 
 @uygulama.get("/", include_in_schema=False)
 def kok() -> dict:
-    return {"mesaj": "Gezi Platformu API calisiyor. Dokumantasyon icin /docs adresine git."}
+    return {"mesaj": "Samandira API calisiyor. Dokumantasyon icin /docs adresine git."}

@@ -17,11 +17,11 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: {
-    default: "Rotam — Karadeniz’de senin rotan",
-    template: "%s · Rotam",
+    default: "Şamandıra — Karadeniz'in kişisel gezi rehberi",
+    template: "%s · Şamandıra",
   },
   description:
-    "Samsun’dan başlayan kişisel gezi platformu. Yerleri keşfet, bölgeleri oku, gün gün rota kur.",
+    "Şamandıra, Karadeniz'in kişisel gezi rehberi — keşfet, oku, gün gün rotanı kur.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -15,12 +15,12 @@ export default async function AnaSayfa() {
     <main>
       <section className="hero-dalga relative min-h-[100svh] overflow-hidden text-white">
         <SiteHeader />
-        <div className="anim-nefes pointer-events-none absolute -right-16 top-24 h-64 w-64 rounded-full bg-yosun/25 blur-3xl" />
-        <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-5 pb-16 pt-28 md:px-8 md:pb-20">
+        <div className="anim-nefes bg-yosun/25 pointer-events-none absolute top-24 -right-16 h-64 w-64 rounded-full blur-3xl" />
+        <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-5 pt-28 pb-16 md:px-8 md:pb-20">
           <p className="anim-yukselt font-display text-5xl leading-none tracking-tight md:text-7xl lg:text-8xl">
-            Rotam
+            Şamandıra
           </p>
-          <h1 className="anim-yukselt-gec mt-5 max-w-xl font-display text-2xl font-medium leading-snug text-white/95 md:text-3xl">
+          <h1 className="anim-yukselt-gec font-display mt-5 max-w-xl text-2xl leading-snug font-medium text-white/95 md:text-3xl">
             {sehirIsim} kıyısında, sana özel bir gezi yolu.
           </h1>
           <p className="anim-yukselt-daha-gec mt-4 max-w-md text-base text-white/80 md:text-lg">
@@ -29,7 +29,7 @@ export default async function AnaSayfa() {
           <div className="anim-yukselt-daha-gec mt-8 flex flex-wrap gap-3">
             <Link
               href="/sehir/samsun"
-              className="rounded-full bg-gunes px-6 py-3 text-sm font-semibold text-deniz-derin transition hover:brightness-105"
+              className="bg-gunes text-deniz-derin rounded-full px-6 py-3 text-sm font-semibold transition hover:brightness-105"
             >
               Keşfe başla
             </Link>
@@ -58,16 +58,17 @@ export default async function AnaSayfa() {
             },
             {
               baslik: "Rota",
-              metin: "İlgi alanına göre gün gün plan; konaklama senin veya bizim önerimiz.",
+              metin:
+                "İlgi alanına göre gün gün plan; konaklama senin veya bizim önerimiz.",
               href: "/sehir/samsun/rota",
             },
           ].map((oge) => (
             <Link key={oge.baslik} href={oge.href} className="group block">
-              <h2 className="font-display text-3xl text-deniz transition group-hover:text-yosun">
+              <h2 className="font-display text-deniz group-hover:text-yosun text-3xl transition">
                 {oge.baslik}
               </h2>
-              <p className="mt-3 text-ink/70">{oge.metin}</p>
-              <span className="mt-4 inline-block text-sm font-medium text-yosun">
+              <p className="text-ink/70 mt-3">{oge.metin}</p>
+              <span className="text-yosun mt-4 inline-block text-sm font-medium">
                 İncele →
               </span>
             </Link>

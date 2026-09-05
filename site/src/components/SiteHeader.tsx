@@ -12,7 +12,7 @@ export function SiteHeader({ sehirAnahtari = "samsun" }: Props) {
           href="/"
           className="font-display text-2xl tracking-tight text-white drop-shadow-sm md:text-3xl"
         >
-          Rotam
+          Şamandıra
         </Link>
         <nav className="flex items-center gap-5 text-sm text-white/90 md:gap-7 md:text-base">
           <Link href={`/sehir/${sehirAnahtari}`} className="transition hover:text-white">

@@ -6,13 +6,7 @@ bak (özellikle `kategori_taksonomisi.md` ve `veri_sozlugu.md`).
 
 ## Kurulum
 
-```bash
-cd veri
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-pip install -r requirements.txt
-playwright install chromium     # Google Maps ve TripAdvisor toplayicilari icin sart
-```
+Python ortamı repo kökündeki `.venv_test` (veri + sunucu aynı venv; kurulum `calis.txt`).
 
 Komutları **repo kökünden** (`gezi_bot/` içinden) çalıştır, çünkü modüller
 `ortak.*` ve `veri.*` şeklinde birbirine referans veriyor:
