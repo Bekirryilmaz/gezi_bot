@@ -37,6 +37,18 @@ class SehirCevap(BaseModel):
         )
 
 
+class SehirIstatistikleri(BaseModel):
+    """Ana sayfa kanit bandi: sayilar elle yazilmaz, buradan gelir
+    (bkz. plan/tasarim/yon.md 3.8). Yorum sayisi BILEREK yoktur (K2)."""
+
+    sehir_anahtari: str
+    yer_sayisi: int
+    kesif_yer_sayisi: int
+    ilce_sayisi: int
+    bolge_profili_sayisi: int
+    deneyim_ekseni_sayisi: int
+
+
 class YerOzet(BaseModel):
     """Liste gorunumlerinde (yer listeleme, rota duraklari) kullanilan
     kisa yer bilgisi."""
@@ -141,9 +153,21 @@ class BolgeProfiliCevap(BaseModel):
     kullanilan_yorum_sayisi: int
     duygu_ozeti: str | None = None
     tanitim_metni: str | None = None
+    # sehir_ayarlari.ilce_merkezleri — kolon yok, K6 veri katmani (poligon sonra).
+    enlem: float | None = None
+    boylam: float | None = None
 
     @classmethod
-    def yerden_olustur(cls, bolge_profili: BolgeProfili) -> "BolgeProfiliCevap":
+    def yerden_olustur(
+        cls, bolge_profili: BolgeProfili, sehir_anahtari: str | None = None
+    ) -> "BolgeProfiliCevap":
+        from veri.ortak.sehir_ayarlari import bolge_merkezini_bul
+
+        merkez = (
+            bolge_merkezini_bul(sehir_anahtari, bolge_profili.bolge_adi)
+            if sehir_anahtari
+            else None
+        )
         return cls(
             bolge_adi=bolge_profili.bolge_adi,
             ilce_mi=bolge_profili.ilce_mi,
@@ -153,6 +177,8 @@ class BolgeProfiliCevap(BaseModel):
             kullanilan_yorum_sayisi=bolge_profili.kullanilan_yorum_sayisi,
             duygu_ozeti=bolge_profili.duygu_ozeti,
             tanitim_metni=getattr(bolge_profili, "tanitim_metni", None),
+            enlem=merkez[0] if merkez else None,
+            boylam=merkez[1] if merkez else None,
         )
 
 

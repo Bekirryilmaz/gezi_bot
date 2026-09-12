@@ -4,6 +4,7 @@ import type {
   RotaCevap,
   RotaTalebi,
   Sehir,
+  SehirIstatistikleri,
   YerDetay,
   YerListeCevabi,
   YerOzet,
@@ -38,7 +39,9 @@ async function apiGet<T>(yol: string): Promise<T> {
   let yanit: Response;
   try {
     yanit = await fetch(`${apiKoku()}${yol}`, {
-      ...(typeof window === "undefined" ? { next: { revalidate: 60 } } : { cache: "no-store" }),
+      ...(typeof window === "undefined"
+        ? { next: { revalidate: 60 } }
+        : { cache: "no-store" }),
     });
   } catch (hata) {
     throw new Error(agHatasiMesaji(hata));
@@ -76,6 +79,13 @@ export async function yerleriGetir(
     return { yerler: cevap, toplam_sayi: cevap.length };
   }
   return cevap;
+}
+
+/** Ana sayfa kanit bandi: sayilar elle yazilmaz (yon.md 3.8). */
+export async function istatistikleriGetir(
+  sehirAnahtari: string,
+): Promise<SehirIstatistikleri> {
+  return apiGet<SehirIstatistikleri>(`/sehirler/${sehirAnahtari}/istatistikler`);
 }
 
 export async function yerDetayiGetir(yerId: string): Promise<YerDetay> {

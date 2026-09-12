@@ -81,6 +81,24 @@ def _yer_listesi_sorgusu(
     return sorgu.order_by(Yer.isim)
 
 
+def sehir_yer_sayilari(oturum: Session, sehir_id: str) -> tuple[int, int, int]:
+    """(toplam yer, kesif vitrinindeki yer, farkli ilce) uclusu."""
+    toplam = int(oturum.query(func.count(Yer.id)).filter(Yer.sehir_id == sehir_id).scalar() or 0)
+    kesif = int(
+        oturum.query(func.count(Yer.id))
+        .filter(Yer.sehir_id == sehir_id, _kesif_vitrin_kosulu())
+        .scalar()
+        or 0
+    )
+    ilce = int(
+        oturum.query(func.count(func.distinct(Yer.ilce)))
+        .filter(Yer.sehir_id == sehir_id, Yer.ilce.isnot(None), Yer.ilce != "")
+        .scalar()
+        or 0
+    )
+    return toplam, kesif, ilce
+
+
 def yer_ve_koordinat_getir(oturum: Session, yer_id: str) -> tuple[Yer, float, float] | None:
     enlem_kolonu, boylam_kolonu = _koordinat_kolonlari()
     sonuc = oturum.query(Yer, enlem_kolonu, boylam_kolonu).filter(Yer.id == yer_id).first()

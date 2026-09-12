@@ -1,9 +1,6 @@
 "use client";
 
-import { type ReactNode } from "react";
-import { motion } from "motion/react";
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+import { type ReactNode, useEffect, useRef } from "react";
 
 type Ozellik = {
   children: ReactNode;
@@ -11,21 +8,45 @@ type Ozellik = {
   className?: string;
 };
 
+function useBirKezGorunur(esik: number) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.dataset.gorunur = "1";
+      return;
+    }
+    const gozlem = new IntersectionObserver(
+      ([girdi]) => {
+        if (!girdi?.isIntersecting) return;
+        gozlem.disconnect();
+        el.dataset.gorunur = "1";
+      },
+      { threshold: esik },
+    );
+    gozlem.observe(el);
+    return () => gozlem.disconnect();
+  }, [esik]);
+
+  return ref;
+}
+
 /**
- * Kaydirma ile bir kez gorunen reveal.
- * MotionConfig reducedMotion="user" transform'u kisar; opacity kalir.
+ * Kaydirma ile bir kez gorunen reveal — CSS, motion yok (Lighthouse TBT).
  */
 export function Reveal({ children, delay = 0, className }: Ozellik) {
+  const ref = useBirKezGorunur(0.18);
   return (
-    <motion.div
+    <div
+      ref={ref}
+      data-reveal
       className={className}
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.55, delay, ease: EASE }}
+      style={delay ? { ["--reveal-gecikme" as string]: `${delay}s` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -36,21 +57,11 @@ export function RevealListe({
   children: ReactNode;
   className?: string;
 }) {
+  const ref = useBirKezGorunur(0.12);
   return (
-    <motion.div
-      className={className}
-      initial="gizli"
-      whileInView="gorunur"
-      viewport={{ once: true, amount: 0.12 }}
-      variants={{
-        gizli: {},
-        gorunur: {
-          transition: { staggerChildren: 0.08, delayChildren: 0.06 },
-        },
-      }}
-    >
+    <div ref={ref} data-reveal-liste className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -62,18 +73,8 @@ export function RevealOge({
   className?: string;
 }) {
   return (
-    <motion.div
-      className={className}
-      variants={{
-        gizli: { opacity: 0, y: 16 },
-        gorunur: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.5, ease: EASE },
-        },
-      }}
-    >
+    <div data-reveal-oge className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }

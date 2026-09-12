@@ -4,7 +4,7 @@
 
 > **K8 bu dosyayı geçersiz kılar (logo).** Kullanıcı illüstrasyonu `plan/logo/secili/logo.png` FİNAL'dir; §6–§7'deki Ufuk / Sonar / Rota / Demir seçimi uygulanmaz. **Slogan + GEO tanım cümlesi (§5 / §7) geçerlidir.** Güncel karar: `plan/00_brief_eki.md` §3. Güncel yön: `plan/tasarim/yon.md`. Sergi `/tasarim-secim` kapatıldı.
 
-Bu dosya T-16 Faz 1'in araştırma çıktısıdır: kaynak havuzu taraması, çıkarılan desenler, `ui-ux-pro-max` notları, reddedilen logo gerekçeleri ve SEO+GEO slogan stratejisi. Ekran görüntüleri `plan/logo/arastirma/` klasöründedir.
+Bu dosya T-16 Faz 1'in araştırma çıktısıdır: kaynak havuzu taraması, çıkarılan desenler, `ui-ux-pro-max` notları, reddedilen logo gerekçeleri ve SEO+GEO slogan stratejisi. Ekran PNG'leri 2026-09-08 silindi (ajan bağlamı); tablo URL'leri durur.
 
 **Bağlam / kısıt (o gün):** K5, K6, K7. Palet o sırada `deniz/kopuk/kumsal/gunes` + `samandira #D6402C` idi; **güncel palet `yon.md` §1.2** (bordo mürekkep). Fontlar Fraunces + Sora kilit kaldı.
 

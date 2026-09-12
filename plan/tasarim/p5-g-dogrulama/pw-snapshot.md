@@ -1,0 +1,273 @@
+- generic [active] [ref=f50e1]:
+  - banner [ref=f50e2]:
+    - generic [ref=f50e3]:
+      - link "Şamandıra ana sayfa" [ref=f50e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f50e379]: şamandıra
+      - navigation "Ana" [ref=f50e380]:
+        - link "Keşfet" [ref=f50e381] [cursor=pointer]:
+          - /url: /sehir/samsun
+        - link "Bölgeler" [ref=f50e383] [cursor=pointer]:
+          - /url: /sehir/samsun/bolgeler
+      - link "Rotanı kur" [ref=f50e6] [cursor=pointer]:
+        - /url: /sehir/samsun/rota
+  - main [ref=f50e14]:
+    - generic [ref=f50e17]:
+      - paragraph [ref=f50e18]: Gezi rehberi
+      - heading "Gezilecek yerleri işaretler." [level=1] [ref=f50e19]
+      - paragraph [ref=f50e20]: Şamandıra, bir şehirdeki gezilecek yerleri deneyim eksenlerine göre puanlayan ve gün gün rota kuran bir gezi rehberidir.
+      - generic [ref=f50e21]:
+        - link "Rotanı kur" [ref=f50e23] [cursor=pointer]:
+          - /url: /sehir/samsun/rota
+        - link "Keşfe başla" [ref=f50e24] [cursor=pointer]:
+          - /url: /sehir/samsun
+      - paragraph [ref=f50e25]: 1.719 işaretli yer · 15 ilçe · 18 bölge profili
+    - generic [ref=f50e28]:
+      - generic [ref=f50e31]:
+        - paragraph [ref=f50e33]: Atlas
+        - generic [ref=f50e34]:
+          - generic [ref=f50e35]:
+            - heading "Samsun işaretli" [level=2] [ref=f50e36]
+            - link "Bölgeyi tanı" [ref=f50e37] [cursor=pointer]:
+              - /url: /sehir/samsun/bolgeler
+          - paragraph [ref=f50e40]: İlçeler birer ışık. Kaydırınca kamera uçar; tıklayınca plaka açılır. Yeni şehir aynı katmandan eklenir.
+      - generic [ref=f50e42]:
+        - generic [ref=f50e44]:
+          - img "Samsun ilçe atlası" [ref=f50e45]
+          - list [ref=f50e101]:
+            - listitem [ref=f50e102]:
+              - button "Vezirköprü" [ref=f50e103] [cursor=pointer]
+            - listitem [ref=f50e104]:
+              - button "Yakakent" [ref=f50e105] [cursor=pointer]
+            - listitem [ref=f50e106]:
+              - button "Alaçam" [ref=f50e107] [cursor=pointer]
+            - listitem [ref=f50e108]:
+              - button "Havza" [ref=f50e109] [cursor=pointer]
+            - listitem [ref=f50e110]:
+              - button "Ladik" [ref=f50e111] [cursor=pointer]
+            - listitem [ref=f50e112]:
+              - button "Bafra" [ref=f50e113] [cursor=pointer]
+            - listitem [ref=f50e114]:
+              - button "Kavak" [ref=f50e115] [cursor=pointer]
+            - listitem [ref=f50e116]:
+              - button "19 Mayıs" [ref=f50e117] [cursor=pointer]
+            - listitem [ref=f50e118]:
+              - button "Asarcık" [ref=f50e119] [cursor=pointer]
+            - listitem [ref=f50e120]:
+              - button "Atakum" [ref=f50e121] [cursor=pointer]
+            - listitem [ref=f50e122]:
+              - button "İlkadım" [ref=f50e123] [cursor=pointer]
+            - listitem [ref=f50e124]:
+              - button "Canik" [ref=f50e125] [cursor=pointer]
+            - listitem [ref=f50e126]:
+              - button "Tekkeköy" [ref=f50e127] [cursor=pointer]
+            - listitem [ref=f50e128]:
+              - button "Ayvacık" [ref=f50e129] [cursor=pointer]
+            - listitem [ref=f50e130]:
+              - button "Çarşamba" [ref=f50e131] [cursor=pointer]
+            - listitem [ref=f50e132]:
+              - button "Salıpazarı" [ref=f50e133] [cursor=pointer]
+            - listitem [ref=f50e134]:
+              - button "Terme" [ref=f50e135] [cursor=pointer]
+        - complementary [ref=f50e137]:
+          - paragraph [ref=f50e141]: Plaka
+          - paragraph [ref=f50e142]: Bir ilçe ışığına dokun.
+          - paragraph [ref=f50e143]: Samsun ilçeleri işaretli. Şehir eklendikçe aynı atlas büyür.
+    - generic [ref=f50e145]:
+      - generic [ref=f50e146]:
+        - paragraph [ref=f50e148]: Kanıt
+        - paragraph [ref=f50e149]: Şamandıra, bir şehirdeki gezilecek yerleri deneyim eksenlerine göre puanlayan ve gün gün rota kuran bir gezi rehberidir. İlk çıkış şehri Samsun; kapsam tüm Türkiye.
+      - generic [ref=f50e151]:
+        - generic [ref=f50e152]:
+          - term [ref=f50e153]: İşaretli yer
+          - definition [ref=f50e154]:
+            - generic [ref=f50e155]: "1.719"
+          - paragraph [ref=f50e156]: Samsun genelinde
+        - generic [ref=f50e157]:
+          - term [ref=f50e158]: İlçe
+          - definition [ref=f50e159]:
+            - generic [ref=f50e160]: "15"
+          - paragraph [ref=f50e161]: Yer verisi olan ilçeler
+        - generic [ref=f50e162]:
+          - term [ref=f50e163]: Bölge profili
+          - definition [ref=f50e164]:
+            - generic [ref=f50e165]: "18"
+          - paragraph [ref=f50e166]: Yorumlardan derlendi
+      - paragraph [ref=f50e168]: "Önerilerimizin nedenini gösteririz: her skorun kırılımı açık."
+    - generic [ref=f50e170]:
+      - generic [ref=f50e173]:
+        - paragraph [ref=f50e175]: Ne yapar?
+        - generic [ref=f50e176]:
+          - heading "Şehri üç yoldan oku" [level=2] [ref=f50e178]
+          - paragraph [ref=f50e179]: Keşif listesi, ilçe profilleri ve gün gün rota — üçü de aynı skor dilini konuşur.
+      - generic [ref=f50e180]:
+        - article [ref=f50e182]:
+          - generic [ref=f50e184]:
+            - heading "Nereye gidilir?" [level=3] [ref=f50e185]
+            - paragraph [ref=f50e186]: Gezilecek yerler, yeme-içme ve konaklama tek listede; deneyim eksenlerine göre sıralı.
+            - link "Keşfe başla" [ref=f50e188] [cursor=pointer]:
+              - /url: /sehir/samsun
+        - article [ref=f50e192]:
+          - generic [ref=f50e194]:
+            - heading "Hangi bölge sana göre?" [level=3] [ref=f50e195]
+            - paragraph [ref=f50e196]: İlçelerin tanıtımı ile ziyaretçi izlenimi yan yana; konaklama üssünü seç.
+            - link "Bölgeyi tanı" [ref=f50e198] [cursor=pointer]:
+              - /url: /sehir/samsun/bolgeler
+        - article [ref=f50e202]:
+          - generic [ref=f50e204]:
+            - heading "Kaç günün var?" [level=3] [ref=f50e205]
+            - paragraph [ref=f50e206]: Gün gün planı kur; her durağın gerekçesi skor kırılımında açık durur.
+            - link "Rotanı kur" [ref=f50e208] [cursor=pointer]:
+              - /url: /sehir/samsun/rota
+    - generic [ref=f50e212]:
+      - generic [ref=f50e214]:
+        - paragraph [ref=f50e216]: Nereye gidilir?
+        - generic [ref=f50e217]:
+          - generic [ref=f50e218]:
+            - heading "Açık şehir" [level=2] [ref=f50e219]
+            - link "Keşfe başla" [ref=f50e220] [cursor=pointer]:
+              - /url: /sehir/samsun
+          - paragraph [ref=f50e223]: "Yeni şehir eklemek tasarımı değiştirmez: veri gelir, işaretlenir, aynı kutulara oturur."
+      - generic [ref=f50e224]:
+        - paragraph [ref=f50e225]: 1 / 81 şehir
+        - generic [ref=f50e226]:
+          - article [ref=f50e227]:
+            - generic [ref=f50e228]:
+              - paragraph [ref=f50e229]: Şehir
+              - heading [level=3] [ref=f50e230]:
+                - link "Samsun" [ref=f50e231] [cursor=pointer]:
+                  - /url: /sehir/samsun
+              - paragraph [ref=f50e232]: 1.719 yer · 15 ilçe
+              - paragraph [ref=f50e233]: Samsun ilk çıkış noktamız. Gezilecek yerler işaretli, ilçeler profillendi, rota gün gün kuruluyor.
+              - link "Keşfe başla" [ref=f50e235] [cursor=pointer]:
+                - /url: /sehir/samsun
+            - generic [ref=f50e239]:
+              - paragraph [ref=f50e240]: İlçe indeksi
+              - list [ref=f50e241]:
+                - listitem [ref=f50e242]:
+                  - generic [ref=f50e243]: "01"
+                  - generic [ref=f50e244]: Atakum
+                - listitem [ref=f50e245]:
+                  - generic [ref=f50e246]: "02"
+                  - generic [ref=f50e247]: Çarşamba
+                - listitem [ref=f50e248]:
+                  - generic [ref=f50e249]: "03"
+                  - generic [ref=f50e250]: Kavak
+                - listitem [ref=f50e251]:
+                  - generic [ref=f50e252]: "04"
+                  - generic [ref=f50e253]: Bafra
+                - listitem [ref=f50e254]:
+                  - generic [ref=f50e255]: "05"
+                  - generic [ref=f50e256]: Ayvacık
+                - listitem [ref=f50e257]:
+                  - generic [ref=f50e258]: "06"
+                  - generic [ref=f50e259]: Canik
+                - listitem [ref=f50e260]:
+                  - generic [ref=f50e261]: "07"
+                  - generic [ref=f50e262]: Terme
+                - listitem [ref=f50e263]:
+                  - generic [ref=f50e264]: "08"
+                  - generic [ref=f50e265]: Vezirköprü
+                - listitem [ref=f50e266]:
+                  - generic [ref=f50e267]: "09"
+                  - generic [ref=f50e268]: Ladik
+                - listitem [ref=f50e269]:
+                  - generic [ref=f50e270]: "10"
+                  - generic [ref=f50e271]: Havza
+                - listitem [ref=f50e272]:
+                  - generic [ref=f50e273]: "11"
+                  - generic [ref=f50e274]: Alaçam
+                - listitem [ref=f50e275]:
+                  - generic [ref=f50e276]: "12"
+                  - generic [ref=f50e277]: İlkadım
+                - listitem [ref=f50e278]:
+                  - generic [ref=f50e279]: "13"
+                  - generic [ref=f50e280]: Tekkeköy
+                - listitem [ref=f50e281]:
+                  - generic [ref=f50e282]: "14"
+                  - generic [ref=f50e283]: Yakakent
+                - listitem [ref=f50e284]:
+                  - generic [ref=f50e285]: "15"
+                  - generic [ref=f50e286]: Asarcık
+                - listitem [ref=f50e287]:
+                  - generic [ref=f50e288]: "16"
+                  - generic [ref=f50e289]: Salıpazarı
+                - listitem [ref=f50e290]:
+                  - generic [ref=f50e291]: "17"
+                  - generic [ref=f50e292]: 19 Mayıs
+          - link "Bölgeyi tanı" [ref=f50e294] [cursor=pointer]:
+            - /url: /sehir/samsun/bolgeler
+    - generic [ref=f50e298]:
+      - generic [ref=f50e301]:
+        - paragraph [ref=f50e303]: Nasıl bilir?
+        - generic [ref=f50e304]:
+          - heading "Yorumları biz okuduk" [level=2] [ref=f50e306]
+          - paragraph [ref=f50e307]: "Puanın yanında bir de izlenim var: ziyaretçi yorumlarından derlenmiştir, şablonla yazıldı, kırılımı açık."
+      - generic [ref=f50e308]:
+        - blockquote [ref=f50e310]:
+          - paragraph [ref=f50e311]: ziyaretçi yorumlarından derlenmiştir
+          - paragraph [ref=f50e312]: Atakum · Nötr
+          - paragraph [ref=f50e313]: “Bölge hakkında konuşanların görüşleri birbirinden oldukça farklı. Doğal…”
+          - paragraph [ref=f50e314]: Bölge hakkında konuşanların görüşleri birbirinden oldukça farklı. Doğal güzellikler konusunda genel olarak iyi bir izlenim var. Konum açısından bölgenin öne çıkan bir yönü. Lezzet açısından bölgenin öne çıkan bir yönü.
+        - generic [ref=f50e316]:
+          - paragraph [ref=f50e317]: Deneyim eksenleri
+          - list [ref=f50e318]:
+            - listitem [ref=f50e319]:
+              - generic [ref=f50e320]: Tarih & kültür
+              - generic [ref=f50e321]: 0–10
+            - listitem [ref=f50e322]:
+              - generic [ref=f50e323]: Eğlence
+              - generic [ref=f50e324]: 0–10
+            - listitem [ref=f50e325]:
+              - generic [ref=f50e326]: Doğa & macera
+              - generic [ref=f50e327]: 0–10
+            - listitem [ref=f50e328]:
+              - generic [ref=f50e329]: Gastronomi
+              - generic [ref=f50e330]: 0–10
+            - listitem [ref=f50e331]:
+              - generic [ref=f50e332]: Gece hayatı
+              - generic [ref=f50e333]: 0–10
+            - listitem [ref=f50e334]:
+              - generic [ref=f50e335]: Sakin & rahat
+              - generic [ref=f50e336]: 0–10
+          - link "Bölge profillerine bak" [ref=f50e338] [cursor=pointer]:
+            - /url: /sehir/samsun/bolgeler
+    - generic [ref=f50e343]:
+      - paragraph [ref=f50e344]: Son işaret
+      - heading "Rotanı kur, şehri oku." [level=2] [ref=f50e345]
+      - paragraph [ref=f50e346]: Kaç günün var ve ne arıyorsun — gerisini skor kırılımı taşır.
+      - link "Rotanı kur" [ref=f50e349] [cursor=pointer]:
+        - /url: /sehir/samsun/rota
+  - contentinfo [ref=f50e350]:
+    - generic [ref=f50e351]:
+      - generic [ref=f50e352]:
+        - link "Şamandıra ana sayfa" [ref=f50e353] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f50e354]: şamandıra
+        - paragraph [ref=f50e355]: Gezilecek yerleri işaretler.
+        - paragraph [ref=f50e356]: Şamandıra, bir şehirdeki gezilecek yerleri deneyim eksenlerine göre puanlayan ve gün gün rota kuran bir gezi rehberidir.
+      - generic [ref=f50e357]:
+        - paragraph [ref=f50e358]: Sayfalar
+        - list [ref=f50e359]:
+          - listitem [ref=f50e360]:
+            - link "Ana sayfa" [ref=f50e361] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=f50e362]:
+            - link "Keşfet" [ref=f50e363] [cursor=pointer]:
+              - /url: /sehir/samsun
+          - listitem [ref=f50e364]:
+            - link "Bölgeler" [ref=f50e365] [cursor=pointer]:
+              - /url: /sehir/samsun/bolgeler
+          - listitem [ref=f50e366]:
+            - link "Rota planlayıcı" [ref=f50e367] [cursor=pointer]:
+              - /url: /sehir/samsun/rota
+      - generic [ref=f50e368]:
+        - paragraph [ref=f50e369]: Yasal
+        - paragraph [ref=f50e370]: Alegre Group
+        - paragraph [ref=f50e371]: Gizlilik, kullanım koşulları ve iletişim sayfaları yayınlanınca burada yer alır.
+      - generic [ref=f50e372]:
+        - paragraph [ref=f50e373]: Güven
+        - paragraph [ref=f50e374]: "Önerilerimizin nedenini gösteririz: her skorun kırılımı açık."
+        - paragraph [ref=f50e375]: Harita verisi © OpenStreetMap katkıda bulunanlar
+    - paragraph [ref=f50e377]: şamandıra · Alegre Group
+  - alert [ref=f50e378]

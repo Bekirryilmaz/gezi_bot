@@ -8,6 +8,15 @@ export type Sehir = {
   merkez_boylam: number | null;
 };
 
+export type SehirIstatistikleri = {
+  sehir_anahtari: string;
+  yer_sayisi: number;
+  kesif_yer_sayisi: number;
+  ilce_sayisi: number;
+  bolge_profili_sayisi: number;
+  deneyim_ekseni_sayisi: number;
+};
+
 export type YerOzet = {
   id: string;
   isim: string;
@@ -61,6 +70,8 @@ export type BolgeProfili = {
   kullanilan_yorum_sayisi: number;
   duygu_ozeti: string | null;
   tanitim_metni: string | null;
+  enlem?: number | null;
+  boylam?: number | null;
 };
 
 export type RotaTercihleri = {

@@ -1,8 +1,6 @@
-"use client";
-
-import { MotionConfig } from "motion/react";
 import type { ReactNode } from "react";
 
+/** Cocuklari sarar; motion/react ana paketinden cikarildi (TBT). */
 export function HareketSaglayici({ children }: { children: ReactNode }) {
-  return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
+  return children;
 }

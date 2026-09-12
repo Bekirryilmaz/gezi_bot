@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import { cn } from "cn";
 
 export type PlakaOran = "kart" | "hero" | "genis" | "dikey";
@@ -20,8 +20,47 @@ function KategoriIsareti({ kategori }: { kategori?: string }) {
   return <rect x="6" y="6" width="12" height="12" />;
 }
 
+function PlakaGorsel({
+  kaynak,
+  avifKaynak,
+  alt,
+  oncelik,
+}: {
+  kaynak: string;
+  avifKaynak?: string | null;
+  alt: string;
+  oncelik: boolean;
+}) {
+  if (avifKaynak) {
+    const { props } = getImageProps({
+      src: avifKaynak,
+      alt,
+      width: 1200,
+      height: 750,
+      sizes: "(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 400px",
+      priority: oncelik,
+      unoptimized: true,
+    });
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- getImageProps
+      <img {...props} alt={alt} className="absolute inset-0 size-full object-cover" />
+    );
+  }
+  return (
+    <Image
+      src={kaynak}
+      alt={alt}
+      fill
+      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 400px"
+      className="object-cover"
+      priority={oncelik}
+    />
+  );
+}
+
 export function Plaka({
   kaynak,
+  avifKaynak,
   alt = "",
   oran = "kart",
   etiket,
@@ -32,6 +71,8 @@ export function Plaka({
   className,
 }: {
   kaynak?: string | null;
+  /** On-optimize edilmis AVIF ikizi; verilirse next/image getImageProps. */
+  avifKaynak?: string | null;
   alt?: string;
   oran?: PlakaOran;
   etiket?: React.ReactNode;
@@ -54,13 +95,11 @@ export function Plaka({
       )}
     >
       {fotograf && kaynak ? (
-        <Image
-          src={kaynak}
+        <PlakaGorsel
+          kaynak={kaynak}
+          avifKaynak={avifKaynak}
           alt={alt}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 400px"
-          className="object-cover"
-          priority={oncelik}
+          oncelik={oncelik}
         />
       ) : (
         <div className="plaka-izgara absolute inset-0" aria-hidden="true">

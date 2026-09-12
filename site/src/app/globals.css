@@ -13,6 +13,8 @@
   --kagit-koyu: #ebe3d6;
   --tuz: #fbf8f3;
   --ink: #142126;
+  /* Ritim bandi: bordo-950'ye yakin, doygunlugu dusuk murekkep (kagitta 15,2:1). */
+  --murekkep: #281516;
   --deniz: #0a4d5c;
   --deniz-derin: #063642;
   --kopuk: #e8f2f1;
@@ -62,8 +64,8 @@
   --sure-sahne: 900ms;
   --ease-cikis: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-giris: cubic-bezier(0.4, 0, 0.2, 1);
-  --doku-kagit: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  --doku-koyu: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  --doku-kagit: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.052'/%3E%3C/svg%3E");
+  --doku-koyu: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -86,6 +88,7 @@
   --color-kagit: var(--kagit);
   --color-kagit-koyu: var(--kagit-koyu);
   --color-ink: var(--ink);
+  --color-murekkep: var(--murekkep);
   --color-sis: var(--sis);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -255,6 +258,122 @@ body {
   text-wrap: balance;
 }
 
+/* Hero h1: 5/12 kolonda yasar, bu yuzden kapak katindan bir tik dar olceklenir.
+   Govde (17 px) ile arasindaki siçrama 5,2x — 1.3 (a) kuralinin ustunde. */
+.yazi-hero {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(2.75rem, 1.1rem + 6.4vw, 5.5rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+/* Asimetrik split (2.1): 1024+ plaka sag kenara tasar, metin 5/12'de kalir.
+   Yuzde degerleri bolumun (govde genisligi, kaydirma cubugu haric) uzerinden
+   cozulur — 100vw kullanilsa kaydirma cubugu kadar tasardi. */
+.hero-plaka {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.hero-kapak-gorsel {
+  transform: scale(1);
+  transform-origin: center;
+  transition: transform 2.6s var(--ease-cikis);
+}
+
+.hero-plaka:hover .hero-kapak-gorsel,
+.hero-plaka:focus-within .hero-kapak-gorsel {
+  transform: scale(1.03);
+}
+
+.hero-ufuk-logo {
+  position: absolute;
+  left: 55%;
+  top: 32%;
+  z-index: 2;
+  width: clamp(52px, 8.5vw, 84px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero-ufuk-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hero-ufuk-nabiz {
+  position: absolute;
+  left: 50%;
+  top: 36%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 999px;
+  background: var(--samandira);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--samandira) 50%, transparent);
+  animation: isik-nabiz 1.8s var(--ease-cikis) infinite;
+}
+
+.hero-plaka canvas {
+  z-index: 2;
+}
+
+.hero-ufuk-grain {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background-image: var(--doku-koyu);
+  background-repeat: repeat;
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+  opacity: 0.7;
+}
+
+.plaka-murekkep > img,
+.plaka-murekkep .hero-kapak-gorsel {
+  filter: grayscale(0.38) sepia(0.42) saturate(0.58) hue-rotate(-14deg) contrast(1.06);
+}
+
+.plaka-murekkep:not(:has(canvas))::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, var(--bordo) 16%, transparent);
+  mix-blend-mode: multiply;
+}
+
+@media (min-width: 1024px) {
+  .hero-plaka {
+    position: absolute;
+    inset-inline-end: 0;
+    /* 4rem ust bant + 1,5rem nefes. Metin kolonu ayni merkeze hizalanir. */
+    top: 5.5rem;
+    height: 78vh;
+    width: calc(
+      max(0px, (100% - 1200px) / 2) + 40px + (min(100%, 1200px) - 120px) * 7 / 12
+    );
+  }
+
+  /* 4rem pt + 78vh + 3rem metin kolonu + 3,5rem alt nefes. */
+  .hero-kapak {
+    min-height: calc(78vh + 10.5rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-plaka {
+    width: calc(
+      max(0px, (100% - 1200px) / 2) + 64px + (min(100%, 1200px) - 168px) * 7 / 12
+    );
+  }
+}
+
 .yazi-bolum {
   font-family: var(--font-fraunces), Georgia, serif;
   font-size: clamp(1.875rem, 1.25rem + 2.65vw, 3.375rem);
@@ -305,6 +424,27 @@ body {
   background-size: 160px 160px;
 }
 
+/* Opak kagit yuzeyler (tuz/kagit-koyu bloklar) govdenin dokusunu ortuyor;
+   bu sinif ayni gurultuyu yuzeyin ustunde tekrar eder. */
+.doku-kagit {
+  background-image: var(--doku-kagit);
+  background-repeat: repeat;
+  background-size: 160px 160px;
+}
+
+/* Kenar notu (1.4): 1280+ sol 1 kolonda dikey; altinda basligin ustune duser. */
+.kenar-notu {
+  display: block;
+}
+
+@media (min-width: 1280px) {
+  .kenar-notu {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+}
+
 .plaka-izgara {
   background-color: var(--kagit-koyu);
   background-image:
@@ -348,16 +488,28 @@ body {
   bottom: 0;
   height: 1px;
   background: var(--samandira);
-  opacity: 0;
-  transition: opacity var(--sure-hizli) var(--ease-giris);
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 1;
+  transition: transform var(--sure-hizli) var(--ease-giris);
 }
 
 .kart-kabuk:hover .su-hatti,
 .kart-kabuk:focus-within .su-hatti {
-  opacity: 1;
+  transform: scaleX(1);
 }
 
 .dugme-birincil {
+  isolation: isolate;
+  background-image: linear-gradient(
+    105deg,
+    transparent 38%,
+    color-mix(in oklab, var(--kagit) 32%, transparent) 50%,
+    transparent 62%
+  );
+  background-size: 220% 100%;
+  background-position: 120% 0;
+  background-repeat: no-repeat;
   transition:
     background-color var(--sure-hizli) var(--ease-giris),
     box-shadow var(--sure-hizli) var(--ease-giris),
@@ -366,6 +518,16 @@ body {
 
 .dugme-birincil:hover {
   box-shadow: 0 0 24px color-mix(in oklab, var(--samandira) 35%, transparent);
+  animation: isik-supur 720ms var(--ease-cikis) 1;
+}
+
+@keyframes isik-supur {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -30% 0;
+  }
 }
 
 @keyframes nabiz {
@@ -446,6 +608,179 @@ body {
   contain-intrinsic-size: 0 360px;
 }
 
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity var(--sure-yavas) var(--ease-cikis) var(--reveal-gecikme, 0s),
+    transform var(--sure-yavas) var(--ease-cikis) var(--reveal-gecikme, 0s);
+}
+
+[data-reveal][data-gorunur="1"] {
+  opacity: 1;
+  transform: none;
+}
+
+[data-reveal-oge] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 500ms var(--ease-cikis),
+    transform 500ms var(--ease-cikis);
+}
+
+[data-reveal-liste][data-gorunur="1"] > [data-reveal-oge] {
+  opacity: 1;
+  transform: none;
+}
+
+[data-reveal-liste][data-gorunur="1"] > [data-reveal-oge]:nth-child(1) {
+  transition-delay: 60ms;
+}
+[data-reveal-liste][data-gorunur="1"] > [data-reveal-oge]:nth-child(2) {
+  transition-delay: 120ms;
+}
+[data-reveal-liste][data-gorunur="1"] > [data-reveal-oge]:nth-child(3) {
+  transition-delay: 180ms;
+}
+[data-reveal-liste][data-gorunur="1"] > [data-reveal-oge]:nth-child(4) {
+  transition-delay: 240ms;
+}
+[data-reveal-liste][data-gorunur="1"] > [data-reveal-oge]:nth-child(5) {
+  transition-delay: 300ms;
+}
+[data-reveal-liste][data-gorunur="1"] > [data-reveal-oge]:nth-child(6) {
+  transition-delay: 360ms;
+}
+
+.bolum-harita {
+  padding-block: 48px 64px;
+}
+
+@media (min-width: 768px) {
+  .bolum-harita {
+    padding-block: 64px 80px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .bolum-harita {
+    padding-block: 80px 128px;
+  }
+}
+
+.harita-sahne {
+  aspect-ratio: 4 / 5;
+  min-height: 320px;
+  background: var(--kagit-koyu);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
+
+@media (min-width: 768px) {
+  .harita-sahne {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+@media (min-width: 1024px) {
+  .harita-sahne {
+    aspect-ratio: auto;
+    height: min(70vh, 640px);
+  }
+}
+
+.harita-kanvas {
+  z-index: 1;
+}
+
+.harita-isik {
+  position: relative;
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.harita-isik::before,
+.harita-isik::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.harita-isik::before {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--samandira);
+  opacity: 0.85;
+  animation: isik-nabiz 1.8s var(--ease-cikis) infinite;
+}
+
+.harita-isik::after {
+  width: 6px;
+  height: 6px;
+  background: var(--samandira);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--samandira) 45%, transparent);
+}
+
+.harita-isik-secili::before,
+.harita-isik[aria-pressed="true"]::before {
+  border-color: var(--signal);
+}
+
+@keyframes isik-nabiz {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  70% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+.harita-kanvas.maplibregl-map,
+.harita-kanvas .maplibregl-map {
+  width: 100%;
+  height: 100%;
+}
+
+[data-kesik-ayrac] [data-cizgi] {
+  transform: scaleX(0);
+  transition: transform var(--sure-yavas) var(--ease-cikis);
+}
+
+[data-kesik-ayrac] [data-cizgi="sol"] {
+  transform-origin: left center;
+}
+
+[data-kesik-ayrac] [data-cizgi="sag"] {
+  transform-origin: right center;
+}
+
+[data-kesik-ayrac][data-gorunur="1"] [data-cizgi] {
+  transform: scaleX(1);
+}
+
+.manyetik {
+  transition: transform var(--sure-hizli) var(--ease-cikis);
+}
+
+.font-display.italic {
+  font-family: var(--font-fraunces-italic), var(--font-fraunces), Georgia, serif;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -462,9 +797,36 @@ body {
   .dugme-birincil,
   .kart-kabuk,
   .kart-kabuk .su-hatti,
-  .skor-cubuk {
+  .skor-cubuk,
+  .hero-kapak-gorsel,
+  [data-reveal],
+  [data-reveal-oge],
+  [data-kesik-ayrac] [data-cizgi],
+  .harita-isik::before,
+  .hero-ufuk-nabiz,
+  .manyetik {
     animation: none;
     transition-duration: 0s;
+  }
+
+  [data-reveal],
+  [data-reveal-oge] {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-kesik-ayrac] [data-cizgi],
+  .kart-kabuk .su-hatti {
+    transform: none;
+  }
+
+  .manyetik {
+    transform: none;
+  }
+
+  .hero-plaka:hover .hero-kapak-gorsel,
+  .hero-plaka:focus-within .hero-kapak-gorsel {
+    transform: none;
   }
 
   .iskel-parlama {

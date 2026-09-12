@@ -14,6 +14,7 @@ export function SehirKarti({
   yerSayisi,
   ilceSayisi,
   kapak,
+  plakaYerine,
   varyant = "izgara",
   className,
 }: {
@@ -23,6 +24,12 @@ export function SehirKarti({
   yerSayisi?: number;
   ilceSayisi?: number;
   kapak?: string | null;
+  /**
+   * Vitrin varyantinda fotograf yokken plaka kutusunu dolduran editoryal
+   * icerik (ilce indeksi gibi). Fotograf gelirse plaka geri gelir; kutu orani
+   * ve kart yuksekligi degismez (yon.md 0.6).
+   */
+  plakaYerine?: React.ReactNode;
   varyant?: SehirKartiVaryant;
   className?: string;
 }) {
@@ -56,7 +63,11 @@ export function SehirKarti({
           </div>
         </div>
         <div className="md:col-span-7">
-          <Plaka kaynak={kapak} alt="" oran="genis" kenarli={false} />
+          {!kapak && plakaYerine ? (
+            plakaYerine
+          ) : (
+            <Plaka kaynak={kapak} alt="" oran="genis" kenarli={false} />
+          )}
         </div>
         <span className="su-hatti" />
       </article>

@@ -38,7 +38,7 @@ type DugmeOzellik = Ortak & {
 };
 
 const TABAN = cn(
-  "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[8px] px-5",
+  "relative inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-[8px] px-5",
   "transition-[background-color,color,border-color,box-shadow,text-decoration-thickness] duration-[var(--sure-hizli)]",
   "disabled:pointer-events-none disabled:opacity-50",
   ODAK,

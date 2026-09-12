@@ -10,13 +10,23 @@ const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin", "latin-ext"],
   weight: ["500", "600"],
-  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const frauncesItalik = Fraunces({
+  variable: "--font-fraunces-italic",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500"],
+  style: "italic",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -55,9 +65,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="tr"
       data-scroll-behavior="smooth"
-      className={`${sora.variable} ${fraunces.variable} h-full`}
+      className={`${sora.variable} ${fraunces.variable} ${frauncesItalik.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
         <HareketSaglayici>
           <SiteHeader />
           <div className="flex-1">{children}</div>

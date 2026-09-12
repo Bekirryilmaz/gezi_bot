@@ -36,8 +36,9 @@ export function SiteHeader({ sehirAnahtari = "samsun" }: { sehirAnahtari?: strin
       <div className="kabuk grid h-full grid-cols-[auto_1fr_auto] items-center gap-3">
         <KelimeKilidi
           oncelik
-          yaziSinif="text-[22px] md:text-[24px]"
-          className="text-ink min-h-11 [&_img]:size-7 md:[&_img]:size-8"
+          boyut={40}
+          yaziSinif="text-[24px] md:text-[28px]"
+          className="text-ink min-h-11 [&_img]:size-9 md:[&_img]:size-10"
           mobilGizleYazi
         />
         <nav

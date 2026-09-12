@@ -7,10 +7,23 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from sunucu.api.semalar import BolgeProfiliCevap, OrnekYorum, SehirCevap, YerDetay, YerListeCevabi, YerOzet
+from ortak.sabitler import DeneyimEksen
+from sunucu.api.semalar import (
+    BolgeProfiliCevap,
+    OrnekYorum,
+    SehirCevap,
+    SehirIstatistikleri,
+    YerDetay,
+    YerListeCevabi,
+    YerOzet,
+)
 from sunucu.veritabani.baglanti import oturum_al
 from sunucu.veritabani.modeller import BolgeProfili, Sehir, Yorum
-from sunucu.veritabani.sorgular import sehir_yerlerini_sayfa_getir, yer_ve_koordinat_getir
+from sunucu.veritabani.sorgular import (
+    sehir_yer_sayilari,
+    sehir_yerlerini_sayfa_getir,
+    yer_ve_koordinat_getir,
+)
 from veri.ortak.sehir_ayarlari import SEHIRLER, sehir_anahtarini_isme_gore_bul, sehir_getir
 
 yonlendirici = APIRouter(tags=["yerler"])
@@ -126,7 +139,29 @@ def bolgeleri_listele(sehir_anahtari: str, oturum: Session = Depends(oturum_al))
         .order_by(BolgeProfili.ilce_mi.asc(), BolgeProfili.kullanilan_yorum_sayisi.desc())
         .all()
     )
-    return [BolgeProfiliCevap.yerden_olustur(profil) for profil in profiller]
+    return [
+        BolgeProfiliCevap.yerden_olustur(profil, sehir_anahtari) for profil in profiller
+    ]
+
+
+@yonlendirici.get("/sehirler/{sehir_anahtari}/istatistikler", response_model=SehirIstatistikleri)
+def sehir_istatistikleri(
+    sehir_anahtari: str, oturum: Session = Depends(oturum_al)
+) -> SehirIstatistikleri:
+    """Ana sayfa kanit bandinin sayilari. Yorum sayisi bilerek yer almaz (K2)."""
+    sehir = _sehri_veritabanindan_bul(oturum, sehir_anahtari)
+    toplam, kesif, ilce = sehir_yer_sayilari(oturum, sehir.id)
+    bolge_sayisi = (
+        oturum.query(BolgeProfili).filter(BolgeProfili.sehir_id == sehir.id).count()
+    )
+    return SehirIstatistikleri(
+        sehir_anahtari=sehir_anahtari,
+        yer_sayisi=toplam,
+        kesif_yer_sayisi=kesif,
+        ilce_sayisi=ilce,
+        bolge_profili_sayisi=bolge_sayisi,
+        deneyim_ekseni_sayisi=len(DeneyimEksen),
+    )
 
 
 @yonlendirici.get("/yerler/{yer_id}", response_model=YerDetay)

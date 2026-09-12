@@ -49,3 +49,6 @@ altyapi/postgres_veri/
 .cursor/mcp.json
 .playwright-mcp/
 .claude/
+
+site/public/hero/sequence
+site/public/hero/kareler_ham

@@ -1,95 +1,189 @@
-import { HeroKapak } from "@/components/hero/HeroKapak";
+import { Suspense } from "react";
+import ScrollHero from "@/components/hero/ScrollHero";
+import { HaritaBolum } from "@/components/harita/HaritaBolum";
 import { BolumBasligi } from "@/components/ui/BolumBasligi";
+import { KesilenAyrac } from "@/components/ui/KesilenAyrac";
 import { Dugme } from "@/components/ui/Dugme";
+import { DuyguOzeti } from "@/components/ui/DuyguOzeti";
+import { IlceIndeksi } from "@/components/ui/IlceIndeksi";
 import { IstatistikBandi } from "@/components/ui/IstatistikBandi";
+import { Plaka } from "@/components/ui/Plaka";
 import { SehirKarti } from "@/components/ui/SehirKarti";
 import { Reveal, RevealListe, RevealOge } from "@/components/hareket/Reveal";
-import { CTA_BIRINCIL, TANIM_CUMLESI } from "@/lib/marka";
-import { sehirleriGetir, yerleriGetir } from "@/lib/api";
-import { DENEYIM_EKSENLERI } from "@/lib/sabitler";
+import { Manyetik } from "@/components/hareket/Manyetik";
+import { LogoKaro } from "@/components/marka/LogoKaro";
+import { CTA_BIRINCIL, DUYGU_KUNYE, GUVEN_CUMLESI, TANIM_CUMLESI } from "@/lib/marka";
+import { haritaIsaretleriniKur, haritaMerkeziniBul } from "@/lib/harita";
+import { bolgeleriGetir, istatistikleriGetir, sehirleriGetir } from "@/lib/api";
+import { DENEYIM_EKSENLERI, duyguEtiketi } from "@/lib/sabitler";
+import type { BolgeProfili } from "@/lib/types";
 
-export default async function AnaSayfa() {
-  let sehirIsim = "Samsun";
-  let sehirAnahtar = "samsun";
-  let yerSayisi = 0;
-  try {
-    const [sehirler, liste] = await Promise.all([
-      sehirleriGetir(),
-      yerleriGetir("samsun", { limit: 1 }),
-    ]);
-    sehirIsim = sehirler[0]?.isim ?? "Samsun";
-    sehirAnahtar = sehirler[0]?.anahtar ?? "samsun";
-    yerSayisi = liste.toplam_sayi;
-  } catch {
-    // API kapaliysa marka yine ayakta kalsin
+/** yon.md 4.2 (3) — "ne yapar?" uc karti; plakalar atmosfer, yer fotografi degil. */
+const YOLLAR = [
+  {
+    anahtar: "kesif",
+    baslik: "Nereye gidilir?",
+    metin:
+      "Gezilecek yerler, yeme-içme ve konaklama tek listede; deneyim eksenlerine göre sıralı.",
+    href: (s: string) => `/sehir/${s}`,
+    cta: "Keşfe başla",
+  },
+  {
+    anahtar: "bolge",
+    baslik: "Hangi bölge sana göre?",
+    metin: "İlçelerin tanıtımı ile ziyaretçi izlenimi yan yana; konaklama üssünü seç.",
+    href: (s: string) => `/sehir/${s}/bolgeler`,
+    cta: "Bölgeyi tanı",
+  },
+  {
+    anahtar: "rota",
+    baslik: "Kaç günün var?",
+    metin: "Gün gün planı kur; her durağın gerekçesi skor kırılımında açık durur.",
+    href: (s: string) => `/sehir/${s}/rota`,
+    cta: CTA_BIRINCIL,
+  },
+] as const;
+
+/** Ilce ozeti tercih; yoksa sehir ozeti. Siralama degil tek gecis (7.12). */
+function teaserBolgesi(bolgeler: BolgeProfili[]): BolgeProfili | null {
+  let secilen: BolgeProfili | null = null;
+  for (const b of bolgeler) {
+    if (!b.duygu_ozeti) continue;
+    if (!secilen) {
+      secilen = b;
+      continue;
+    }
+    const adayIlce = b.ilce_mi && !secilen.ilce_mi;
+    const ayniSinif = b.ilce_mi === secilen.ilce_mi;
+    if (
+      adayIlce ||
+      (ayniSinif && b.kullanilan_yorum_sayisi > secilen.kullanilan_yorum_sayisi)
+    ) {
+      secilen = b;
+    }
   }
+  return secilen;
+}
 
+export default function AnaSayfa() {
   return (
     <main>
-      <HeroKapak sehirAnahtari={sehirAnahtar} yerSayisi={yerSayisi} />
+      <ScrollHero />
+      <Suspense fallback={<AnaSayfaIskel />}>
+        <AnaSayfaGovde />
+      </Suspense>
+    </main>
+  );
+}
 
-      <section className="bolum bg-kagit">
+function AnaSayfaIskel() {
+  return (
+    <section className="doku-koyu bg-murekkep text-kagit bolum" aria-hidden="true">
+      <div className="kabuk min-h-48" />
+    </section>
+  );
+}
+
+async function AnaSayfaGovde() {
+  // Sehir anahtari veriden gelir (sehir bagimsizligi); bagimli istekler
+  // zincirlenir, bagimsiz olanlar ayni turda cozulur.
+  const sehirlerSozu = sehirleriGetir().catch(() => []);
+  const anahtarSozu = sehirlerSozu.then((l) => l[0]?.anahtar ?? "samsun");
+  const [sehirler, istatistik, bolgeler] = await Promise.all([
+    sehirlerSozu,
+    anahtarSozu.then(istatistikleriGetir).catch(() => null),
+    anahtarSozu.then(bolgeleriGetir).catch((): BolgeProfili[] => []),
+  ]);
+
+  const sehir = sehirler[0];
+  const sehirIsim = sehir?.isim ?? "Samsun";
+  const sehirAnahtar = sehir?.anahtar ?? "samsun";
+  const ilceler = bolgeler.filter((b) => b.ilce_mi).map((b) => b.bolge_adi);
+  const teaser = teaserBolgesi(bolgeler);
+  const isaretler = haritaIsaretleriniKur(sehirAnahtar, bolgeler);
+  const haritaMerkez = haritaMerkeziniBul(sehir, bolgeler, isaretler);
+
+  return (
+    <>
+      <HaritaBolum
+        sehirAnahtari={sehirAnahtar}
+        sehirIsim={sehirIsim}
+        isaretler={isaretler}
+        merkez={haritaMerkez}
+      />
+      {/* 2 — Kanit. V2: tek ton kagit monotonlugunu kiran koyu murekkep bandi. */}
+      <section className="doku-koyu bg-murekkep text-kagit bolum">
         <div className="kabuk">
-          <Reveal>
-            <p className="yazi-govde text-ink/80 max-w-[42rem]">
+          <Reveal className="xl:grid xl:grid-cols-12 xl:gap-6">
+            <div className="mb-3 flex items-center gap-2 xl:col-span-1 xl:mb-0 xl:flex-col xl:items-start xl:gap-3 xl:pt-2">
+              <LogoKaro boyut={16} dekoratif className="size-4" />
+              <p className="etiket text-kagit/45">Kanıt</p>
+            </div>
+            <p className="yazi-govde text-kagit/85 max-w-[42rem] xl:col-span-10">
               {TANIM_CUMLESI} İlk çıkış şehri {sehirIsim}; kapsam tüm Türkiye.
             </p>
           </Reveal>
-          <Reveal delay={0.08}>
-            <IstatistikBandi
-              className="mt-12"
-              ogeler={[
-                ...(yerSayisi > 0 ? [{ deger: yerSayisi, etiket: "İşaretli yer" }] : []),
-                {
-                  deger: 1,
-                  etiket: "Açık şehir",
-                  baglam: `${sehirIsim}'da başladık`,
-                },
-                { deger: DENEYIM_EKSENLERI.length, etiket: "Deneyim ekseni" },
-              ]}
-            />
+          {istatistik && istatistik.yer_sayisi > 0 ? (
+            <Reveal delay={0.08}>
+              <IstatistikBandi
+                koyu
+                className="mt-10"
+                ogeler={[
+                  {
+                    deger: istatistik.yer_sayisi,
+                    etiket: "İşaretli yer",
+                    baglam: `${sehirIsim} genelinde`,
+                  },
+                  {
+                    deger: istatistik.ilce_sayisi,
+                    etiket: "İlçe",
+                    baglam: "Yer verisi olan ilçeler",
+                  },
+                  {
+                    deger: istatistik.bolge_profili_sayisi,
+                    etiket: "Bölge profili",
+                    baglam: "Yorumlardan derlendi",
+                  },
+                ]}
+              />
+            </Reveal>
+          ) : null}
+          <Reveal delay={0.16}>
+            <p className="text-kagit/60 mt-8 max-w-[38rem] text-sm">{GUVEN_CUMLESI}</p>
           </Reveal>
         </div>
       </section>
 
-      <section className="bolum bg-kagit-koyu/60">
+      {/* 3 — "Ne yapar?" uc kart, 60 ms kademe, bolum sonu mini CTA. */}
+      <section className="bg-kagit bolum">
         <div className="kabuk">
+          <KesilenAyrac className="mb-16" />
           <Reveal>
             <BolumBasligi
               etiket="Ne yapar?"
               baslik="Şehri üç yoldan oku"
-              ozet="Keşif listesi, ilçe profilleri ve gün gün rota — hepsi aynı skor dilinde."
+              ozet="Keşif listesi, ilçe profilleri ve gün gün rota — üçü de aynı skor dilini konuşur."
             />
           </Reveal>
-          <RevealListe className="mt-10 grid gap-5 md:grid-cols-3">
-            {[
-              {
-                baslik: "Nereye gidilir?",
-                metin: "Gezilecek yerleri deneyim eksenlerine göre sıralı gör.",
-                href: `/sehir/${sehirAnahtar}`,
-                cta: "Keşfe başla",
-              },
-              {
-                baslik: "Hangi bölge sana göre?",
-                metin: "İlçelerin tanıtımı ve ziyaretçi izlenimi, yan yana.",
-                href: `/sehir/${sehirAnahtar}/bolgeler`,
-                cta: "Bölgeyi tanı",
-              },
-              {
-                baslik: "Kaç günün var?",
-                metin: "Kaç günün varsa planı kur; her durağın gerekçesi açık.",
-                href: `/sehir/${sehirAnahtar}/rota`,
-                cta: "Rotanı kur",
-              },
-            ].map((o) => (
-              <RevealOge key={o.baslik}>
-                <article className="kart-kabuk flex h-full flex-col p-6">
-                  <h3 className="yazi-alt text-bordo">{o.baslik}</h3>
-                  <p className="yazi-govde text-ink/70 mt-3 flex-1">{o.metin}</p>
-                  <div className="relative z-10 mt-6">
-                    <Dugme href={o.href} varyant="bolum">
-                      {o.cta}
-                    </Dugme>
+          <RevealListe className="mt-12 grid gap-5 md:grid-cols-3">
+            {YOLLAR.map((y) => (
+              <RevealOge key={y.anahtar} className="h-full">
+                <article className="kart-kabuk flex h-full flex-col">
+                  <Plaka
+                    kaynak={`/plaka/${y.anahtar}.webp`}
+                    avifKaynak={`/plaka/${y.anahtar}.avif`}
+                    oran="kart"
+                    kenarli={false}
+                    className="plaka-murekkep"
+                  />
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="yazi-alt text-ink">{y.baslik}</h3>
+                    <p className="yazi-govde text-ink/70 mt-3 flex-1">{y.metin}</p>
+                    <div className="relative z-10 mt-6">
+                      <Dugme href={y.href(sehirAnahtar)} varyant="bolum">
+                        {y.cta}
+                      </Dugme>
+                    </div>
                   </div>
                   <span className="su-hatti" />
                 </article>
@@ -99,43 +193,121 @@ export default async function AnaSayfa() {
         </div>
       </section>
 
-      <section className="bolum bg-kagit">
+      {/* 4 — Sehir vitrini: koyu murekkep bandi, kart tuz adasi. */}
+      <section className="doku-koyu bg-murekkep text-kagit bolum">
         <div className="kabuk">
           <Reveal>
             <BolumBasligi
+              koyu
               etiket="Nereye gidilir?"
               baslik="Açık şehir"
-              ozet="Yeni şehir eklemek tasarımı değiştirmez; veri gelir, işaretlenir."
+              ozet="Yeni şehir eklemek tasarımı değiştirmez: veri gelir, işaretlenir, aynı kutulara oturur."
               aksiyon={{ href: `/sehir/${sehirAnahtar}`, etiket: "Keşfe başla" }}
             />
           </Reveal>
-          <Reveal delay={0.1} className="mt-10">
-            <SehirKarti
-              varyant="vitrin"
-              isim={sehirIsim}
-              anahtar={sehirAnahtar}
-              yerSayisi={yerSayisi || undefined}
-              ozet={`${sehirIsim} ilk çıkış plajı. Gezilecek yerler işaretli; gün gün rota kurulur.`}
-            />
-          </Reveal>
-        </div>
-      </section>
-
-      <section className="doku-koyu bg-bordo text-kagit bolum-doruk relative overflow-hidden">
-        <div className="kabuk relative text-center">
-          <Reveal>
-            <h2 className="yazi-bolum">Rotanı kur, şehri oku.</h2>
-            <p className="yazi-govde text-kagit/75 mx-auto mt-4 max-w-lg">
-              Kaç günün ve ne aradığın belli olsun; gerisini skor kırılımı taşır.
+          <Reveal delay={0.1} className="mt-12 xl:grid xl:grid-cols-12 xl:gap-6">
+            <p className="kenar-notu etiket text-kagit/45 mb-3 xl:col-span-1 xl:mb-0 xl:justify-self-end">
+              1 / 81 şehir
             </p>
-            <div className="mt-8 flex justify-center">
-              <Dugme href={`/sehir/${sehirAnahtar}/rota`} varyant="birincil">
-                {CTA_BIRINCIL}
-              </Dugme>
+            <div className="min-w-0 xl:col-span-11">
+              <SehirKarti
+                varyant="vitrin"
+                isim={sehirIsim}
+                anahtar={sehirAnahtar}
+                yerSayisi={istatistik?.yer_sayisi}
+                ilceSayisi={istatistik?.ilce_sayisi}
+                ozet={`${sehirIsim} ilk çıkış noktamız. Gezilecek yerler işaretli, ilçeler profillendi, rota gün gün kuruluyor.`}
+                plakaYerine={<IlceIndeksi ilceler={ilceler} />}
+              />
+              <div className="mt-6">
+                <Dugme
+                  href={`/sehir/${sehirAnahtar}/bolgeler`}
+                  varyant="bolum"
+                  className="text-kagit hover:bg-bordo-700"
+                >
+                  Bölgeyi tanı
+                </Dugme>
+              </div>
             </div>
           </Reveal>
         </div>
       </section>
-    </main>
+
+      {/* 5 — Duygu teaser'i: kara kutu yok, ozet + hangi eksenlerden okundugu. */}
+      <section className="bg-kagit bolum">
+        <div className="kabuk">
+          <KesilenAyrac className="mb-16" />
+          <Reveal>
+            <BolumBasligi
+              etiket="Nasıl bilir?"
+              baslik="Yorumları biz okuduk"
+              ozet={`Puanın yanında bir de izlenim var: ${DUYGU_KUNYE}, şablonla yazıldı, kırılımı açık.`}
+            />
+          </Reveal>
+          <div className="mt-12 grid gap-6 lg:grid-cols-12">
+            <Reveal className="lg:col-span-7">
+              {teaser?.duygu_ozeti ? (
+                <DuyguOzeti
+                  metin={teaser.duygu_ozeti}
+                  etiket={`${teaser.bolge_adi} · ${duyguEtiketi(teaser.genel_duygu_etiketi)}`}
+                />
+              ) : (
+                <blockquote className="bg-bordo-900 text-kagit rounded-[12px] px-6 py-6">
+                  <p className="etiket text-kagit/55">{DUYGU_KUNYE}</p>
+                  <p className="yazi-govde text-kagit/85 mt-4">
+                    Bölge özetleri hazırlanıyor. Yorumlar işlendikçe burada ilçe ilçe
+                    izlenim çıkacak.
+                  </p>
+                </blockquote>
+              )}
+            </Reveal>
+            <Reveal delay={0.1} className="lg:col-span-5">
+              <div className="h-full">
+                <p className="etiket text-ink/45">Deneyim eksenleri</p>
+                <ul className="mt-4">
+                  {DENEYIM_EKSENLERI.map((e) => (
+                    <li
+                      key={e.deger}
+                      className="border-bordo/12 text-ink/80 flex items-baseline justify-between gap-4 border-b py-3 text-sm"
+                    >
+                      <span>{e.etiket}</span>
+                      <span className="text-ink/40 text-[11px] tracking-[0.24em] uppercase">
+                        0–10
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6">
+                  <Dugme href={`/sehir/${sehirAnahtar}/bolgeler`} varyant="bolum">
+                    Bölge profillerine bak
+                  </Dugme>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* 6 — Doruk CTA: kanit ile ayni murekkep token; bordo logo akrabaligi. */}
+      <section className="doku-koyu bg-murekkep text-kagit bolum-doruk border-bordo relative overflow-hidden border-t-2">
+        <div className="kabuk relative text-center">
+          <Reveal>
+            <LogoKaro boyut={40} dekoratif className="mx-auto size-10" />
+            <p className="etiket text-kagit/50 mt-5">Son işaret</p>
+            <h2 className="yazi-bolum mt-4">Rotanı kur, şehri oku.</h2>
+            <p className="yazi-govde text-kagit/75 mx-auto mt-4 max-w-lg">
+              Kaç günün var ve ne arıyorsun — gerisini skor kırılımı taşır.
+            </p>
+            <div className="mt-8 flex justify-center">
+              <Manyetik>
+                <Dugme href={`/sehir/${sehirAnahtar}/rota`} varyant="birincil">
+                  {CTA_BIRINCIL}
+                </Dugme>
+              </Manyetik>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </>
   );
 }

@@ -1,0 +1,44 @@
+{
+  "olcum_tarihi": "2026-09-05",
+  "not": "Kapak ayri dosya (kapak-*.avif). Sekans klasoru k-002.. son; kare 001 = kapak.",
+  "setler": [
+    {
+      "set": "masaustu",
+      "kare_sayisi": 66,
+      "sekans_kare": 65,
+      "olcu": "1600x1200",
+      "kapak_avif": 68297,
+      "kapak_avif_kb": 66.7,
+      "kapak_webp": 53904,
+      "kapak_butce": 122880,
+      "sekans_avif": 853728,
+      "sekans_avif_kb": 833.7,
+      "sekans_butce": 921600,
+      "sekans_butce_kb": 900,
+      "kare_basi_avif": 13134,
+      "px_kare": 18.75,
+      "faz_b_pay": 900,
+      "faz_b_kare": 48,
+      "butce_gecti_mi": false
+    },
+    {
+      "set": "mobil",
+      "kare_sayisi": 36,
+      "sekans_kare": 35,
+      "olcu": "900x1125",
+      "kapak_avif": 41121,
+      "kapak_avif_kb": 40.2,
+      "kapak_webp": 30108,
+      "kapak_butce": 92160,
+      "sekans_avif": 338271,
+      "sekans_avif_kb": 330.3,
+      "sekans_butce": 389120,
+      "sekans_butce_kb": 380,
+      "kare_basi_avif": 9665,
+      "px_kare": 21.67,
+      "faz_b_pay": 520,
+      "faz_b_kare": 24,
+      "butce_gecti_mi": false
+    }
+  ]
+}
