@@ -56,11 +56,13 @@ class Sehir(Taban):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
     isim: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     plaka_kodu: Mapped[str | None] = mapped_column(String(2))
-    bolge: Mapped[str | None] = mapped_column(String(50), comment="Orn. 'Karadeniz' -- bolgesel rota gruplamasi icin")
+    bolge: Mapped[str | None] = mapped_column(String(50))
     merkez_enlem: Mapped[float | None] = mapped_column(Float)
     merkez_boylam: Mapped[float | None] = mapped_column(Float)
-    aktif_mi: Mapped[bool] = mapped_column(default=True, comment="Site uzerinde yayinda mi")
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    aktif_mi: Mapped[bool] = mapped_column(default=True)
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     yerler: Mapped[list["Yer"]] = relationship(back_populates="sehir")
 
@@ -87,18 +89,18 @@ class Yer(Taban):
     ilce: Mapped[str | None] = mapped_column(String(100))
     adres: Mapped[str | None] = mapped_column(Text)
     aciklama: Mapped[str | None] = mapped_column(Text)
-    tanitim_metni: Mapped[str | None] = mapped_column(
-        Text, comment="Wikipedia/OSM/Google/sablon birlesiminden turetilen tanitim"
-    )
+    tanitim_metni: Mapped[str | None] = mapped_column(Text)
     telefon: Mapped[str | None] = mapped_column(String(30))
     web_sitesi: Mapped[str | None] = mapped_column(String(500))
 
     # PostGIS cografi nokta -- rota algoritmasindaki "en yakin N yer" ve
     # "X km yaricap icindeki yerler" sorgulari icin (ST_DWithin, ST_Distance).
-    konum: Mapped[str] = mapped_column(Geography(geometry_type="POINT", srid=4326), nullable=False)
+    konum: Mapped[str] = mapped_column(
+        Geography(geometry_type="POINT", srid=4326, spatial_index=False), nullable=False
+    )
 
-    ozellikler: Mapped[dict] = mapped_column(JSONB, default=dict, comment="dokumanlar/kategori_taksonomisi.md #2")
-    aktiviteler: Mapped[list] = mapped_column(JSONB, default=list, comment="dokumanlar/kategori_taksonomisi.md #3")
+    ozellikler: Mapped[dict] = mapped_column(JSONB, default=dict)
+    aktiviteler: Mapped[list] = mapped_column(JSONB, default=list)
     fotograf_urlleri: Mapped[list] = mapped_column(JSONB, default=list)
 
     # Kaynaklardaki ham puanlarin agirlikli ortalamasi (esleme asamasinda hesaplanir)
@@ -106,10 +108,8 @@ class Yer(Taban):
     kaynakta_puan_sayisi: Mapped[int | None] = mapped_column(Integer)
 
     # Duygu analizinden uretilen, rota algoritmasinin dogrudan kullandigi alanlar
-    duygu_skoru_ortalama: Mapped[float | None] = mapped_column(Float, comment="-1..+1 arasi, yorumlar.duygu_skoru ortalamasi")
-    deneyim_puanlari: Mapped[dict] = mapped_column(
-        JSONB, default=dict, comment="dokumanlar/kategori_taksonomisi.md #4 -- 6 eksende 0-100 puan"
-    )
+    duygu_skoru_ortalama: Mapped[float | None] = mapped_column(Float)
+    deneyim_puanlari: Mapped[dict] = mapped_column(JSONB, default=dict)
     yer_profili: Mapped[dict] = mapped_column(
         JSONB, default=dict, comment="dokumanlar/kategori_taksonomisi.md #6 -- YerProfili (fiyat algisi, ulasim, kalabalik zamanlar, ziyaretci profili)"
     )
@@ -118,8 +118,10 @@ class Yer(Taban):
     )
     duygu_son_guncelleme: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    guncellenme_zamani: Mapped[datetime] = mapped_column(
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    guncellenme_zamani: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
@@ -155,18 +157,20 @@ class BolgeProfili(Taban):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
     sehir_id: Mapped[str] = mapped_column(ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False)
 
-    bolge_adi: Mapped[str] = mapped_column(String(100), nullable=False, comment="Sehir merkeziyse sehrin adi, ilceyse ilce adi")
-    ilce_mi: Mapped[bool] = mapped_column(default=False, comment="False ise bu profil sehir MERKEZI/GENELI icindir")
+    bolge_adi: Mapped[str] = mapped_column(String(100), nullable=False)
+    ilce_mi: Mapped[bool] = mapped_column(default=False)
 
-    genel_duygu_skoru: Mapped[float | None] = mapped_column(Float, comment="-1..+1, bolgeye ait yorumlarin ortalamasi")
+    genel_duygu_skoru: Mapped[float | None] = mapped_column(Float)
     genel_duygu_etiketi: Mapped[str | None] = mapped_column(String(20))
-    on_plana_cikan_konular: Mapped[list] = mapped_column(JSONB, default=list, comment="[{konu, duygu_etiketi, bahsedilme_sayisi}]")
+    on_plana_cikan_konular: Mapped[list] = mapped_column(JSONB, default=list)
     kullanilan_yorum_sayisi: Mapped[int] = mapped_column(Integer, default=0)
-    duygu_ozeti: Mapped[str | None] = mapped_column(Text, comment="anlatim_uretici.py::bolge_tanitim_metni_uret ciktisi")
-    tanitim_metni: Mapped[str | None] = mapped_column(Text, comment="Wikipedia/sablon bolge tanitimi")
+    duygu_ozeti: Mapped[str | None] = mapped_column(Text)
+    tanitim_metni: Mapped[str | None] = mapped_column(Text)
 
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    guncellenme_zamani: Mapped[datetime] = mapped_column(
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    guncellenme_zamani: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
@@ -198,11 +202,14 @@ class YerKaynak(Taban):
     kaynakta_gozlemlenme_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     sisteme_alinma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     veri_batch_id: Mapped[str | None] = mapped_column(ForeignKey("veri_batchleri.id", ondelete="SET NULL"))
-    sube_id: Mapped[str | None] = mapped_column(ForeignKey("subeler.id", ondelete="RESTRICT"))
+    sube_id: Mapped[str] = mapped_column(ForeignKey("subeler.id", ondelete="RESTRICT"), nullable=False)
 
     yer: Mapped["Yer"] = relationship(back_populates="kaynaklar")
 
-    __table_args__ = (UniqueConstraint("kaynak", "kaynak_id", name="ux_yer_kaynaklari_kaynak_kimlik"),)
+    __table_args__ = (
+        UniqueConstraint("kaynak", "kaynak_id", name="ux_yer_kaynaklari_kaynak_kimlik"),
+        Index("ix_yer_kaynaklari_sube_id", "sube_id"),
+    )
 
 
 class KonaklamaDetay(Taban):
@@ -216,7 +223,7 @@ class KonaklamaDetay(Taban):
     yer_id: Mapped[str] = mapped_column(ForeignKey("yerler.id", ondelete="CASCADE"), primary_key=True)
     gecelik_fiyat_araligi_min: Mapped[float | None] = mapped_column(Float)
     gecelik_fiyat_araligi_max: Mapped[float | None] = mapped_column(Float)
-    rezervasyon_linkleri: Mapped[dict] = mapped_column(JSONB, default=dict, comment="orn. {'booking': '...', 'etstur': '...'}")
+    rezervasyon_linkleri: Mapped[dict] = mapped_column(JSONB, default=dict)
     oda_sayisi: Mapped[int | None] = mapped_column(Integer)
 
     yer: Mapped["Yer"] = relationship(back_populates="konaklama_detayi")
@@ -240,13 +247,15 @@ class Yorum(Taban):
     yorum_tarihi: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     dil: Mapped[str] = mapped_column(String(5), default="tr")
 
-    duygu_skoru: Mapped[float | None] = mapped_column(Float, comment="-1..+1")
+    duygu_skoru: Mapped[float | None] = mapped_column(Float)
     duygu_etiketi: Mapped[str | None] = mapped_column(String(20))
-    konu_duygulari: Mapped[list] = mapped_column(JSONB, default=list, comment="[{konu, duygu_etiketi, gecen_ifade}]")
+    konu_duygulari: Mapped[list] = mapped_column(JSONB, default=list)
     analiz_model_adi: Mapped[str | None] = mapped_column(String(200))
     analiz_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    cekilme_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    cekilme_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     yer: Mapped["Yer"] = relationship(back_populates="yorumlar")
 
@@ -266,11 +275,13 @@ class SabitRota(Taban):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
     isim: Mapped[str] = mapped_column(String(255), nullable=False)
     aciklama: Mapped[str | None] = mapped_column(Text)
-    bolge: Mapped[str | None] = mapped_column(String(50), comment="Orn. 'Karadeniz', tek sehri asan rotalar icin")
-    rota_tipi: Mapped[str | None] = mapped_column(String(50), comment="Orn. 'gastronomi', 'tarihi', 'doga'")
-    duraklar: Mapped[list] = mapped_column(JSONB, default=list, comment="[{gun, yer_id veya serbest_metin_konum, aciklama}]")
+    bolge: Mapped[str | None] = mapped_column(String(50))
+    rota_tipi: Mapped[str | None] = mapped_column(String(50))
+    duraklar: Mapped[list] = mapped_column(JSONB, default=list)
     kapak_fotografi_url: Mapped[str | None] = mapped_column(String(500))
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class KullaniciRotasi(Taban):
@@ -283,15 +294,13 @@ class KullaniciRotasi(Taban):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
     sehir_id: Mapped[str] = mapped_column(ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False)
 
-    tercihler: Mapped[dict] = mapped_column(
-        JSONB, nullable=False, comment="gun_sayisi, ilgi_agirliklari, aktiviteler, zorunlu_duraklar, konaklama_yer_id vb."
-    )
-    gunler: Mapped[list] = mapped_column(JSONB, default=list, comment="[{gun_no, duraklar: [yer_id, ...]}]")
-    konaklama_onerisi_yer_id: Mapped[str | None] = mapped_column(
-        ForeignKey("yerler.id"), comment="Senaryo 2: konaklama bolgesi belli degilse onerilen yer"
-    )
+    tercihler: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    gunler: Mapped[list] = mapped_column(JSONB, default=list)
+    konaklama_onerisi_yer_id: Mapped[str | None] = mapped_column(ForeignKey("yerler.id"))
 
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 # Ayrik domain dosyalari metadata'ya kaydedilir; public API bunlari import etmez.

@@ -33,7 +33,7 @@ copy sunucu\.env.example sunucu\.env
 postgresql+psycopg://gezi_kullanici:gezi_sifre@localhost:5432/gezi_veritabani
 ```
 
-Şema (Alembic `0001_ilk_sema` … `0004_tanitim_metni`):
+Şema (Alembic `0001_ilk_sema` … `0012_sema_drift_duzeltmeleri`):
 
 ```text
 cd sunucu
@@ -47,12 +47,17 @@ cd sunucu
 ..\.venv_test\Scripts\python.exe -m alembic current
 ..\.venv_test\Scripts\python.exe -m alembic heads
 ..\.venv_test\Scripts\python.exe -m alembic history
+..\.venv_test\Scripts\python.exe -m alembic check
 cd ..
 .\.venv_test\Scripts\python.exe -m sunucu.veritabani.sema_baseline
 ```
 
-Denetim Alembic revizyonunu, PostGIS'i, tablo/kolon ve kritik indeksleri
-salt-okunur karşılaştırır; drift durumunda kod `1`, erişim yoksa `2` döner.
+Denetim koddan güncel Alembic head'ini türetir; PostGIS extension'ını,
+`yerler.konum` geography/GiST sözleşmesini, uygulama tablo/kolon/FK/indekslerini
+ve canonical `yer_kaynaklari.sube_id` bağlantı bütünlüğünü salt-okunur
+karşılaştırır. Drift durumunda kod `1`, erişim yoksa `2` döner. Alembic
+autogenerate yalnız PostGIS'in yönettiği `spatial_ref_sys` tablosunu dışlar;
+uygulama geography kolonları ve GiST indeksleri dışlanmaz.
 Gerçek ortamda migration öncesi PostgreSQL yedeği alınır ve geri yükleme
 ayrı bir kopyada denenir; bu denetim otomatik `upgrade`, `downgrade` veya
 tablo/indeks silme çalıştırmaz.
@@ -129,7 +134,7 @@ sunucu/
     baglanti.py
     sorgular.py            Keşif vitrini filtresi burada
     sema_baseline.py       Salt-okunur migration/model drift denetimi
-    migrasyonlar/          Alembic 0001–0004
+    migrasyonlar/          Alembic 0001–0012
     aktarim/               JSONL → PostgreSQL
   api/
     uygulama.py            FastAPI giriş

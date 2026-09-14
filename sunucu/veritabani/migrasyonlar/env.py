@@ -25,6 +25,7 @@ if str(REPO_KOKU) not in sys.path:
 from sunucu.veritabani.baglanti import VERITABANI_URL  # noqa: E402
 from sunucu.veritabani.temel import Taban  # noqa: E402
 from sunucu.veritabani import modeller  # noqa: E402,F401  (tum modelleri Taban.metadata'ya kaydetmek icin import edilir)
+from sunucu.veritabani.migrasyonlar.karsilastirma import nesneyi_karsilastir  # noqa: E402
 
 config = context.config
 config.set_main_option("sqlalchemy.url", VERITABANI_URL)
@@ -44,6 +45,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=nesneyi_karsilastir,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -58,7 +60,11 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as baglanti:
-        context.configure(connection=baglanti, target_metadata=target_metadata)
+        context.configure(
+            connection=baglanti,
+            target_metadata=target_metadata,
+            include_object=nesneyi_karsilastir,
+        )
 
         with context.begin_transaction():
             context.run_migrations()

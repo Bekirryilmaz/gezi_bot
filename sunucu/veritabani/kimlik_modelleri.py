@@ -19,7 +19,9 @@ class YerKimligi(Taban):
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid)
     sehir_id: Mapped[str] = mapped_column(ForeignKey("sehirler.id", ondelete="RESTRICT"), nullable=False)
     durum: Mapped[str] = mapped_column(String(20), nullable=False, default="aktif")
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class Sube(Taban):
@@ -30,7 +32,9 @@ class Sube(Taban):
     guncel_isim: Mapped[str] = mapped_column(String(255), nullable=False)
     durum: Mapped[str] = mapped_column(String(20), nullable=False, default="aktif")
     yonlendirilen_sube_id: Mapped[str | None] = mapped_column(ForeignKey("subeler.id", ondelete="RESTRICT"))
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class YerAlias(Taban):
@@ -51,7 +55,9 @@ class EslemeAdayi(Taban):
     confidence: Mapped[float] = mapped_column(Float, nullable=False)
     belirsizlik: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     durum: Mapped[str] = mapped_column(String(20), nullable=False, default="bekliyor")
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     __table_args__ = (UniqueConstraint("sol_sube_id", "sag_sube_id", name="ux_esleme_adayi_cift"),)
 
 
@@ -63,7 +69,9 @@ class EslemeKarari(Taban):
     gerekce: Mapped[str] = mapped_column(Text, nullable=False)
     confidence: Mapped[float | None] = mapped_column(Float)
     manuel_override: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    karar_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    karar_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class YerBirlestirmesi(Taban):
@@ -74,7 +82,8 @@ class YerBirlestirmesi(Taban):
     karar_id: Mapped[str] = mapped_column(ForeignKey("esleme_kararlari.id", ondelete="RESTRICT"), nullable=False)
     tasinan_kaynak_idleri: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
     aktif_mi: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    birlestirme_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    birlestirme_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     geri_alinma_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     __table_args__ = (Index("ix_yer_birlestirme_kaynak_aktif", "kaynak_sube_id", "aktif_mi"),)
-

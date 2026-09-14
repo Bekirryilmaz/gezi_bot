@@ -24,7 +24,9 @@ class YayinKaydi(Taban):
     izinli_kullanimlar: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
     surum: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     aktif_mi: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    guncellenme_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    guncellenme_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
     __table_args__ = (
         UniqueConstraint("nesne_turu", "nesne_id", name="ux_yayin_nesnesi"),
         Index("ix_yayin_durum_nesne", "durum", "nesne_turu"),
@@ -40,7 +42,9 @@ class GeriCekmeKaydi(Taban):
     gerekce_kodu: Mapped[str] = mapped_column(String(80), nullable=False)
     gerekce: Mapped[str] = mapped_column(Text, nullable=False)
     aktor_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
-    geri_cekme_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    geri_cekme_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class EtkiBaglantisi(Taban):
@@ -66,7 +70,9 @@ class GecersizlestirmeOlayi(Taban):
     kaynak_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
     olay_turu: Mapped[str] = mapped_column(String(40), nullable=False)
     payload: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     islenme_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     deneme_sayisi: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 

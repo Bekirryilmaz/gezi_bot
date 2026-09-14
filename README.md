@@ -29,7 +29,7 @@ edilmemiştir; hedef davranışla uyum için uygulama farkı incelemesi gerekir.
 | Parça | Durum |
 |---|---|
 | Veri toplama + eşleme + duygu + profil + tanıtım | Yazılmış, Samsun ile çalıştırılmış |
-| PostgreSQL + PostGIS + Alembic (`0001`–`0004`) | Hazır (bu makinede Docker yok; yerel `C:\PostgreSQL`) |
+| PostgreSQL + PostGIS + Alembic (`0001`–`0012`) | Hazır (bu makinede Docker yok; yerel `C:\PostgreSQL`) |
 | JSONL → DB aktarım | Hazır, idempotent |
 | FastAPI + rota motoru | Hazır, uçtan uca test edilmiş — port **8125** |
 | Next.js site | Yazılmış ve yerel çalışıyor — port **3000** |

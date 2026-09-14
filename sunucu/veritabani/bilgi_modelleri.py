@@ -25,7 +25,9 @@ class KaynakPolitikasi(Taban):
     dayanak_notu: Mapped[str | None] = mapped_column(Text)
     gecerli_baslangic: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     gecerli_bitis: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class VeriBatch(Taban):
@@ -38,7 +40,9 @@ class VeriBatch(Taban):
     cekilme_baslangici: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cekilme_bitisi: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     tamamlanma_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    sisteme_alinma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    sisteme_alinma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     __table_args__ = (UniqueConstraint("kaynak", "kosu_anahtari", name="ux_veri_batch_kaynak_kosu"),)
 
 
@@ -53,7 +57,9 @@ class Gozlem(Taban):
     kaynakta_gozlemlenme_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cekilme_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     dogrulanma_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    sisteme_alinma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    sisteme_alinma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     icerik_ozeti: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     icerik_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     __table_args__ = (UniqueConstraint("veri_batch_id", "kaynak", "kaynak_kayit_id", "icerik_hash", name="ux_gozlem_idempotent"), Index("ix_gozlem_kaynak_kayit", "kaynak", "kaynak_kayit_id"))
@@ -66,7 +72,9 @@ class Iddia(Taban):
     aile: Mapped[str] = mapped_column(String(40), nullable=False)
     kapsam: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     aktif_surum_no: Mapped[int | None] = mapped_column(Integer)
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     __table_args__ = (Index("ix_iddia_sube_aile", "sube_id", "aile"),)
 
 
@@ -81,7 +89,9 @@ class IddiaSurumu(Taban):
     gecerlilik_baslangici: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     gecerlilik_bitisi: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     dogrulanma_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    sisteme_alinma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    sisteme_alinma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     yayin_durumu: Mapped[str] = mapped_column(String(30), nullable=False, default="taslak")
     yayin_engeli: Mapped[str | None] = mapped_column(String(100))
     ai_tarafindan_uretildi: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -96,4 +106,3 @@ class KanitBaglantisi(Taban):
     rol: Mapped[str] = mapped_column(String(20), nullable=False)
     gerekce: Mapped[str | None] = mapped_column(Text)
     __table_args__ = (UniqueConstraint("iddia_surumu_id", "gozlem_id", "rol", name="ux_kanit_baglantisi"),)
-

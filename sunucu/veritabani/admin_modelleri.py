@@ -23,7 +23,9 @@ class AdminKullanici(Taban):
     parola_salt: Mapped[str] = mapped_column(String(64), nullable=False)
     kapsam: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
     aktif_mi: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 class AdminRol(Taban):
@@ -49,7 +51,9 @@ class AdminOturum(Taban):
     ip_izi: Mapped[str | None] = mapped_column(String(64))
     user_agent_izi: Mapped[str | None] = mapped_column(String(64))
     iptal_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     __table_args__ = (Index("ix_admin_oturum_kullanici_sona_erme", "kullanici_id", "sona_erme_zamani"),)
 
 
@@ -66,7 +70,9 @@ class AdminAuditOlayi(Taban):
     istek_id: Mapped[str] = mapped_column(String(100), nullable=False)
     korelasyon_id: Mapped[str] = mapped_column(String(100), nullable=False)
     meta: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     __table_args__ = (Index("ix_admin_audit_nesne", "nesne_turu", "nesne_id", "olusturulma_zamani"),)
 
 
@@ -85,6 +91,10 @@ class IncelemeDosyasi(Taban):
     ikinci_inceleyen_id: Mapped[str | None] = mapped_column(ForeignKey("admin_kullanicilari.id", ondelete="RESTRICT"))
     karar_gerekcesi: Mapped[str | None] = mapped_column(Text)
     surum: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
-    olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    guncellenme_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    olusturulma_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    guncellenme_zamani: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
     __table_args__ = (Index("ix_inceleme_kuyruk", "durum", "dosya_turu", "risk_sinifi"),)
