@@ -15,6 +15,9 @@ from sqlalchemy.orm import Query, Session
 
 from ortak.sabitler import AnaKategori, OzelEtiket
 from sunucu.veritabani.modeller import Yer
+from sunucu.veritabani.yayin_modelleri import YayinKaydi
+from sunucu.yayin.domain import KullanimTuru
+from sunucu.yayin.servis import KAMUSAL_DURUMLAR
 
 # Taksonomide duygu_skoru_ortalama -1..+1. Vitrin esigi 80/100:
 # (skor + 1) * 50 >= 80  <=>  skor >= 0.6
@@ -62,15 +65,30 @@ def _kesif_vitrin_kosulu():
     )
 
 
-def _yer_listesi_sorgusu(
+def _kamusal_yayin_kosullari(kullanim: KullanimTuru) -> tuple:
+    return (
+        YayinKaydi.nesne_turu == "yer",
+        YayinKaydi.nesne_id == Yer.id,
+        YayinKaydi.aktif_mi.is_(True),
+        YayinKaydi.durum.in_(KAMUSAL_DURUMLAR),
+        YayinKaydi.izinli_kullanimlar.contains([kullanim.value]),
+    )
+
+
+def _kamusal_yer_listesi_sorgusu(
     oturum: Session,
     sehir_id: str,
     ana_kategoriler: list[str] | None = None,
     alt_kategoriler: list[str] | None = None,
     sadece_kesif: bool = False,
+    kullanim: KullanimTuru = KullanimTuru.LISTE,
 ) -> Query:
     enlem_kolonu, boylam_kolonu = _koordinat_kolonlari()
-    sorgu = oturum.query(Yer, enlem_kolonu, boylam_kolonu).filter(Yer.sehir_id == sehir_id)
+    sorgu = (
+        oturum.query(Yer, enlem_kolonu, boylam_kolonu)
+        .join(YayinKaydi, and_(YayinKaydi.nesne_id == Yer.id, YayinKaydi.nesne_turu == "yer"))
+        .filter(Yer.sehir_id == sehir_id, *_kamusal_yayin_kosullari(kullanim))
+    )
     if ana_kategoriler:
         sorgu = sorgu.filter(Yer.ana_kategori.in_(ana_kategoriler))
     if alt_kategoriler:
@@ -82,25 +100,31 @@ def _yer_listesi_sorgusu(
 
 def sehir_yer_sayilari(oturum: Session, sehir_id: str) -> tuple[int, int, int]:
     """(toplam yer, kesif vitrinindeki yer, farkli ilce) uclusu."""
-    toplam = int(oturum.query(func.count(Yer.id)).filter(Yer.sehir_id == sehir_id).scalar() or 0)
+    taban = oturum.query(func.count(Yer.id)).join(YayinKaydi, and_(YayinKaydi.nesne_id == Yer.id, YayinKaydi.nesne_turu == "yer"))
+    toplam = int(taban.filter(Yer.sehir_id == sehir_id, *_kamusal_yayin_kosullari(KullanimTuru.LISTE)).scalar() or 0)
     kesif = int(
-        oturum.query(func.count(Yer.id))
-        .filter(Yer.sehir_id == sehir_id, _kesif_vitrin_kosulu())
+        oturum.query(func.count(Yer.id)).join(YayinKaydi, and_(YayinKaydi.nesne_id == Yer.id, YayinKaydi.nesne_turu == "yer"))
+        .filter(Yer.sehir_id == sehir_id, _kesif_vitrin_kosulu(), *_kamusal_yayin_kosullari(KullanimTuru.KESFET))
         .scalar()
         or 0
     )
     ilce = int(
-        oturum.query(func.count(func.distinct(Yer.ilce)))
-        .filter(Yer.sehir_id == sehir_id, Yer.ilce.isnot(None), Yer.ilce != "")
+        oturum.query(func.count(func.distinct(Yer.ilce))).join(YayinKaydi, and_(YayinKaydi.nesne_id == Yer.id, YayinKaydi.nesne_turu == "yer"))
+        .filter(Yer.sehir_id == sehir_id, Yer.ilce.isnot(None), Yer.ilce != "", *_kamusal_yayin_kosullari(KullanimTuru.LISTE))
         .scalar()
         or 0
     )
     return toplam, kesif, ilce
 
 
-def yer_ve_koordinat_getir(oturum: Session, yer_id: str) -> tuple[Yer, float, float] | None:
+def yer_ve_koordinat_getir(oturum: Session, yer_id: str, *, kullanim: KullanimTuru = KullanimTuru.DETAY) -> tuple[Yer, float, float] | None:
     enlem_kolonu, boylam_kolonu = _koordinat_kolonlari()
-    sonuc = oturum.query(Yer, enlem_kolonu, boylam_kolonu).filter(Yer.id == yer_id).first()
+    sonuc = (
+        oturum.query(Yer, enlem_kolonu, boylam_kolonu)
+        .join(YayinKaydi, and_(YayinKaydi.nesne_id == Yer.id, YayinKaydi.nesne_turu == "yer"))
+        .filter(Yer.id == yer_id, *_kamusal_yayin_kosullari(kullanim))
+        .first()
+    )
     if sonuc is None:
         return None
     yer, enlem, boylam = sonuc
@@ -118,7 +142,7 @@ def sehir_yerlerini_getir(
     """Bir sehirdeki yerleri, her biri icin (Yer, enlem, boylam) uclusu
     olarak dondurur. Rota motoru `sadece_kesif=False` (varsayilan) ile
     kisitlamasiz ceker; API vitrini `sadece_kesif=True` kullanir."""
-    sorgu = _yer_listesi_sorgusu(oturum, sehir_id, ana_kategoriler, alt_kategoriler, sadece_kesif)
+    sorgu = _kamusal_yer_listesi_sorgusu(oturum, sehir_id, ana_kategoriler, alt_kategoriler, sadece_kesif, KullanimTuru.ROTA_ADAYI)
     return [(yer, float(enlem), float(boylam)) for yer, enlem, boylam in sorgu.all()]
 
 
@@ -133,7 +157,11 @@ def sehir_yerlerini_sayfa_getir(
     offset: int = 0,
 ) -> tuple[list[tuple[Yer, float, float]], int]:
     """Filtrelenmis kume uzerinde sayfalama. `toplam_sayi` filtre SONRASI adettir."""
-    sayim_sorgusu = oturum.query(func.count(Yer.id)).filter(Yer.sehir_id == sehir_id)
+    sayim_sorgusu = (
+        oturum.query(func.count(Yer.id))
+        .join(YayinKaydi, and_(YayinKaydi.nesne_id == Yer.id, YayinKaydi.nesne_turu == "yer"))
+        .filter(Yer.sehir_id == sehir_id, *_kamusal_yayin_kosullari(KullanimTuru.LISTE))
+    )
     if ana_kategoriler:
         sayim_sorgusu = sayim_sorgusu.filter(Yer.ana_kategori.in_(ana_kategoriler))
     if alt_kategoriler:
@@ -142,6 +170,11 @@ def sehir_yerlerini_sayfa_getir(
         sayim_sorgusu = sayim_sorgusu.filter(_kesif_vitrin_kosulu())
     toplam_sayi = int(sayim_sorgusu.scalar() or 0)
 
-    sorgu = _yer_listesi_sorgusu(oturum, sehir_id, ana_kategoriler, alt_kategoriler, sadece_kesif)
+    sorgu = _kamusal_yer_listesi_sorgusu(oturum, sehir_id, ana_kategoriler, alt_kategoriler, sadece_kesif, KullanimTuru.LISTE)
     satirlar = sorgu.offset(offset).limit(limit).all()
     return [(yer, float(enlem), float(boylam)) for yer, enlem, boylam in satirlar], toplam_sayi
+
+
+def yer_yayin_kaydi_getir(oturum: Session, yer_id: str) -> YayinKaydi | None:
+    """410/ETag gibi kamusal protokol kararlarinda kullanilir; ham Yer dondurmez."""
+    return oturum.query(YayinKaydi).filter_by(nesne_turu="yer", nesne_id=yer_id, aktif_mi=True).first()

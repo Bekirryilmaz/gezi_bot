@@ -91,6 +91,12 @@ sayılar basılır.
 
 ## API
 
+İç admin API'si public sözleşmeden ayrıdır: `/v1/admin/*`; kendi OpenAPI yüzeyi
+`/v1/admin/docs` adresindedir. İlk admin kurulumu ve güvenlik işlemleri için
+[`docs/08-admin/admin-auth-runbook.md`](../docs/08-admin/admin-auth-runbook.md),
+tek public yayın kapısı için
+[`docs/07-backend/publication-lifecycle.md`](../docs/07-backend/publication-lifecycle.md) kullanılır.
+
 ```text
 .\.venv_test\Scripts\python.exe -m uvicorn sunucu.api.uygulama:uygulama --host 127.0.0.1 --port 8125
 ```

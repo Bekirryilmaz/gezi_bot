@@ -65,6 +65,8 @@ class Yer(BaseModel):
     kaynak_id: str = Field(..., description="Kaynaktaki orijinal kimlik (orn. OSM node id, Google place_id)")
     kaynak_url: str | None = None
     cekilme_zamani: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    kaynakta_gozlemlenme_zamani: datetime | None = None
+    olay_zamani: datetime | None = None
 
     # Temel bilgiler
     isim: str

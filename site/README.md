@@ -47,6 +47,8 @@ CORS: API tarafında `API_IZINLI_ORIGINLER` varsayılanı `http://localhost:3000
 | `/yer/[id]` | Allow-list tanıtım + olgusal yan bilgiler (UUID) |
 | `/sehir/[anahtar]/bolgeler` | Şehir + ilçe tanıtımları |
 | `/sehir/[anahtar]/rota` | Tek günlük Akıllı Rota |
+| `/admin/login` | İç ekip girişi (tüketici hesabı değildir) |
+| `/admin` | Yetkili inceleme, yayın, withdrawal ve audit masası |
 
 Sihirbaz yalnız günlük tercihleri alır ve `POST /v1/gunluk-planlar` çağırır.
 Gün sayısı, konaklama ve çok günlük alternatif seçimi public akışta yoktur.

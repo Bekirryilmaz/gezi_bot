@@ -11,7 +11,7 @@ from sunucu.veritabani.baglanti import motor
 from sunucu.veritabani.temel import Taban
 import sunucu.veritabani.modeller  # noqa: F401 -- metadata kaydi icin
 
-BEKLENEN_REVIZYON = "0004"
+BEKLENEN_REVIZYON = "0010"
 SISTEM_TABLOLARI = {"alembic_version", "spatial_ref_sys"}
 
 

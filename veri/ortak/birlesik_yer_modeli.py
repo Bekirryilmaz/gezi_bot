@@ -30,6 +30,9 @@ class KaynakReferansi(BaseModel):
     kaynak: VeriKaynagi
     kaynak_id: str
     kaynak_url: str | None = None
+    cekilme_zamani: datetime | None = None
+    kaynakta_gozlemlenme_zamani: datetime | None = None
+    olay_zamani: datetime | None = None
     kaynakta_puan_ortalamasi: float | None = None
     kaynakta_puan_sayisi: int | None = None
 

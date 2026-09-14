@@ -4,7 +4,7 @@ Sehir ve yer listeleme/detay uc noktalari.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from ortak.sabitler import DeneyimEksen
@@ -22,6 +22,7 @@ from sunucu.veritabani.sorgular import (
     sehir_yer_sayilari,
     sehir_yerlerini_sayfa_getir,
     yer_ve_koordinat_getir,
+    yer_yayin_kaydi_getir,
 )
 from veri.ortak.sehir_ayarlari import SEHIRLER, sehir_anahtarini_isme_gore_bul, sehir_getir
 
@@ -58,6 +59,7 @@ def sehirleri_listele(oturum: Session = Depends(oturum_al)) -> list[SehirCevap]:
 @yonlendirici.get("/sehirler/{sehir_anahtari}/yerler", response_model=YerListeCevabi)
 def yerleri_listele(
     sehir_anahtari: str,
+    yanit: Response,
     ana_kategori: str | None = Query(default=None, description="Orn. 'gezilecek_yer', 'konaklama', 'yeme_icme'"),
     alt_kategori: str | None = Query(default=None, description="Orn. 'tarihi_kulturel', 'plaj_su'"),
     sadece_kesif: bool = Query(
@@ -83,6 +85,8 @@ def yerleri_listele(
         limit=limit,
         offset=offset,
     )
+    yanit.headers["ETag"] = f'W/"yer-listesi-{sehir.id}-{toplam_sayi}"'
+    yanit.headers["Cache-Control"] = "public, max-age=60, must-revalidate"
     return YerListeCevabi(
         yerler=[YerOzet.yerden_olustur(yer, enlem, boylam) for yer, enlem, boylam in yerler_ve_koordinatlar],
         toplam_sayi=toplam_sayi,
@@ -127,13 +131,19 @@ def sehir_istatistikleri(
 
 
 @yonlendirici.get("/yerler/{yer_id}", response_model=YerDetay)
-def yer_detayi(yer_id: str, oturum: Session = Depends(oturum_al)) -> YerDetay:
+def yer_detayi(yer_id: str, yanit: Response, oturum: Session = Depends(oturum_al)) -> YerDetay:
     """Bir yerin kamusal allow-list detaylarini getirir."""
     sonuc = yer_ve_koordinat_getir(oturum, yer_id)
     if sonuc is None:
+        yayin = yer_yayin_kaydi_getir(oturum, yer_id)
+        if yayin and "geri_cekilmis" in yayin.neden_kodlari:
+            raise HTTPException(status_code=status.HTTP_410_GONE, detail="Bu yer kamusal kullanimdan geri cekildi.")
         raise HTTPException(status_code=404, detail=f"'{yer_id}' id'li yer bulunamadi.")
 
     yer, enlem, boylam = sonuc
+    yayin = yer_yayin_kaydi_getir(oturum, yer_id)
+    yanit.headers["ETag"] = f'"yer-{yer_id}-v{yayin.surum if yayin else 0}"'
+    yanit.headers["Cache-Control"] = "public, max-age=60, must-revalidate"
     return YerDetay.yerden_olustur(yer, enlem, boylam)
 
 

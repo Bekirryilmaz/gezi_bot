@@ -23,6 +23,7 @@ from sunucu.api.rotalar_router import yonlendirici as rotalar_yonlendirici
 from sunucu.api.semalar import ApiHataCevabi
 from sunucu.api.yerler_router import yonlendirici as yerler_yonlendirici
 from sunucu.veritabani.baglanti import motor
+from sunucu.admin.router import yonlendirici as admin_yonlendirici
 
 
 def _izinli_originleri_al() -> list[str]:
@@ -78,9 +79,9 @@ _izinli_originler = _izinli_originleri_al()
 uygulama.add_middleware(
     CORSMiddleware,
     allow_origins=_izinli_originler,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Accept", "Content-Type", "Idempotency-Key", "X-Request-ID"],
+    allow_headers=["Accept", "Authorization", "Content-Type", "Idempotency-Key", "X-CSRF-Token", "X-Request-ID"],
     expose_headers=["X-Request-ID", "X-Idempotency-Key"],
 )
 uygulama.add_middleware(ApiGuvenlikMiddleware)
@@ -88,6 +89,14 @@ hata_yakalayicilari_kur(uygulama)
 
 uygulama.include_router(yerler_yonlendirici)
 uygulama.include_router(rotalar_yonlendirici)
+
+admin_uygulama = FastAPI(
+    title="Şamandıra İç Admin API",
+    description="Public istemcilerden ayrik kimlik, claim, yayin ve audit operasyonlari.",
+    version="1.0.0",
+)
+admin_uygulama.include_router(admin_yonlendirici)
+uygulama.mount("/v1/admin", admin_uygulama)
 
 
 @uygulama.get("/", include_in_schema=False)

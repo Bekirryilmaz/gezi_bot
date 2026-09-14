@@ -27,6 +27,8 @@ olmasi gerekir:
 from __future__ import annotations
 
 import argparse
+import hashlib
+from datetime import datetime, timezone
 from pathlib import Path
 
 from sqlalchemy.orm import Session
@@ -38,6 +40,7 @@ from sunucu.veritabani.aktarim.yer_aktar import yer_yukle_veya_olustur
 from sunucu.veritabani.aktarim.yorum_aktar import yorumlari_aktar
 from sunucu.veritabani.baglanti import OturumUretici
 from sunucu.veritabani.modeller import Sehir
+from sunucu.veritabani.bilgi_modelleri import Gozlem, VeriBatch
 from veri.ortak.birlesik_yer_modeli import BirlesikYer
 from veri.ortak.bolge_profili_modeli import BolgeProfili
 from veri.ortak.dosya_araclari import jsonl_oku
@@ -58,11 +61,34 @@ def _en_guncel_dosyayi_bul(klasor: Path, desen: str) -> Path | None:
     return adaylar[-1] if adaylar else None
 
 
-def _birlesik_yerleri_yukle(sehir_anahtari: str) -> list[BirlesikYer]:
+def _birlesik_yerleri_yukle(sehir_anahtari: str) -> tuple[list[BirlesikYer], Path | None]:
     dosya = _en_guncel_dosyayi_bul(_veri_cikti_kok() / "birlesik_yerler", f"{sehir_anahtari}_*.jsonl")
     if dosya is None:
-        return []
-    return [BirlesikYer(**kayit) for kayit in jsonl_oku(dosya)]
+        return [], None
+    return [BirlesikYer(**kayit) for kayit in jsonl_oku(dosya)], dosya
+
+
+def _batch_sagla(oturum: Session, dosya: Path) -> VeriBatch:
+    icerik_hash = hashlib.sha256(dosya.read_bytes()).hexdigest()
+    kosu = f"{dosya.name}:{icerik_hash}"
+    batch = oturum.query(VeriBatch).filter_by(kaynak="birlesik_yerler", kosu_anahtari=kosu).first()
+    if batch:
+        return batch
+    zaman = datetime.fromtimestamp(dosya.stat().st_mtime, timezone.utc)
+    batch = VeriBatch(kaynak="birlesik_yerler", kosu_anahtari=kosu, kok_tanimi={"dosya": dosya.name, "sha256": icerik_hash}, baslama_zamani=zaman, tamamlanma_zamani=zaman)
+    oturum.add(batch)
+    oturum.flush()
+    return batch
+
+
+def _gozlemleri_sagla(oturum: Session, batch: VeriBatch, yer: BirlesikYer) -> None:
+    for ref in yer.kaynaklar:
+        if ref.cekilme_zamani is None:
+            continue
+        oz = hashlib.sha256(f"{ref.kaynak.value}|{ref.kaynak_id}|{ref.cekilme_zamani.isoformat()}".encode()).hexdigest()
+        varsa = oturum.query(Gozlem).filter_by(veri_batch_id=batch.id, kaynak=ref.kaynak.value, kaynak_kayit_id=ref.kaynak_id, icerik_hash=oz).first()
+        if not varsa:
+            oturum.add(Gozlem(veri_batch_id=batch.id, kaynak=ref.kaynak.value, kaynak_kayit_id=ref.kaynak_id, kaynak_url=ref.kaynak_url, olay_zamani=ref.olay_zamani, kaynakta_gozlemlenme_zamani=ref.kaynakta_gozlemlenme_zamani, cekilme_zamani=ref.cekilme_zamani, icerik_hash=oz))
 
 
 def _islenmis_yorumlari_yukle(sehir_anahtari: str) -> list[IslenmisYorum]:
@@ -114,7 +140,7 @@ def calistir(sehir_anahtari: str) -> None:
         sehir = _sehri_yukle_veya_olustur(oturum, sehir_ayari)
         print(f"[BILGI] Sehir hazir: {sehir.isim} ({sehir.id})")
 
-        birlesik_yerler = _birlesik_yerleri_yukle(sehir_anahtari)
+        birlesik_yerler, birlesik_dosya = _birlesik_yerleri_yukle(sehir_anahtari)
         if not birlesik_yerler:
             print(
                 f"[UYARI] '{sehir_ayari.isim}' icin birlesik yer kataloğu bulunamadi. "
@@ -122,9 +148,12 @@ def calistir(sehir_anahtari: str) -> None:
             )
             return
 
+        assert birlesik_dosya is not None
+        batch = _batch_sagla(oturum, birlesik_dosya)
         yer_kimligi_haritasi: dict[str, str] = {}
         for birlesik_yer in birlesik_yerler:
-            yer = yer_yukle_veya_olustur(oturum, sehir.id, birlesik_yer)
+            yer = yer_yukle_veya_olustur(oturum, sehir.id, birlesik_yer, batch.id)
+            _gozlemleri_sagla(oturum, batch, birlesik_yer)
             yer_kimligi_haritasi[birlesik_yer.yer_kimligi] = yer.id
         oturum.commit()
         print(

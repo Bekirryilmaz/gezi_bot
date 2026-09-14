@@ -50,6 +50,7 @@ from veri.ortak.metin_araclari import konsolu_guvenli_hale_getir, turkce_kucuk_h
 from veri.ortak.sehir_ayarlari import sehir_getir
 from veri.ortak.veri_yukleyiciler import tum_ham_yerleri_yukle
 from veri.ortak.yer_modeli import OzellikSeti, Yer
+from ortak.esleme_politikasi import EslemeSonucu, eslemeyi_degerlendir
 
 # Alanlari birlestirirken hangi kaynagin once tercih edilecegi (basdan sona
 # oncelik sirasi). Google Maps/TripAdvisor genelde daha temiz/guncel isim,
@@ -94,12 +95,19 @@ def _ayni_yer_mi(
     mesafe_esigi_metre: float,
     isim_benzerlik_esigi: float,
 ) -> bool:
-    if yer1.ana_kategori != yer2.ana_kategori:
-        return False
     mesafe = haversine_metre(yer1.enlem, yer1.boylam, yer2.enlem, yer2.boylam)
-    if mesafe > mesafe_esigi_metre:
+    isim = _isim_benzerligi(yer1.isim, yer2.isim)
+    if mesafe > mesafe_esigi_metre or isim < isim_benzerlik_esigi:
         return False
-    return _isim_benzerligi(yer1.isim, yer2.isim) >= isim_benzerlik_esigi
+    sonuc = eslemeyi_degerlendir(
+        ayni_kaynak=yer1.kaynak == yer2.kaynak,
+        ayni_kategori=yer1.ana_kategori == yer2.ana_kategori,
+        isim_benzerligi=isim,
+        mesafe_metre=mesafe,
+        telefon_eslesiyor=bool(yer1.telefon and yer1.telefon == yer2.telefon),
+        adres_eslesiyor=bool(yer1.adres and yer1.adres == yer2.adres),
+    )
+    return sonuc.sonuc is EslemeSonucu.OTOMATIK_KABUL
 
 
 class _BirlesikKumeler:
@@ -108,6 +116,7 @@ class _BirlesikKumeler:
 
     def __init__(self, eleman_sayisi: int) -> None:
         self._ebeveyn = list(range(eleman_sayisi))
+        self._uyeler = {i: {i} for i in range(eleman_sayisi)}
 
     def bul(self, x: int) -> int:
         while self._ebeveyn[x] != x:
@@ -119,6 +128,10 @@ class _BirlesikKumeler:
         kok_x, kok_y = self.bul(x), self.bul(y)
         if kok_x != kok_y:
             self._ebeveyn[kok_y] = kok_x
+            self._uyeler[kok_x].update(self._uyeler.pop(kok_y))
+
+    def uyeler(self, x: int) -> set[int]:
+        return set(self._uyeler[self.bul(x)])
 
 
 def _izgara_anahtari(enlem: float, boylam: float) -> tuple[int, int]:
@@ -218,6 +231,9 @@ def _kumeyi_birlestir(kume: list[Yer], sehir_isim: str) -> BirlesikYer:
             kaynak=yer.kaynak,
             kaynak_id=yer.kaynak_id,
             kaynak_url=yer.kaynak_url,
+            cekilme_zamani=yer.cekilme_zamani,
+            kaynakta_gozlemlenme_zamani=yer.kaynakta_gozlemlenme_zamani,
+            olay_zamani=yer.olay_zamani,
             kaynakta_puan_ortalamasi=yer.kaynakta_puan_ortalamasi,
             kaynakta_puan_sayisi=yer.kaynakta_puan_sayisi,
         )
@@ -279,8 +295,16 @@ def calistir(
                 continue  # her cifti bir kez karsilastir
             karsilastirma_sayisi += 1
             if _ayni_yer_mi(yer, tum_yerler[j], mesafe_esigi_metre, isim_benzerlik_esigi):
-                kumeler.birlestir(i, j)
-                eslesme_sayisi += 1
+                # Complete-link kapisi: A-B ve B-C eslesmesi, A-C de guclu
+                # degilse union-find zinciriyle kalici kume yaratamaz.
+                guvenli = all(
+                    _ayni_yer_mi(tum_yerler[a], tum_yerler[b], mesafe_esigi_metre, isim_benzerlik_esigi)
+                    for a in kumeler.uyeler(i)
+                    for b in kumeler.uyeler(j)
+                )
+                if guvenli:
+                    kumeler.birlestir(i, j)
+                    eslesme_sayisi += 1
 
     print(f"[BILGI] {karsilastirma_sayisi} ikili karsilastirma yapildi, {eslesme_sayisi} eslesme bulundu.")
 

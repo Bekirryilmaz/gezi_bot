@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 from ortak.sabitler import VARSAYILAN_DENEYIM_PUANLARI
 from sunucu.veritabani.modeller import KonaklamaDetay, KullaniciRotasi, Yer, YerKaynak, Yorum
 from veri.ortak.birlesik_yer_modeli import BirlesikYer, KaynakReferansi
+from sunucu.kimlik.servis import aday_kaydet, legacy_yer_icin_kimlik_sagla
 
 
 def _konum_noktasi_uret(enlem: float, boylam: float) -> WKTElement:
@@ -127,7 +128,7 @@ def _yerleri_birlestir(oturum: Session, birincil: Yer, ikinciller: list[Yer]) ->
         )
 
 
-def _eksik_kaynaklari_ekle(oturum: Session, yer: Yer, birlesik_yer: BirlesikYer) -> None:
+def _eksik_kaynaklari_ekle(oturum: Session, yer: Yer, birlesik_yer: BirlesikYer, veri_batch_id: str | None = None) -> None:
     """`yer`de henuz kaydi olmayan yeni YerKaynak referanslarini ekler
     (orn. bu yer ilk aktarimda sadece OSM'den geldi, bu aktarimda Google
     Maps de eslesmis olabilir).
@@ -154,6 +155,9 @@ def _eksik_kaynaklari_ekle(oturum: Session, yer: Yer, birlesik_yer: BirlesikYer)
                 kaynak=kaynak_ref.kaynak.value,
                 kaynak_id=kaynak_ref.kaynak_id,
                 kaynak_url=_kisalt(kaynak_ref.kaynak_url, 500),
+                cekilme_zamani=kaynak_ref.cekilme_zamani,
+                kaynakta_gozlemlenme_zamani=kaynak_ref.kaynakta_gozlemlenme_zamani,
+                veri_batch_id=veri_batch_id,
             )
         )
 
@@ -201,7 +205,7 @@ def _varsayilan_deneyim_puanlarini_uygula(yer: Yer) -> None:
     yer.deneyim_puanlari = dict(VARSAYILAN_DENEYIM_PUANLARI.get(yer.alt_kategori, {}))
 
 
-def yer_yukle_veya_olustur(oturum: Session, sehir_id: str, birlesik_yer: BirlesikYer) -> Yer:
+def yer_yukle_veya_olustur(oturum: Session, sehir_id: str, birlesik_yer: BirlesikYer, veri_batch_id: str | None = None) -> Yer:
     """Bir BirlesikYer kaydini veritabanina aktarir. Var olan bir Yer'e
     eslesirse gunceller, eslesmezse yeni Yer + YerKaynak satirlari olusturur.
     Donen Yer, `oturum.flush()` sonrasi kesin bir `id`'ye sahiptir.
@@ -228,17 +232,35 @@ def yer_yukle_veya_olustur(oturum: Session, sehir_id: str, birlesik_yer: Birlesi
                     kaynak=kaynak_ref.kaynak.value,
                     kaynak_id=kaynak_ref.kaynak_id,
                     kaynak_url=kaynak_ref.kaynak_url,
+                    cekilme_zamani=kaynak_ref.cekilme_zamani,
+                    kaynakta_gozlemlenme_zamani=kaynak_ref.kaynakta_gozlemlenme_zamani,
+                    veri_batch_id=veri_batch_id,
                 )
             )
     else:
         yer = _birincil_yeri_sec(mevcut_yerler)
         ikinciller = [aday for aday in mevcut_yerler if aday.id != yer.id]
         if ikinciller:
-            _yerleri_birlestir(oturum, yer, ikinciller)
-        _eksik_kaynaklari_ekle(oturum, yer, birlesik_yer)
+            ana_sube = legacy_yer_icin_kimlik_sagla(oturum, yer)
+            for ikincil in ikinciller:
+                diger_sube = legacy_yer_icin_kimlik_sagla(oturum, ikincil)
+                aday_kaydet(oturum, ana_sube.id, diger_sube.id, 0.9, {"neden": "importta_coklu_legacy_eslesme"})
+            oturum.flush()
+            return yer
+        _eksik_kaynaklari_ekle(oturum, yer, birlesik_yer, veri_batch_id)
 
     _temel_alanlari_guncelle(yer, birlesik_yer)
     _varsayilan_deneyim_puanlarini_uygula(yer)
+
+    sube = legacy_yer_icin_kimlik_sagla(oturum, yer)
+    referanslar = {(r.kaynak.value, r.kaynak_id): r for r in _essiz_kaynak_referanslari(birlesik_yer)}
+    for kaynak in yer.kaynaklar:
+        kaynak.sube_id = sube.id
+        ref = referanslar.get((kaynak.kaynak, kaynak.kaynak_id))
+        if ref is not None:
+            kaynak.veri_batch_id = veri_batch_id
+            kaynak.cekilme_zamani = ref.cekilme_zamani
+            kaynak.kaynakta_gozlemlenme_zamani = ref.kaynakta_gozlemlenme_zamani
 
     oturum.flush()
     return yer

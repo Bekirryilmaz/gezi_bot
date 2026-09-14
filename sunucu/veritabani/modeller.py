@@ -194,7 +194,11 @@ class YerKaynak(Taban):
     kaynak: Mapped[str] = mapped_column(String(30), nullable=False)
     kaynak_id: Mapped[str] = mapped_column(String(255), nullable=False)
     kaynak_url: Mapped[str | None] = mapped_column(String(500))
-    cekilme_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    cekilme_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    kaynakta_gozlemlenme_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    sisteme_alinma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    veri_batch_id: Mapped[str | None] = mapped_column(ForeignKey("veri_batchleri.id", ondelete="SET NULL"))
+    sube_id: Mapped[str | None] = mapped_column(ForeignKey("subeler.id", ondelete="RESTRICT"))
 
     yer: Mapped["Yer"] = relationship(back_populates="kaynaklar")
 
@@ -288,3 +292,18 @@ class KullaniciRotasi(Taban):
     )
 
     olusturulma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+# Ayrik domain dosyalari metadata'ya kaydedilir; public API bunlari import etmez.
+from sunucu.veritabani.bilgi_modelleri import (  # noqa: E402,F401
+    Gozlem, Iddia, IddiaSurumu, KanitBaglantisi, KaynakPolitikasi, VeriBatch,
+)
+from sunucu.veritabani.kimlik_modelleri import (  # noqa: E402,F401
+    EslemeAdayi, EslemeKarari, Sube, YerAlias, YerBirlestirmesi, YerKimligi,
+)
+from sunucu.veritabani.yayin_modelleri import (  # noqa: E402,F401
+    EtkiBaglantisi, GecersizlestirmeOlayi, GeriCekmeKaydi, PublicProjection, YayinKaydi,
+)
+from sunucu.veritabani.admin_modelleri import (  # noqa: E402,F401
+    AdminAuditOlayi, AdminKullanici, AdminKullaniciRolu, AdminOturum, AdminRol, IncelemeDosyasi,
+)
