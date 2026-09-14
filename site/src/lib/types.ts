@@ -132,3 +132,48 @@ export type ApiHataZarfi = {
 
 export type VeriDurumu =
   "loading" | "empty" | "insufficient" | "unavailable" | "error" | "ready";
+
+export type KararSonucuTuru =
+  | "onerilebilir"
+  | "kosula_bagli_onerilebilir"
+  | "ihtiyacla_uyusmuyor"
+  | "kritik_bilgi_bilinmiyor"
+  | "kapsam_disi"
+  | "netlestirme_gerekli"
+  | "servis_gecici_kullanilamiyor";
+
+export type KararUygunlugu = "uygun" | "uygun_degil" | "degerlendirilemiyor";
+
+export type KararGerekcesi = {
+  kod: string;
+  mesaj: string;
+  ilgili_kosul: string | null;
+};
+
+export type KararSonucu = {
+  karar_id: string;
+  yer: {
+    place_id: string;
+    canonical_id: string;
+    branch_id: string;
+    isim: string;
+  } | null;
+  karar_turu: KararSonucuTuru;
+  anlasilan_ihtiyac: Record<string, unknown>;
+  uygunluk: KararUygunlugu;
+  gerekceler: KararGerekcesi[];
+  kritik_engeller: KararGerekcesi[];
+  onemli_odunler: KararGerekcesi[];
+  bilinmeyenler: KararGerekcesi[];
+  zaman_ve_kapsam: Record<string, unknown>;
+  bilgi_surumu: string;
+  politika_surumu: string;
+  yayin_surumu: number | null;
+  anlamli_alternatif_farki: string | null;
+  trace_reference: string | null;
+};
+
+export type KararDegerlendirmeCevabi = {
+  sonuclar: KararSonucu[];
+  trace_reference: string;
+};

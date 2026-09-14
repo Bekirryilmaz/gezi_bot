@@ -307,3 +307,6 @@ from sunucu.veritabani.yayin_modelleri import (  # noqa: E402,F401
 from sunucu.veritabani.admin_modelleri import (  # noqa: E402,F401
     AdminAuditOlayi, AdminKullanici, AdminKullaniciRolu, AdminOturum, AdminRol, IncelemeDosyasi,
 )
+from sunucu.veritabani.karar_modelleri import (  # noqa: E402,F401
+    KararIzi,
+)

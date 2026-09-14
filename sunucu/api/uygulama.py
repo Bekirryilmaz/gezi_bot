@@ -22,6 +22,7 @@ from sunucu.api.altyapi import ApiGuvenlikMiddleware, hata_yakalayicilari_kur, s
 from sunucu.api.rotalar_router import yonlendirici as rotalar_yonlendirici
 from sunucu.api.semalar import ApiHataCevabi
 from sunucu.api.yerler_router import yonlendirici as yerler_yonlendirici
+from sunucu.karar_motoru.router import yonlendirici as karar_yonlendirici
 from sunucu.veritabani.baglanti import motor
 from sunucu.admin.router import yonlendirici as admin_yonlendirici
 
@@ -89,6 +90,7 @@ hata_yakalayicilari_kur(uygulama)
 
 uygulama.include_router(yerler_yonlendirici)
 uygulama.include_router(rotalar_yonlendirici)
+uygulama.include_router(karar_yonlendirici)
 
 admin_uygulama = FastAPI(
     title="Şamandıra İç Admin API",
