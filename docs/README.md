@@ -1,6 +1,6 @@
 ---
 title: "Şamandıra — Dokümantasyon Dizini"
-version: "1.8"
+version: "1.9"
 status: "dokumantasyon-kurali"
 phase: "urun-mimarisi"
 last_update: "2026-09-14"
@@ -19,6 +19,7 @@ depends:
   - "03-design/11-ekran-mimarisi.md"
   - "03-design/12-gorsel-tasarim-dili.md"
   - "03-design/13-bilesen-ve-etkilesim-sozlesmeleri.md"
+  - "09-business/14-urun-ozellik-haritasi.md"
 affects:
   - "docs altındaki bütün yeni belgeler"
 author: "Codex"
@@ -48,6 +49,10 @@ Yeni belgelerin tek kalıcı yeri proje deposunun docs dizinidir. Kullanıcını
 
 13. [12 Görsel Tasarım Dili](./03-design/12-gorsel-tasarim-dili.md)
 14. [13 Bileşen ve Etkileşim Sözleşmeleri](./03-design/13-bilesen-ve-etkilesim-sozlesmeleri.md) — kabul edilmiş 00–12 kaynaklarının davranış karşılığı. İstenen 48 konu ve dört tamamlayıcı bölüm; her bölümde amaç, kullanıcı beklentisi, davranış kuralları, istisnalar ve kabul kriterleri vardır. B01–B48 ile E01–E30 kapsamı eşlenmiştir. 30 Mermaid diyagramı, 77 örnek senaryo, 50 öz eleştiri ve 20 maddelik nihai Interaction Contract içerir. Belge incelemeye hazırdır; kod, UI, Figma veya yeni ürün fikri değildir.
+
+15. [14 Ürün Özellik Haritası](./09-business/14-urun-ozellik-haritasi.md) — FAZ 14 gelişim planı. 40 ana bölüm, 32 sorumluluk kaydı, 30 Mermaid diyagramı, 40 kabul senaryosu, 60 maddelik öz eleştiri ve nihai ürün yol haritası içerir. MVP/v1/v2 sırası, gerçek değere bağlı Premium, kurumsal kapsam, ticari büyüme ve yayın kapıları tanımlanır. Kabul edilmiş günlük Akıllı Rota ile ayrı kapsam kararı gerektiren çok günlük Akıllı Gezi açıkça ayrılır. Kod, UI veya uygulanmış ürün değildir.
+
+**14 Eylül 2026 — FAZ 14 kaynak ve kapsam kaydı:** 00–12 kabul edilmiş referans kümesidir; 13, dizinde ayrıca kabulü kayıtlı olmayan tamamlayıcı davranış kaynağıdır. 14'teki sürümleme ve geliştirme sırası planlama kararıdır; çok günlük Akıllı Gezi yeni ürün genişlemesidir. Belgenin tamamlanması kapsam değişikliği, araştırma sonucu veya ürün yayını anlamına gelmez. Kaynak gövdeleri korunmuştur. Sonraki çalışma uygulama farkı, pilot kapasitesi ve doğrulama planıdır; henüz yazılmamıştır.
 
 **14 Eylül 2026 — Bileşen ve Etkileşim Sözleşmeleri görevinin kaynak kaydı:** Kullanıcının bu görevde birlikte esas alınmasını istediği 00–12 belgeleri kabul edilmiş referans kümesidir. Kaynaklardaki tarihsel öneri etiketleri korunur; kaynakların kendi kapsamlarında koşullu bıraktıkları hizmetler bu kayıtla açılmış sayılmaz. 13 belgesinin hazırlanması ayrıca kabul, uygulama veya kullanıcı doğrulaması değildir. Sonraki uygulama incelemelerinde 10 Design System, 11 Ekran Mimarisi ve 13 birlikte okunmalıdır. UX ve erişilebilirlik doğrulama planı hâlâ planlanan çalışmadır.
 
@@ -105,6 +110,7 @@ Her yeni belge başında title, version, status, phase, last_update, depends, af
 - [11 Ekran Mimarisi](./03-design/11-ekran-mimarisi.md)
 - [12 Görsel Tasarım Dili](./03-design/12-gorsel-tasarim-dili.md)
 - [13 Bileşen ve Etkileşim Sözleşmeleri](./03-design/13-bilesen-ve-etkilesim-sozlesmeleri.md)
+- [14 Ürün Özellik Haritası](./09-business/14-urun-ozellik-haritasi.md)
 
 ## Bu dokümanın etkilediği belgeler
 
@@ -121,4 +127,3 @@ docs altındaki bütün yeni ürün ve geliştirme belgeleri; klasör sahipliği
 ## Design System sonrası güncel okuma kaydı
 
 [10 Design System](./03-design/10-design-system.md) yalnız proje deposundaki docs/03-design altında oluşturulmuştur. Bütün istenen referanslar okunmuş; 00–09 değiştirilmemiştir. README bağlantıları ve bu dizin güncellenmiştir. Sonraki tasarım çalışmalarında sayısal başlangıç değerleri araştırma bulgusu sayılmadan, belgedeki kabul senaryolarıyla doğrulanmalıdır. Bu görev kod, ekran, commit veya push üretmemiştir; Documents altında dosya oluşturulmamıştır.
-

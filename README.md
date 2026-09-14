@@ -4,15 +4,25 @@ Karadeniz kıyısından başlayan kişiselleştirilmiş gezi / keşif platformu.
 Marka: **Şamandıra** (Alegre Group). Repo adı henüz `gezi_bot` (GitHub’da
 `samandira` olacak). Canonical: `https://şamandıra.com`.
 
-İlk şehir: **Samsun**. Kullanıcıya üç şey sunar:
+İlk şehir: **Samsun**. Tarihsel yerel uygulamanın üç ana alanı:
 
 - **Keşif** — şehirdeki yerleri listele, filtrele, detay oku (konaklama vitrinde gizlenir)
 - **Bölgeler** — şehir + ilçe tanıtımı ve ziyaretçi yorumlarından derlenen duygu özeti
 - **Rota** — ilgi ağırlıklarına göre gün gün plan; konaklama belli veya değil
 
-Yerel çalıştırma kaynağı: [`calis.txt`](calis.txt). Güncel ürün kararları:
-[`plan/00_brief_eki.md`](plan/00_brief_eki.md). `plan/BRIF.md` tarihî belgedir;
-çelişkide brief eki kazanır.
+Yerel çalıştırma kaynağı: [`calis.txt`](calis.txt). Güncel kabul edilmiş ürün
+referansları ve kabul kayıtları: [dokümantasyon dizini](docs/README.md).
+Geliştirme sırası, MVP/v1/v2 ve ticari büyüme:
+[14 Ürün Özellik Haritası](docs/09-business/14-urun-ozellik-haritasi.md).
+`plan/00_brief_eki.md` ve `plan/BRIF.md` tarihsel planlardır; kabul edilmiş
+ürün referanslarının önüne geçmezler.
+
+Bu README'deki gün gün rota, konaklama bağlamı, duygu skoru ve diğer teknik
+anlatımlar mevcut uygulama geçmişidir; hedef kapsamın kabulü değildir.
+Kabul edilmiş Akıllı Rota günlük planla sınırlıdır. Çok günlük **Akıllı Gezi**,
+FAZ 14'te ayrı kapsam kararı bekleyen genişleme olarak değerlendirilmiştir.
+Aşağıdaki hazır/çalışıyor beyanları bu dokümantasyon görevinde yeniden test
+edilmemiştir; hedef davranışla uyum için uygulama farkı incelemesi gerekir.
 
 ## Şu anki durum
 
