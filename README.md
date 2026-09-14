@@ -206,6 +206,16 @@ Rota testleri:
 
 ## Doküman haritası
 
+[12 Görsel Tasarım Dili](docs/03-design/12-gorsel-tasarim-dili.md)
+
+[13 Bileşen ve Etkileşim Sözleşmeleri](docs/03-design/13-bilesen-ve-etkilesim-sozlesmeleri.md) — kabul edilmiş 00–12 referanslarına bağlı davranış belgesi; 52 ana bölüm, 30 Mermaid diyagramı, 77 örnek senaryo, 50 maddelik öz eleştiri ve nihai Interaction Contract. Dokümantasyon olarak hazır; uygulama veya yeni sözleşmenin ayrıca kabul edildiği anlamına gelmez.
+
+**14 Eylül 2026 — Design System güncellemesi:** Kullanıcının açık beyanıyla 00–09 belgelerinin tamamı kabul edilmiş referanstır; aşağıdaki eski durum kayıtları tarihsel olarak korunur. Yeni [10 Design System](docs/03-design/10-design-system.md), 60 ana başlık, 48 bileşen sözleşmesi, 22 Mermaid diyagramı, 32 kabul senaryosu ve 60 maddelik öz eleştiriyle bütün kanalların tasarım anayasası önerisini tanımlar. Referansların içerikleri değiştirilmemiştir. Yeni belge ayrıca kabul ve doğrulama bekler; kod, ekran veya tamamlanmış kullanıcı araştırması değildir.
+
+**13 Eylül 2026 — Ürün Ekosistemi güncellemesi:** Bu görevde 00–08 belgelerinin tamamı kabul edilmiş referans olarak alınmıştır; aşağıdaki önceki kabul/durum ifadeleri tarihsel kayıttır. Yeni [09 Ürün Ekosistemi](docs/09-business/09-urun-ekosistemi.md), bu referansları değiştirmeden yaşam döngülerini, kişisel kayıt ve paylaşımı, ücretsiz/Premium sınırlarını, ticari modelleri ve uzun vadeli büyümeyi tanımlar. 14 Mermaid diyagramı, 48 maddelik öz eleştiri ve alternatif mimari değerlendirmesi içerir. Yeni belge kabul bekleyen ürün mimarisi önerisidir; uygulanmış özellik veya tamamlanmış araştırma değildir.
+
+Kabul edilmiş 00–07 ürün ve UX referansları ile yeni tasarım belgesi için [dokümantasyon dizini](docs/README.md) kullanılır. [08 Tasarım İlkeleri](docs/03-design/08-tasarim-ilkeleri.md), bu referansların üzerine kurulan nihai tasarım anayasası önerisidir; kabul, uygulama veya tamamlanmış kullanıcı araştırması anlamına gelmez. 07 UX Karar Akışları kullanıcının Tasarım İlkeleri görevindeki açık beyanıyla kabul edilmiş referanstır. Ürün kararlarında kabul edilmiş referanslar aşağıdaki tarihsel planların önündedir.
+
 | Dosya | İçerik |
 |---|---|
 | `calis.txt` | Bu makinede çalıştırma (port, venv, PostgreSQL) |

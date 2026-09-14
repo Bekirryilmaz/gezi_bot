@@ -45,3 +45,12 @@ Kök / `sunucu/` / `site/` README’leri `calis.txt` ile hizalıdır. Çelişkid
 ## Commit / push
 
 Kullanıcı açıkça istemeden `git commit` / `git push` yapma.
+
+
+## Bağlayıcı ürün referansları ve belge yeri — 13 Eylül 2026
+
+Kullanıcının açık talimatıyla kabul edilmiş ürün referansları docs/00-product/00-urun-felsefesi.md, 01-bilgi-mimarisi.md, 02-product-language.md ve 03-karar-motoru.md dosyalarıdır. Ürün kararlarında bunlar eski planların ve yukarıdaki tarihsel doküman öncelik ifadesinin önündedir. docs/00-product/04-sistem-mimarisi.md bundan sonraki backend, frontend, admin, AI ve mobil geliştirmeler için mimari referanstır; ilk dört belgeyi sessizce değiştiremez. Çelişki varsa ilgili madde açıkça belirtilir.
+
+Bütün yeni belgeler bu Git deposunun docs/ yapısında yaşar: 00-product, 01-research, 02-ux, 03-design, 04-ai, 05-api, 06-frontend, 07-backend, 08-admin, 09-business. Belgeleri kullanıcının Documents klasörüne kaydetme; bu konumda bulunan önceki proje belgelerini uygun depo klasörüne içeriklerini doğrulayarak taşı.
+
+Her yeni belge title, version, status, phase, last_update, depends, affects ve author metadata alanlarıyla başlar. Sonunda bağlı belgeler, etkilediği belgeler ve bundan sonra okunması gereken belge bulunur. Henüz yazılmamış belge açıkça planlanan olarak işaretlenir. Dizin ve aktarım kaydı: docs/README.md. Commit/push kuralı aynen geçerlidir.
