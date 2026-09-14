@@ -17,21 +17,23 @@ Port **8125** (`calis.txt` ile aynı; 8000 değil). `site/.env.local`:
 üzerinden `/backend/*` rewrite ile gelir (CORS ihtiyacını azaltır). SSR
 doğrudan `NEXT_PUBLIC_API_URL`’e gider.
 
-CORS: `API_IZINLI_ORIGINLER` (varsayılan `http://localhost:3000` ve
-`http://127.0.0.1:3000`).
+CORS: development varsayılanı `http://localhost:3000` ve
+`http://127.0.0.1:3000`; production'da `API_IZINLI_ORIGINLER` zorunlu,
+wildcard/localhost reddedilir. Her cevap `X-Request-ID` taşır; loglar JSON
+allow-list'tir ve query/header/body yazmaz.
 
 ## Dosyalar
 
-- `uygulama.py` — FastAPI uygulaması, CORS, router bağlama
+- `uygulama.py` — FastAPI uygulaması, CORS, health/readiness, router bağlama
+- `altyapi.py` — Request ID, tipli hata, structured log, gövde/write limitleri
 - `semalar.py` — İstek/cevap Pydantic. `veritabani/modeller.py` (saklama) ile
   bilinçli ayrı: biri nasıl durduğu, diğeri dışarıya nasıl göründüğü
 - `yerler_router.py` — Şehir, keşif listesi, yer detay, bölgeler
-- `rotalar_router.py` — Rota üretme / getirme / alternatifler / bölge önerisi /
-  sabit rotalar
+- `rotalar_router.py` — Tek günlük public üretim ve tarihsel read-only uçlar
 
 Site tipleri `site/src/lib/types.ts` bu şemalarla hizalı tutulur.
 
-## Uç noktalar (9 genel)
+## Kamusal uç noktalar
 
 `plan/00_brief_eki.md` §4: API ayakta. Aşağıdaki tablo brif §8 / kod ile aynıdır.
 
@@ -39,50 +41,36 @@ Site tipleri `site/src/lib/types.ts` bu şemalarla hizalı tutulur.
 |---|---|---|
 | GET | `/sehirler` | Aktif şehirler |
 | GET | `/sehirler/{sehir_anahtari}/yerler` | `{ yerler, toplam_sayi }`. `limit` / `offset`. Varsayılan `sadece_kesif=true` |
-| GET | `/sehirler/{sehir_anahtari}/bolgeler` | Şehir merkezi + ilçe duygu profilleri |
-| GET | `/yerler/{yer_id}` | Detay: profil, duygu özeti, örnek ifadeler |
-| POST | `/rotalar/olustur` | Tek rota (Senaryo 1 veya eski Senaryo 2) |
-| POST | `/rotalar/olustur-alternatifler` | 2–3 alternatif; otel dayatma yok (sitenin Senaryo 2’si) |
-| POST | `/rotalar/{rota_id}/konaklama-bolgesi-oner` | Seçilen rotaya baskın ilçe + gerekçe + örnek tesis |
-| GET | `/rotalar/{rota_id}` | Kayıtlı, paylaşılabilir rota |
-| GET | `/sabit-rotalar` | Elle küratör rotalar (`bolge` filtresi opsiyonel) |
+| GET | `/sehirler/{sehir_anahtari}/bolgeler` | Şehir merkezi + ilçe tanıtımları |
+| GET | `/yerler/{yer_id}` | Allow-list yer detayı; iç analiz alanı yok |
+| POST | `/v1/gunluk-planlar` | Tek günlük plan; `Idempotency-Key` zorunlu |
+| GET | `/health` | Süreç liveness |
+| GET | `/readiness` | PostgreSQL + PostGIS readiness |
 
-Şemada gizli: `GET /` (sağlık mesajı), `GET /sehirler-tanimli` (`include_in_schema=false`).
+Şemada gizli tarihsel uçlar yeni kayıt üretmez. Eski çok günlük ve konaklama
+POST uçları kontrollü `410 Gone` döndürür; eski kayıtlar silinmez.
 
 ### Keşif vitrini
 
 `sadece_kesif=true` (site varsayılanı, `sorgular.py`):
 
 - Konaklama gizlenir
-- Yeme-içme yalnız `sehrin_klasigi` / `sponsorlu_mekan` / `kahvalti_verir`
+- Yeme-içme yalnız `sehrin_klasigi` / `kahvalti_verir`
   **veya** duygu ≥ 80/100 (skor ≥ 0.6)
 - Gezilecek yer serbest
 
-Rota motoru `sadece_kesif=false` ile kısıtsız çeker. Ham yorum metni ve
-yorumcu adı dönülmez; `ornek_ifade` kısa ve anonim kalır.
+Rota motoru `sadece_kesif=false` ile kısıtsız çeker. Sponsor bayrağı adaylık,
+sıra veya skoru değiştirmez; yalnız `ticari_bildirim` olarak açıklanabilir.
+Public DTO; yorum/yazar, örnek ifade, duygu/puan, yorum hacmi, profil ve skor
+kırılımı alanlarını hiçbir JSON seviyesinde taşımaz.
 
-### Rota senaryoları
+### Tek günlük rota
 
-**Senaryo 1 — konaklama belli:** `konaklama_yer_id` veya `konaklama_enlem` +
-`konaklama_boylam` veya `konaklama_bolge_adi` (ilçe merkezi
-`sehir_ayarlari.ilce_merkezleri`). `POST /rotalar/olustur`.
-
-**Senaryo 2 — belli değil (sitenin kullandığı akış):**
-
-1. `POST /rotalar/olustur-alternatifler` → “Dengeli keşif” / “Tarih & kültür” /
-   “Doğa & manzara” benzeri alternatifler
-2. Kullanıcı birini seçer
-3. `POST /rotalar/{id}/konaklama-bolgesi-oner` → bölge önerisi (otel zorunlu değil)
-
-Eski `POST /rotalar/olustur` konaklama yoksa hâlâ otel önerir (geriye uyumluluk).
-
-Örnek gövde (Senaryo 1):
+Örnek gövde:
 
 ```json
 {
   "sehir_anahtari": "samsun",
-  "gun_sayisi": 2,
-  "konaklama_yer_id": "<konaklama yer uuid>",
   "tercihler": {
     "ilgi_agirliklari": { "tarihi_kulturel_puani": 0.7, "doga_macera_puani": 0.3 },
     "aktiviteler": ["yuzme"],
@@ -93,5 +81,6 @@ Eski `POST /rotalar/olustur` konaklama yoksa hâlâ otel önerir (geriye uyumlul
 }
 ```
 
-Cevaptaki her durağın `kirilim` alanı skor bileşenlerini açıklar (kara kutu yok).
-Sonuç `kullanici_rotalari` tablosuna yazılır; commit API katmanındadır.
+`gun_sayisi`, konaklama ve alternatif sayısı extra-field doğrulamasıyla
+reddedilir. İç motor kırılımı veritabanında korunabilir ama public cevaba
+çıkmaz. Sonuç `kullanici_rotalari` tablosuna tek gün olarak yazılır.

@@ -25,21 +25,13 @@ export type YerOzet = {
   ilce: string | null;
   enlem: number;
   boylam: number;
-  kaynakta_puan_ortalamasi: number | null;
-  duygu_skoru_ortalama: number | null;
   kapak_fotografi_url: string | null;
+  ticari_bildirim: "sponsorlu" | null;
 };
 
 export type YerListeCevabi = {
   yerler: YerOzet[];
   toplam_sayi: number;
-};
-
-export type OrnekYorum = {
-  yazar_takma_adi: string | null;
-  yorum_metni: string;
-  kaynakta_puan: number | null;
-  duygu_etiketi: string | null;
 };
 
 export type YerDetay = YerOzet & {
@@ -48,27 +40,13 @@ export type YerDetay = YerOzet & {
   tanitim_metni: string | null;
   telefon: string | null;
   web_sitesi: string | null;
-  ozellikler: Record<string, unknown>;
   aktiviteler: string[];
   fotograf_urlleri: string[];
-  deneyim_puanlari: Record<string, number>;
-  yer_profili: Record<string, unknown>;
-  duygu_ozeti: string | null;
-  ornek_yorumlar: OrnekYorum[];
 };
 
 export type BolgeProfili = {
   bolge_adi: string;
   ilce_mi: boolean;
-  genel_duygu_skoru: number | null;
-  genel_duygu_etiketi: string | null;
-  on_plana_cikan_konular: Array<{
-    konu?: string;
-    duygu_etiketi?: string;
-    bahsedilme_sayisi?: number;
-  }>;
-  kullanilan_yorum_sayisi: number;
-  duygu_ozeti: string | null;
   tanitim_metni: string | null;
   enlem?: number | null;
   boylam?: number | null;
@@ -82,28 +60,40 @@ export type RotaTercihleri = {
   sakin_tercih_et?: boolean;
 };
 
-export type RotaTalebi = {
+export type GunlukPlanTalebi = {
   sehir_anahtari: string;
+  tercihler?: RotaTercihleri;
+};
+
+export type GunlukPlanDuragi = {
+  yer: YerOzet;
+  sira: number;
+  onceki_duraktan_mesafe_metre: number;
+  tahmini_ziyaret_suresi_dk: number;
+};
+
+export type GunlukPlanCevap = {
+  id: string;
+  sehir_anahtari: string;
+  duraklar: GunlukPlanDuragi[];
+  toplam_mesafe_metre: number;
+  toplam_sure_dakikasi: number;
+  rota_tavsiyesi?: string | null;
+};
+
+/** Tarihsel rota kayitlarini okumak icin korunan, public akista kullanilmayan tipler. */
+export type RotaTalebi = GunlukPlanTalebi & {
   gun_sayisi: number;
   konaklama_yer_id?: string | null;
   konaklama_enlem?: number | null;
   konaklama_boylam?: number | null;
   konaklama_bolge_adi?: string | null;
   alternatif_sayisi?: number;
-  tercihler?: RotaTercihleri;
-};
-
-export type RotaDuragi = {
-  yer: YerOzet;
-  sira: number;
-  onceki_duraktan_mesafe_metre: number;
-  tahmini_ziyaret_suresi_dk: number;
-  skor_kirilimi: Record<string, number>;
 };
 
 export type GunPlani = {
   gun_no: number;
-  duraklar: RotaDuragi[];
+  duraklar: GunlukPlanDuragi[];
   toplam_mesafe_metre: number;
   toplam_sure_dakikasi: number;
 };
@@ -130,3 +120,15 @@ export type RotaCevap = {
 export type AlternatifRotalarCevap = {
   alternatifler: RotaCevap[];
 };
+
+export type ApiHataZarfi = {
+  hata: {
+    kod: string;
+    mesaj: string;
+    durum: "empty" | "insufficient" | "unavailable" | "error";
+    request_id: string;
+  };
+};
+
+export type VeriDurumu =
+  "loading" | "empty" | "insufficient" | "unavailable" | "error" | "ready";

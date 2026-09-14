@@ -2,9 +2,9 @@ import { Suspense } from "react";
 import ScrollHero from "@/components/hero/ScrollHero";
 import { HaritaBolum } from "@/components/harita/HaritaBolum";
 import { BolumBasligi } from "@/components/ui/BolumBasligi";
+import { BosDurum } from "@/components/ui/BosDurum";
 import { KesilenAyrac } from "@/components/ui/KesilenAyrac";
 import { Dugme } from "@/components/ui/Dugme";
-import { DuyguOzeti } from "@/components/ui/DuyguOzeti";
 import { IlceIndeksi } from "@/components/ui/IlceIndeksi";
 import { IstatistikBandi } from "@/components/ui/IstatistikBandi";
 import { Plaka } from "@/components/ui/Plaka";
@@ -12,10 +12,15 @@ import { SehirKarti } from "@/components/ui/SehirKarti";
 import { Reveal, RevealListe, RevealOge } from "@/components/hareket/Reveal";
 import { Manyetik } from "@/components/hareket/Manyetik";
 import { LogoKaro } from "@/components/marka/LogoKaro";
-import { CTA_BIRINCIL, DUYGU_KUNYE, GUVEN_CUMLESI, TANIM_CUMLESI } from "@/lib/marka";
+import { CTA_BIRINCIL, GUVEN_CUMLESI, TANIM_CUMLESI } from "@/lib/marka";
 import { haritaIsaretleriniKur, haritaMerkeziniBul } from "@/lib/harita";
-import { bolgeleriGetir, istatistikleriGetir, sehirleriGetir } from "@/lib/api";
-import { DENEYIM_EKSENLERI, duyguEtiketi } from "@/lib/sabitler";
+import {
+  apiDurumu,
+  bolgeleriGetir,
+  istatistikleriGetir,
+  sehirleriGetir,
+} from "@/lib/api";
+import { DENEYIM_EKSENLERI } from "@/lib/sabitler";
 import type { BolgeProfili } from "@/lib/types";
 
 /** yon.md 4.2 (3) — "ne yapar?" uc karti; plakalar atmosfer, yer fotografi degil. */
@@ -31,38 +36,26 @@ const YOLLAR = [
   {
     anahtar: "bolge",
     baslik: "Hangi bölge sana göre?",
-    metin: "İlçelerin tanıtımı ile ziyaretçi izlenimi yan yana; konaklama üssünü seç.",
+    metin: "İlçelerin temel tanıtımlarını oku; şehri bölge bölge keşfet.",
     href: (s: string) => `/sehir/${s}/bolgeler`,
     cta: "Bölgeyi tanı",
   },
   {
     anahtar: "rota",
-    baslik: "Kaç günün var?",
-    metin: "Gün gün planı kur; her durağın gerekçesi skor kırılımında açık durur.",
+    baslik: "Bugün ne yapmak istersin?",
+    metin: "İlgi alanlarını seç; tek günlük Akıllı Rota planını oluştur.",
     href: (s: string) => `/sehir/${s}/rota`,
     cta: CTA_BIRINCIL,
   },
 ] as const;
 
-/** Ilce ozeti tercih; yoksa sehir ozeti. Siralama degil tek gecis (7.12). */
+/** Tanitimi olan ilk ilce; yoksa sehir geneli. Yorum hacmi siralama sinyali degildir. */
 function teaserBolgesi(bolgeler: BolgeProfili[]): BolgeProfili | null {
-  let secilen: BolgeProfili | null = null;
-  for (const b of bolgeler) {
-    if (!b.duygu_ozeti) continue;
-    if (!secilen) {
-      secilen = b;
-      continue;
-    }
-    const adayIlce = b.ilce_mi && !secilen.ilce_mi;
-    const ayniSinif = b.ilce_mi === secilen.ilce_mi;
-    if (
-      adayIlce ||
-      (ayniSinif && b.kullanilan_yorum_sayisi > secilen.kullanilan_yorum_sayisi)
-    ) {
-      secilen = b;
-    }
-  }
-  return secilen;
+  return (
+    bolgeler.find((bolge) => bolge.ilce_mi && bolge.tanitim_metni) ??
+    bolgeler.find((bolge) => bolge.tanitim_metni) ??
+    null
+  );
 }
 
 export default function AnaSayfa() {
@@ -87,13 +80,25 @@ function AnaSayfaIskel() {
 async function AnaSayfaGovde() {
   // Sehir anahtari veriden gelir (sehir bagimsizligi); bagimli istekler
   // zincirlenir, bagimsiz olanlar ayni turda cozulur.
-  const sehirlerSozu = sehirleriGetir().catch(() => []);
-  const anahtarSozu = sehirlerSozu.then((l) => l[0]?.anahtar ?? "samsun");
-  const [sehirler, istatistik, bolgeler] = await Promise.all([
-    sehirlerSozu,
-    anahtarSozu.then(istatistikleriGetir).catch(() => null),
-    anahtarSozu.then(bolgeleriGetir).catch((): BolgeProfili[] => []),
-  ]);
+  let sehirler;
+  let istatistik;
+  let bolgeler: BolgeProfili[];
+  try {
+    sehirler = await sehirleriGetir();
+    const anahtar = sehirler[0]?.anahtar ?? "samsun";
+    [istatistik, bolgeler] = await Promise.all([
+      istatistikleriGetir(anahtar),
+      bolgeleriGetir(anahtar),
+    ]);
+  } catch (hata) {
+    return (
+      <section className="bg-kagit bolum">
+        <div className="kabuk">
+          <BosDurum tip={apiDurumu(hata)} />
+        </div>
+      </section>
+    );
+  }
 
   const sehir = sehirler[0];
   const sehirIsim = sehir?.isim ?? "Samsun";
@@ -142,7 +147,7 @@ async function AnaSayfaGovde() {
                   {
                     deger: istatistik.bolge_profili_sayisi,
                     etiket: "Bölge profili",
-                    baglam: "Yorumlardan derlendi",
+                    baglam: "Tanıtımı hazırlanan bölgeler",
                   },
                 ]}
               />
@@ -162,7 +167,7 @@ async function AnaSayfaGovde() {
             <BolumBasligi
               etiket="Ne yapar?"
               baslik="Şehri üç yoldan oku"
-              ozet="Keşif listesi, ilçe profilleri ve gün gün rota — üçü de aynı skor dilini konuşur."
+              ozet="Keşif listesi, ilçe tanıtımları ve tek günlük Akıllı Rota aynı şehir bağlamında çalışır."
             />
           </Reveal>
           <RevealListe className="mt-12 grid gap-5 md:grid-cols-3">
@@ -216,7 +221,7 @@ async function AnaSayfaGovde() {
                 anahtar={sehirAnahtar}
                 yerSayisi={istatistik?.yer_sayisi}
                 ilceSayisi={istatistik?.ilce_sayisi}
-                ozet={`${sehirIsim} ilk çıkış noktamız. Gezilecek yerler işaretli, ilçeler profillendi, rota gün gün kuruluyor.`}
+                ozet={`${sehirIsim} ilk çıkış noktamız. Gezilecek yerler işaretli, ilçeler tanıtılıyor, rota tek gün için kuruluyor.`}
                 plakaYerine={<IlceIndeksi ilceler={ilceler} />}
               />
               <div className="mt-6">
@@ -233,30 +238,30 @@ async function AnaSayfaGovde() {
         </div>
       </section>
 
-      {/* 5 — Duygu teaser'i: kara kutu yok, ozet + hangi eksenlerden okundugu. */}
+      {/* 5 — Kamusal bolge tanitimi; ic yorum/duygu turevleri tarayiciya gitmez. */}
       <section className="bg-kagit bolum">
         <div className="kabuk">
           <KesilenAyrac className="mb-16" />
           <Reveal>
             <BolumBasligi
-              etiket="Nasıl bilir?"
-              baslik="Yorumları biz okuduk"
-              ozet={`Puanın yanında bir de izlenim var: ${DUYGU_KUNYE}, şablonla yazıldı, kırılımı açık.`}
+              etiket="Bölgeyi tanı"
+              baslik="Şehri ilçeleriyle oku"
+              ozet="Kamusal yüzey yalnız temel tanıtım bilgisini gösterir."
             />
           </Reveal>
           <div className="mt-12 grid gap-6 lg:grid-cols-12">
             <Reveal className="lg:col-span-7">
-              {teaser?.duygu_ozeti ? (
-                <DuyguOzeti
-                  metin={teaser.duygu_ozeti}
-                  etiket={`${teaser.bolge_adi} · ${duyguEtiketi(teaser.genel_duygu_etiketi)}`}
-                />
+              {teaser?.tanitim_metni ? (
+                <blockquote className="bg-bordo-900 text-kagit rounded-[12px] px-6 py-6">
+                  <p className="etiket text-kagit/55">{teaser.bolge_adi}</p>
+                  <p className="yazi-govde text-kagit/85 mt-4">{teaser.tanitim_metni}</p>
+                </blockquote>
               ) : (
                 <blockquote className="bg-bordo-900 text-kagit rounded-[12px] px-6 py-6">
-                  <p className="etiket text-kagit/55">{DUYGU_KUNYE}</p>
+                  <p className="etiket text-kagit/55">Bölge tanıtımı</p>
                   <p className="yazi-govde text-kagit/85 mt-4">
-                    Bölge özetleri hazırlanıyor. Yorumlar işlendikçe burada ilçe ilçe
-                    izlenim çıkacak.
+                    Bölge tanıtımları hazırlanıyor. Yayınlandıkça burada ilçe ilçe temel
+                    bilgi yer alacak.
                   </p>
                 </blockquote>
               )}
@@ -272,7 +277,7 @@ async function AnaSayfaGovde() {
                     >
                       <span>{e.etiket}</span>
                       <span className="text-ink/40 text-[11px] tracking-[0.24em] uppercase">
-                        0–10
+                        İlgi alanı
                       </span>
                     </li>
                   ))}
@@ -296,7 +301,7 @@ async function AnaSayfaGovde() {
             <p className="etiket text-kagit/50 mt-5">Son işaret</p>
             <h2 className="yazi-bolum mt-4">Rotanı kur, şehri oku.</h2>
             <p className="yazi-govde text-kagit/75 mx-auto mt-4 max-w-lg">
-              Kaç günün var ve ne arıyorsun — gerisini skor kırılımı taşır.
+              Bugün ne aradığını seç; tek günlük planını oluştur.
             </p>
             <div className="mt-8 flex justify-center">
               <Manyetik>

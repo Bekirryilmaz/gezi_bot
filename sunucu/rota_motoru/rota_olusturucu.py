@@ -346,6 +346,27 @@ def _en_iyi_konaklamayi_bul(oturum: Session, sehir_id: str, merkez_nokta: tuple[
     return en_yakinlar[0]
 
 
+def gunluk_rota_olustur(
+    oturum: Session,
+    sehir_id: str,
+    tercihler: RotaTercihleri,
+) -> RotaSonucu:
+    """MVP icin konaklama karari uretmeden tam bir gunluk rota olusturur.
+
+    Merkez, organik aday havuzunun agirlik merkezidir. Tarihsel cok gunlu
+    fonksiyonlar veri uyumlulugu icin korunur; kamusal olusturma akisi bu
+    tek-gun sinirindan gecmek zorundadir.
+    """
+    gezilecek_adaylar = _adaylari_getir(oturum, sehir_id, AnaKategori.GEZILECEK_YER)
+    if not gezilecek_adaylar:
+        raise RotaOlusturulamadiHatasi("Bu sehir icin veritabaninda gezilecek yer bulunamadi.")
+
+    havuz_boyutu = _HEDEF_GUNLUK_DURAK_SAYISI * _ADAY_HAVUZU_CARPANI
+    en_iyi_adaylar = _en_iyi_n_adayi_sec(gezilecek_adaylar, tercihler, havuz_boyutu)
+    merkez = agirlik_merkezi_hesapla([sonuc.yer for sonuc in en_iyi_adaylar])
+    return senaryo_1_rota_olustur(oturum, sehir_id, merkez, 1, tercihler)
+
+
 def senaryo_2_rota_olustur(
     oturum: Session,
     sehir_id: str,

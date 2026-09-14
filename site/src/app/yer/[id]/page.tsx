@@ -2,11 +2,9 @@ import Link from "next/link";
 import { SayfaHero } from "@/components/layout/SayfaHero";
 import { BosDurum } from "@/components/ui/BosDurum";
 import { Dugme } from "@/components/ui/Dugme";
-import { DuyguOzeti } from "@/components/ui/DuyguOzeti";
 import { Plaka } from "@/components/ui/Plaka";
 import { Rozet } from "@/components/ui/Rozet";
-import { SkorKirilim } from "@/components/ui/SkorKirilim";
-import { yerDetayiGetir } from "@/lib/api";
+import { apiDurumu, yerDetayiGetir } from "@/lib/api";
 import { altKategoriEtiketi, kategoriEtiketi } from "@/lib/sabitler";
 
 type Props = {
@@ -20,7 +18,8 @@ export async function generateMetadata({ params }: Props) {
     return {
       title: yer.isim,
       description:
-        yer.duygu_ozeti?.slice(0, 155) ||
+        yer.tanitim_metni?.slice(0, 155) ||
+        yer.aciklama?.slice(0, 155) ||
         `${yer.isim} — ${kategoriEtiketi(yer.ana_kategori)}. Şamandıra gezilecek yerler rehberi.`,
     };
   } catch {
@@ -38,25 +37,24 @@ export default async function YerDetaySayfasi({ params }: Props) {
   let yer;
   try {
     yer = await yerDetayiGetir(id);
-  } catch {
+  } catch (hata) {
     return (
       <main className="bg-kagit px-5 pt-28 pb-16">
         <div className="kabuk">
           <BosDurum
-            tip="hata"
-            baslik="Yer bulunamadı"
-            metin="Pusula şaştı — keşfe dönüp başka bir işaret seçebilirsin."
+            tip={apiDurumu(hata)}
+            baslik={apiDurumu(hata) === "empty" ? "Yer bulunamadı" : undefined}
+            metin={
+              apiDurumu(hata) === "empty"
+                ? "Keşfe dönüp başka bir işaret seçebilirsin."
+                : undefined
+            }
             cta={{ href: "/sehir/samsun", etiket: "Keşfe dön" }}
           />
         </div>
       </main>
     );
   }
-
-  const profil = yer.yer_profili as {
-    fiyat_algisi?: { deger?: string };
-    ulasim_kolayligi?: { deger?: string };
-  };
 
   const tanitim = yer.tanitim_metni || yer.aciklama || null;
 
@@ -65,7 +63,7 @@ export default async function YerDetaySayfasi({ params }: Props) {
       <SayfaHero
         etiket={[kategoriEtiketi(yer.ana_kategori), yer.ilce].filter(Boolean).join(" · ")}
         baslik={yer.isim}
-        ozet={`${altKategoriEtiketi(yer.alt_kategori)} — skorlar türetilmiş metrik; ham yorum metni yok.`}
+        ozet={`${altKategoriEtiketi(yer.alt_kategori)} — temel yer bilgileri ve tanıtım.`}
       />
 
       <div className="kabuk grid gap-12 py-12 md:grid-cols-[1.4fr_1fr]">
@@ -84,57 +82,13 @@ export default async function YerDetaySayfasi({ params }: Props) {
               <p className="text-ink/55 mt-4">Bu yer için henüz yeterli izlenim yok.</p>
             )}
           </section>
-
-          <section>
-            <h2 className="yazi-alt text-bordo">Kullanıcı deneyimleri</h2>
-            {yer.duygu_ozeti ? (
-              <DuyguOzeti className="mt-4" metin={yer.duygu_ozeti} />
-            ) : (
-              <p className="text-ink/55 mt-4">
-                Bu yer için henüz kullanıcı deneyimi özeti oluşturulmadı.
-              </p>
-            )}
-          </section>
-
-          {Object.keys(yer.deneyim_puanlari ?? {}).length > 0 ? (
-            <section>
-              <h2 className="yazi-alt text-bordo">Skor kırılımı</h2>
-              <p className="text-ink/55 mt-2 text-sm">
-                Her önerinin nedeni açık: eksenler ayrı puanlanır.
-              </p>
-              <div className="mt-5 max-w-md">
-                <SkorKirilim kirilim={yer.deneyim_puanlari} />
-              </div>
-            </section>
-          ) : null}
         </div>
 
         <aside className="yazi-indeks space-y-6">
-          {yer.kaynakta_puan_ortalamasi != null && (
-            <div>
-              <p className="etiket text-ink/45">Puan</p>
-              <p className="yazi-sayi text-bordo mt-1 text-4xl">
-                {yer.kaynakta_puan_ortalamasi.toFixed(1)}
-              </p>
-            </div>
-          )}
+          {yer.ticari_bildirim === "sponsorlu" ? (
+            <Rozet tur="sponsorlu">Sponsorlu</Rozet>
+          ) : null}
           <Rozet tur="kategori">{kategoriEtiketi(yer.ana_kategori)}</Rozet>
-          {profil.fiyat_algisi?.deger &&
-            profil.fiyat_algisi.deger !== "bilgi_yetersiz" && (
-              <div>
-                <p className="text-ink/45">Fiyat algısı</p>
-                <p className="text-ink mt-1 capitalize">{profil.fiyat_algisi.deger}</p>
-              </div>
-            )}
-          {profil.ulasim_kolayligi?.deger &&
-            profil.ulasim_kolayligi.deger !== "bilgi_yetersiz" && (
-              <div>
-                <p className="text-ink/45">Ulaşım</p>
-                <p className="text-ink mt-1 capitalize">
-                  {profil.ulasim_kolayligi.deger}
-                </p>
-              </div>
-            )}
           {yer.adres && (
             <div>
               <p className="text-ink/45">Adres</p>
@@ -165,11 +119,8 @@ export default async function YerDetaySayfasi({ params }: Props) {
           >
             Haritada aç
           </a>
-          <Dugme
-            href={`/sehir/samsun/rota?konaklama_yer_id=${yer.id}`}
-            varyant="birincil"
-          >
-            Burayı konaklama üssü yap
+          <Dugme href="/sehir/samsun/rota" varyant="birincil">
+            Bugünün rotasını kur
           </Dugme>
           <Link
             href="/sehir/samsun"

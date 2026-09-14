@@ -34,7 +34,7 @@ export function haritaIsaretleriniKur(
   for (const b of bolgeler) {
     if (!b.ilce_mi) continue;
     if (b.enlem == null || b.boylam == null) continue;
-    const ozet = b.duygu_ozeti ?? b.tanitim_metni;
+    const ozet = b.tanitim_metni;
     liste.push({
       id: b.bolge_adi,
       ad: b.bolge_adi,

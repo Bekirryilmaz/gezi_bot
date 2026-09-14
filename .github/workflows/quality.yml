@@ -1,0 +1,65 @@
+name: quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: gezi_ci
+          POSTGRES_PASSWORD: gezi_ci_password
+          POSTGRES_DB: gezi_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U gezi_ci -d gezi_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      VERITABANI_URL: postgresql+psycopg://gezi_ci:gezi_ci_password@localhost:5432/gezi_ci
+      UYGULAMA_ORTAMI: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -r sunucu/requirements.txt
+      - name: Bos CI veritabanini head'e getir
+        working-directory: sunucu
+        run: python -m alembic upgrade head
+      - name: Migration/model baseline
+        run: python -m sunucu.veritabani.sema_baseline
+      - name: Backend tests
+        run: python -m pytest
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - name: Frontend tests (test dosyasi yoksa basarisiz)
+        run: npm run test
+      - name: Playwright Chromium kur
+        run: npx playwright install --with-deps chromium
+      - name: Public gunluk rota smoke
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8125
+        run: npm run e2e

@@ -9,10 +9,24 @@ degistirmek digerini kirmasin diye ayrilir.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from typing import Literal
 
-from ortak.sabitler import Aktivite, DeneyimEksen
+from pydantic import BaseModel, ConfigDict, Field
+
+from ortak.sabitler import Aktivite, DeneyimEksen, OzelEtiket
 from sunucu.veritabani.modeller import BolgeProfili, SabitRota, Sehir, Yer
+
+
+class ApiHataDetayi(BaseModel):
+    kod: str
+    mesaj: str
+    durum: Literal["empty", "insufficient", "unavailable", "error"]
+    request_id: str
+    ayrintilar: list[dict[str, str]] | None = None
+
+
+class ApiHataCevabi(BaseModel):
+    hata: ApiHataDetayi
 
 
 class SehirCevap(BaseModel):
@@ -50,8 +64,12 @@ class SehirIstatistikleri(BaseModel):
 
 
 class YerOzet(BaseModel):
-    """Liste gorunumlerinde (yer listeleme, rota duraklari) kullanilan
-    kisa yer bilgisi."""
+    """Kamusal yer ozeti.
+
+    Bu allow-list ham puan, duygu ve ic karar alanlarini bilerek tasimaz.
+    SQLAlchemy modeli veya ic analiz DTO'su response_model olarak
+    kullanilmamalidir.
+    """
 
     id: str
     isim: str
@@ -60,9 +78,8 @@ class YerOzet(BaseModel):
     ilce: str | None = None
     enlem: float
     boylam: float
-    kaynakta_puan_ortalamasi: float | None = None
-    duygu_skoru_ortalama: float | None = None
     kapak_fotografi_url: str | None = None
+    ticari_bildirim: str | None = None
 
     @classmethod
     def yerden_olustur(cls, yer: Yer, enlem: float, boylam: float) -> "YerOzet":
@@ -74,9 +91,12 @@ class YerOzet(BaseModel):
             ilce=yer.ilce,
             enlem=enlem,
             boylam=boylam,
-            kaynakta_puan_ortalamasi=yer.kaynakta_puan_ortalamasi,
-            duygu_skoru_ortalama=yer.duygu_skoru_ortalama,
             kapak_fotografi_url=yer.fotograf_urlleri[0] if yer.fotograf_urlleri else None,
+            ticari_bildirim=(
+                "sponsorlu"
+                if yer.ozellikler.get(OzelEtiket.SPONSORLU_MEKAN.value) in (True, "true", "evet", "1", 1)
+                else None
+            ),
         )
 
 
@@ -87,32 +107,39 @@ class YerListeCevabi(BaseModel):
     toplam_sayi: int
 
 
-class OrnekYorum(BaseModel):
+class IcOrnekYorum(BaseModel):
+    """Yalniz ic/admin kullanim icin ham yorum DTO'su; public router'a baglanmaz."""
+
     yazar_takma_adi: str | None = None
     yorum_metni: str
     kaynakta_puan: float | None = None
     duygu_etiketi: str | None = None
 
 
+class IcYerAnalizi(BaseModel):
+    """Veritabaninda korunan, kamusal sozlesmeye girmeyen analiz alanlari."""
+
+    kaynakta_puan_ortalamasi: float | None = None
+    duygu_skoru_ortalama: float | None = None
+    deneyim_puanlari: dict[str, int] = Field(default_factory=dict)
+    yer_profili: dict = Field(default_factory=dict)
+    duygu_ozeti: str | None = None
+    ornek_yorumlar: list[IcOrnekYorum] = Field(default_factory=list)
+
+
 class YerDetay(YerOzet):
-    """Yer detay sayfasinda gosterilen tam bilgi -- yer profili ve
-    duygu ozeti dahil (bkz. dokumanlar/kategori_taksonomisi.md #6)."""
+    """Kamusal yer detayi; yalniz acikca izin verilen olgusal alanlar."""
 
     adres: str | None = None
     aciklama: str | None = None
     tanitim_metni: str | None = None
     telefon: str | None = None
     web_sitesi: str | None = None
-    ozellikler: dict = Field(default_factory=dict)
     aktiviteler: list[str] = Field(default_factory=list)
     fotograf_urlleri: list[str] = Field(default_factory=list)
-    deneyim_puanlari: dict[str, int] = Field(default_factory=dict)
-    yer_profili: dict = Field(default_factory=dict)
-    duygu_ozeti: str | None = None
-    ornek_yorumlar: list[OrnekYorum] = Field(default_factory=list)
 
     @classmethod
-    def yerden_olustur(cls, yer: Yer, enlem: float, boylam: float, ornek_yorumlar: list[OrnekYorum]) -> "YerDetay":
+    def yerden_olustur(cls, yer: Yer, enlem: float, boylam: float) -> "YerDetay":
         return cls(
             id=yer.id,
             isim=yer.isim,
@@ -121,37 +148,27 @@ class YerDetay(YerOzet):
             ilce=yer.ilce,
             enlem=enlem,
             boylam=boylam,
-            kaynakta_puan_ortalamasi=yer.kaynakta_puan_ortalamasi,
-            duygu_skoru_ortalama=yer.duygu_skoru_ortalama,
             kapak_fotografi_url=yer.fotograf_urlleri[0] if yer.fotograf_urlleri else None,
+            ticari_bildirim=(
+                "sponsorlu"
+                if yer.ozellikler.get(OzelEtiket.SPONSORLU_MEKAN.value) in (True, "true", "evet", "1", 1)
+                else None
+            ),
             adres=yer.adres,
             aciklama=yer.aciklama,
             tanitim_metni=getattr(yer, "tanitim_metni", None),
             telefon=yer.telefon,
             web_sitesi=yer.web_sitesi,
-            ozellikler=yer.ozellikler,
             aktiviteler=yer.aktiviteler,
             fotograf_urlleri=yer.fotograf_urlleri,
-            deneyim_puanlari=yer.deneyim_puanlari,
-            yer_profili=yer.yer_profili,
-            duygu_ozeti=yer.duygu_ozeti,
-            ornek_yorumlar=ornek_yorumlar,
         )
 
 
 class BolgeProfiliCevap(BaseModel):
-    """Bir bolgenin (sehir merkezi veya bir ilce) tanitim duygu profili --
-    veri/ortak/bolge_profili_modeli.py::BolgeProfili ile eslesir. Sehir
-    secim/tanitim ekranlarinda 'Burasi nasil bir yer?' sorusuna cevap
-    vermek icin kullanilir (bkz. dokumanlar/kategori_taksonomisi.md #6)."""
+    """Kamusal bolge tanitimi; yorum ve duygu turevlerini tasimaz."""
 
     bolge_adi: str
     ilce_mi: bool
-    genel_duygu_skoru: float | None = None
-    genel_duygu_etiketi: str | None = None
-    on_plana_cikan_konular: list[dict] = Field(default_factory=list)
-    kullanilan_yorum_sayisi: int
-    duygu_ozeti: str | None = None
     tanitim_metni: str | None = None
     # sehir_ayarlari.ilce_merkezleri — kolon yok, K6 veri katmani (poligon sonra).
     enlem: float | None = None
@@ -171,11 +188,6 @@ class BolgeProfiliCevap(BaseModel):
         return cls(
             bolge_adi=bolge_profili.bolge_adi,
             ilce_mi=bolge_profili.ilce_mi,
-            genel_duygu_skoru=bolge_profili.genel_duygu_skoru,
-            genel_duygu_etiketi=bolge_profili.genel_duygu_etiketi,
-            on_plana_cikan_konular=bolge_profili.on_plana_cikan_konular,
-            kullanilan_yorum_sayisi=bolge_profili.kullanilan_yorum_sayisi,
-            duygu_ozeti=bolge_profili.duygu_ozeti,
             tanitim_metni=getattr(bolge_profili, "tanitim_metni", None),
             enlem=merkez[0] if merkez else None,
             boylam=merkez[1] if merkez else None,
@@ -192,7 +204,7 @@ class SabitRotaCevap(BaseModel):
     aciklama: str | None = None
     bolge: str | None = None
     rota_tipi: str | None = None
-    duraklar: list[dict] = Field(default_factory=list)
+    durak_sayisi: int = 0
     kapak_fotografi_url: str | None = None
 
     @classmethod
@@ -203,7 +215,7 @@ class SabitRotaCevap(BaseModel):
             aciklama=sabit_rota.aciklama,
             bolge=sabit_rota.bolge,
             rota_tipi=sabit_rota.rota_tipi,
-            duraklar=sabit_rota.duraklar,
+            durak_sayisi=len(sabit_rota.duraklar or []),
             kapak_fotografi_url=sabit_rota.kapak_fotografi_url,
         )
 
@@ -223,6 +235,8 @@ class RotaTercihleri(BaseModel):
 
 
 class RotaTalebi(BaseModel):
+    """Yalniz kapali legacy endpoint'lerin istek sekli."""
+
     sehir_anahtari: str = Field(..., description="veri/ortak/sehir_ayarlari.py icindeki sehir anahtari, orn. 'samsun'")
     gun_sayisi: int = Field(..., ge=1, le=14)
     konaklama_yer_id: str | None = Field(
@@ -243,9 +257,6 @@ class RotaDuragi(BaseModel):
     sira: int = Field(..., description="Gun icindeki durak sirasi, 1'den baslar")
     onceki_duraktan_mesafe_metre: float
     tahmini_ziyaret_suresi_dk: int
-    skor_kirilimi: dict[str, float] = Field(
-        default_factory=dict, description="Bu duragin nicin secildigini aciklayan puan bilesenleri (seffaflik icin)"
-    )
 
 
 class GunPlani(BaseModel):
@@ -278,3 +289,23 @@ class RotaCevap(BaseModel):
 
 class AlternatifRotalarCevap(BaseModel):
     alternatifler: list[RotaCevap]
+
+
+class GunlukPlanTalebi(BaseModel):
+    """MVP'nin kamusal tek gunluk plan istegi; cok gun ve konaklama alani yoktur."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    sehir_anahtari: str = Field(..., description="Tanimli sehir anahtari, orn. 'samsun'")
+    tercihler: RotaTercihleri = Field(default_factory=RotaTercihleri)
+
+
+class GunlukPlanCevap(BaseModel):
+    """Tek bir gunluk plan aggregate'inin kamusal projection'i."""
+
+    id: str
+    sehir_anahtari: str
+    duraklar: list[RotaDuragi]
+    toplam_mesafe_metre: float
+    toplam_sure_dakikasi: int
+    rota_tavsiyesi: str | None = None

@@ -1,10 +1,8 @@
 import { SayfaHero } from "@/components/layout/SayfaHero";
 import { BosDurum } from "@/components/ui/BosDurum";
 import { Dugme } from "@/components/ui/Dugme";
-import { DuyguOzeti } from "@/components/ui/DuyguOzeti";
 import { Reveal } from "@/components/hareket/Reveal";
-import { bolgeleriGetir, sehirleriGetir } from "@/lib/api";
-import { duyguEtiketi } from "@/lib/sabitler";
+import { apiDurumu, bolgeleriGetir, sehirleriGetir } from "@/lib/api";
 
 type Props = {
   params: Promise<{ anahtar: string }>;
@@ -17,16 +15,19 @@ export async function generateMetadata({ params }: Props) {
   const isim = sehir?.isim ?? anahtar;
   return {
     title: `${isim} bölgeleri`,
-    description: `${isim} ilçe ve bölge profilleri: tanıtım ile ziyaretçi izlenimi yan yana. Konaklama üssü seçip rota kur.`,
+    description: `${isim} ilçe ve bölge tanıtımları; bölgeyi tanı ve tek günlük rota oluştur.`,
   };
 }
 
 export default async function BolgelerSayfasi({ params }: Props) {
   const { anahtar } = await params;
-  const [sehirler, bolgeler] = await Promise.all([
-    sehirleriGetir().catch(() => []),
-    bolgeleriGetir(anahtar).catch(() => []),
+  const [sehirSonucu, bolgeSonucu] = await Promise.allSettled([
+    sehirleriGetir(),
+    bolgeleriGetir(anahtar),
   ]);
+  const sehirler = sehirSonucu.status === "fulfilled" ? sehirSonucu.value : [];
+  const bolgeler = bolgeSonucu.status === "fulfilled" ? bolgeSonucu.value : [];
+  const bolgeHatasi = bolgeSonucu.status === "rejected" ? bolgeSonucu.reason : null;
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
   const isim = sehir?.isim ?? anahtar;
 
@@ -35,11 +36,13 @@ export default async function BolgelerSayfasi({ params }: Props) {
       <SayfaHero
         etiket="Bölgeler"
         baslik={`${isim} ve ilçeleri`}
-        ozet="Önce tanıtım, sonra orada yaşayanların ve gidenlerin ortak izlenimi."
+        ozet="Şehri ve ilçelerini temel tanıtım bilgileriyle keşfet."
       />
 
       <div className="kabuk space-y-10 py-12">
-        {bolgeler.length === 0 ? (
+        {bolgeHatasi ? (
+          <BosDurum tip={apiDurumu(bolgeHatasi)} />
+        ) : bolgeler.length === 0 ? (
           <BosDurum
             tip="hazirlaniyor"
             cta={{ href: `/sehir/${anahtar}`, etiket: "Keşfe dön" }}
@@ -55,11 +58,8 @@ export default async function BolgelerSayfasi({ params }: Props) {
                       {bolge.ilce_mi ? " ilçe" : " şehir geneli"}
                     </span>
                   </h2>
-                  <Dugme
-                    href={`/sehir/${anahtar}/rota?konaklama_bolge=${encodeURIComponent(bolge.bolge_adi)}`}
-                    varyant="bolum"
-                  >
-                    Bu bölgeden rota kur
+                  <Dugme href={`/sehir/${anahtar}/rota`} varyant="bolum">
+                    Bugünün rotasını kur
                   </Dugme>
                 </div>
 
@@ -76,20 +76,6 @@ export default async function BolgelerSayfasi({ params }: Props) {
                   )}
                 </section>
 
-                <section className="mt-8">
-                  <h3 className="etiket text-ink/45">Kullanıcı deneyimleri</h3>
-                  {bolge.duygu_ozeti ? (
-                    <DuyguOzeti
-                      className="mt-3"
-                      metin={bolge.duygu_ozeti}
-                      etiket={duyguEtiketi(bolge.genel_duygu_etiketi)}
-                    />
-                  ) : (
-                    <p className="text-ink/55 mt-2">
-                      Bu bölge için henüz kullanıcı deneyimi özeti yok.
-                    </p>
-                  )}
-                </section>
                 <span className="su-hatti" />
               </article>
             </Reveal>

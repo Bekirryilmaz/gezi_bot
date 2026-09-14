@@ -1,6 +1,9 @@
 import type {
   AlternatifRotalarCevap,
+  ApiHataZarfi,
   BolgeProfili,
+  GunlukPlanCevap,
+  GunlukPlanTalebi,
   RotaCevap,
   RotaTalebi,
   Sehir,
@@ -8,7 +11,21 @@ import type {
   YerDetay,
   YerListeCevabi,
   YerOzet,
+  VeriDurumu,
 } from "./types";
+
+export class ApiHatasi extends Error {
+  constructor(
+    mesaj: string,
+    readonly status: number | null,
+    readonly durum: Exclude<VeriDurumu, "loading" | "ready">,
+    readonly requestId?: string,
+    readonly kod?: string,
+  ) {
+    super(mesaj);
+    this.name = "ApiHatasi";
+  }
+}
 
 function apiKoku(): string {
   // Sunucu tarafinda dogrudan FastAPI'ye git.
@@ -35,6 +52,52 @@ function agHatasiMesaji(hata: unknown): string {
   return metin;
 }
 
+function hataDurumu(status: number): ApiHatasi["durum"] {
+  if (status === 404) return "empty";
+  if (status === 409 || status === 422) return "insufficient";
+  if ([429, 502, 503, 504].includes(status)) return "unavailable";
+  return "error";
+}
+
+async function apiHatasiOlustur(yanit: Response, yol: string): Promise<ApiHatasi> {
+  let govde: ApiHataZarfi | null = null;
+  try {
+    govde = (await yanit.json()) as ApiHataZarfi;
+  } catch {
+    // Sunucu eski/bozuk bir cevap verdiyse de teknik hata bos sonuca donusmez.
+  }
+  const hata = govde?.hata;
+  return new ApiHatasi(
+    hata?.mesaj ?? `API isteği başarısız (${yanit.status}): ${yol}`,
+    yanit.status,
+    hata?.durum ?? hataDurumu(yanit.status),
+    hata?.request_id ?? yanit.headers.get("X-Request-ID") ?? undefined,
+    hata?.kod,
+  );
+}
+
+export function apiDurumu(hata: unknown): Exclude<VeriDurumu, "loading" | "ready"> {
+  return hata instanceof ApiHatasi ? hata.durum : "error";
+}
+
+export function veriDurumuBelirle({
+  yukleniyor,
+  hata,
+  ogeSayisi,
+  yetersiz = false,
+}: {
+  yukleniyor: boolean;
+  hata?: unknown;
+  ogeSayisi?: number;
+  yetersiz?: boolean;
+}): VeriDurumu {
+  if (yukleniyor) return "loading";
+  if (hata) return apiDurumu(hata);
+  if (yetersiz) return "insufficient";
+  if (ogeSayisi === 0) return "empty";
+  return "ready";
+}
+
 async function apiGet<T>(yol: string): Promise<T> {
   let yanit: Response;
   try {
@@ -44,10 +107,10 @@ async function apiGet<T>(yol: string): Promise<T> {
         : { cache: "no-store" }),
     });
   } catch (hata) {
-    throw new Error(agHatasiMesaji(hata));
+    throw new ApiHatasi(agHatasiMesaji(hata), null, "unavailable");
   }
   if (!yanit.ok) {
-    throw new Error(`API hatası (${yanit.status}): ${yol}`);
+    throw await apiHatasiOlustur(yanit, yol);
   }
   return yanit.json() as Promise<T>;
 }
@@ -101,29 +164,40 @@ async function rotaPost<T>(yol: string, govde: unknown): Promise<T> {
   try {
     yanit = await fetch(`${apiKoku()}${yol}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": globalThis.crypto.randomUUID(),
+      },
       body: JSON.stringify(govde),
     });
   } catch (hata) {
-    throw new Error(agHatasiMesaji(hata));
+    throw new ApiHatasi(agHatasiMesaji(hata), null, "unavailable");
   }
   if (!yanit.ok) {
-    const metin = await yanit.text();
-    throw new Error(metin || `İstek başarısız (${yanit.status})`);
+    throw await apiHatasiOlustur(yanit, yol);
   }
   return yanit.json() as Promise<T>;
 }
 
+export async function gunlukPlanOlustur(
+  talep: GunlukPlanTalebi,
+): Promise<GunlukPlanCevap> {
+  return rotaPost<GunlukPlanCevap>("/v1/gunluk-planlar", talep);
+}
+
+/** @deprecated Public UI tek gunluk akisa gecmistir; sunucu bu uclari 410 ile kapatir. */
 export async function rotaOlustur(talep: RotaTalebi): Promise<RotaCevap> {
   return rotaPost<RotaCevap>("/rotalar/olustur", talep);
 }
 
+/** @deprecated Public UI'da alternatif/konaklama devam adimi yoktur. */
 export async function rotaAlternatifleriOlustur(
   talep: RotaTalebi,
 ): Promise<AlternatifRotalarCevap> {
   return rotaPost<AlternatifRotalarCevap>("/rotalar/olustur-alternatifler", talep);
 }
 
+/** @deprecated Tarihsel uyumluluk; public akista cagrilmaz. */
 export async function konaklamaBolgesiOner(rotaId: string): Promise<RotaCevap> {
   return rotaPost<RotaCevap>(`/rotalar/${rotaId}/konaklama-bolgesi-oner`, {});
 }

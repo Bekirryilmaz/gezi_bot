@@ -21,7 +21,6 @@ from sunucu.veritabani.modeller import Yer
 _KESIF_DUYGU_YUZDE_ESIGI = 80.0
 _VITRIN_ETIKETLERI = (
     OzelEtiket.SEHRIN_KLASIGI.value,
-    OzelEtiket.SPONSORLU_MEKAN.value,
     OzelEtiket.KAHVALTI_VERIR.value,
 )
 

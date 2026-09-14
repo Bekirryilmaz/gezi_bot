@@ -26,7 +26,6 @@ _FIYAT_TERCIH_BONUSU = 10.0
 _FIYAT_TERCIH_CEZASI = -10.0
 _SAKINLIK_CEZA_CARPANI = 15.0  # kalabalik zaman dilimi basina, ayrica asagida guvenle carpilir
 _KAYNAK_PUANI_AGIRLIGI = 2.0  # 0-5 arasi kaynak puanini kucuk bir katki olarak dahil eder (esit skorlarda ayirt edici)
-_SPONSORLU_BONUSU = 30.0
 _SEHRIN_KLASIGI_BONUSU = 15.0
 _YOL_YORGUNLUGU_ESIGI = 1.5
 _YOL_YORGUNLUGU_CARPANI = 0.5
@@ -58,18 +57,16 @@ def yer_uygunluk_puani(
     fiyat_katkisi = _fiyat_tercihi_katkisi_hesapla(yer, tercihler, kirilim)
     sakinlik_katkisi = _sakinlik_tercihi_katkisi_hesapla(yer, tercihler, kirilim)
     kalite_katkisi = _kaynak_kalitesi_katkisi_hesapla(yer, kirilim)
-    ticari_katki = _ticari_bonus_hesapla(yer, kirilim)
+    kuratorluk_katkisi = _kuratorluk_bonusu_hesapla(yer, kirilim)
 
-    toplam = deneyim_puani + aktivite_bonusu + fiyat_katkisi + sakinlik_katkisi + kalite_katkisi + ticari_katki
+    toplam = deneyim_puani + aktivite_bonusu + fiyat_katkisi + sakinlik_katkisi + kalite_katkisi + kuratorluk_katkisi
     toplam = _yol_yorgunlugu_uygula(yer, yol_suresi_dk, toplam, kirilim)
     return SkorSonucu(toplam_puan=round(toplam, 2), kirilim=kirilim)
 
 
-def _ticari_bonus_hesapla(yer: AdayYer, kirilim: dict[str, float]) -> float:
+def _kuratorluk_bonusu_hesapla(yer: AdayYer, kirilim: dict[str, float]) -> float:
+    """Yalniz organik kuratorluk sinyalleri; ticari metadata karara girmez."""
     katki = 0.0
-    if yer.ozellik_isaretli(OzelEtiket.SPONSORLU_MEKAN.value):
-        kirilim["sponsorlu_bonusu"] = _SPONSORLU_BONUSU
-        katki += _SPONSORLU_BONUSU
     if yer.ozellik_isaretli(OzelEtiket.SEHRIN_KLASIGI.value):
         kirilim["sehrin_klasigi_bonusu"] = _SEHRIN_KLASIGI_BONUSU
         katki += _SEHRIN_KLASIGI_BONUSU

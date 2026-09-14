@@ -15,7 +15,17 @@ import {
 import { Dugme } from "./Dugme";
 import { UfukCizgisiBos } from "./UfukCizgisiBos";
 
-export type BosTip = "filtre" | "veri" | "hata" | "404" | "hazirlaniyor";
+export type BosTip =
+  | "filtre"
+  | "veri"
+  | "hata"
+  | "404"
+  | "hazirlaniyor"
+  | "loading"
+  | "empty"
+  | "insufficient"
+  | "unavailable"
+  | "error";
 
 type Cta = {
   href?: string;
@@ -52,6 +62,33 @@ const METIN: Record<BosTip, { baslik: string; metin: string; cta: Cta[] }> = {
     baslik: BOS_HAZIRLANIYOR,
     metin: "Yayına girince bu yüzey dolacak; şimdilik açık sayfalara bakabilirsin.",
     cta: [{ href: "/sehir/samsun", etiket: CTA_SAMSUN, varyant: "ikincil" }],
+  },
+  loading: {
+    baslik: "Hazırlanıyor",
+    metin: "İşaretler yükleniyor; mevcut seçimin korunuyor.",
+    cta: [],
+  },
+  empty: {
+    baslik: "Henüz sonuç yok",
+    metin: BOS_LISTE,
+    cta: [],
+  },
+  insufficient: {
+    baslik: "Plan için bilgi yetersiz",
+    metin:
+      "Bu seçimlerle güvenli bir sonuç üretilemedi. Tercihlerini değiştirip yeniden deneyebilirsin.",
+    cta: [],
+  },
+  unavailable: {
+    baslik: "Şu anda ulaşılamıyor",
+    metin:
+      "Hizmet geçici olarak kullanılamıyor. Seçimin korunuyor; biraz sonra yeniden deneyebilirsin.",
+    cta: [{ etiket: CTA_YENILE, varyant: "ikincil" }],
+  },
+  error: {
+    baslik: "Bir hata oluştu",
+    metin: HATA_PUSULA,
+    cta: [{ etiket: CTA_YENILE, varyant: "ikincil" }],
   },
 };
 

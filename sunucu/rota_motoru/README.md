@@ -16,8 +16,9 @@ skorlama.py -> zaman_butcesi.py -> kumeleme.py -> gunluk_slotlari_diz -> rota_ol
   aşağıdaki modüller gerçek bir veritabanı bağlantısı olmadan, sentetik
   verilerle test edilebilir.
 - **`skorlama.py`** — `yer_uygunluk_puani(yer, tercihler, yol_suresi_dk=...) -> SkorSonucu`.
-  Deneyim ekseni + aktivite + fiyat/sakinlik + kaynak kalitesi + ticari
-  etiket bonusları (`sponsorlu_mekan` +30, `sehrin_klasigi` +15). Yol süresi
+  Deneyim ekseni + aktivite + fiyat/sakinlik + kaynak kalitesi + organik
+  küratörlük (`sehrin_klasigi` +15). Sponsor/ticari metadata bu hesapta
+  hiçbir katkı yapmaz. Yol süresi
   ziyaret süresinin 1.5 katını aşarsa skor yarıya iner (`yol_yorgunlugu_cezasi`).
   Zorunlu duraklar her zaman en üstte. Her sonuç bir `kirilim` sözlüğüyle döner.
 - **`zaman_butcesi.py`** — Bir günün kaç durak kaldırabileceğini hesaplar
@@ -40,17 +41,21 @@ skorlama.py -> zaman_butcesi.py -> kumeleme.py -> gunluk_slotlari_diz -> rota_ol
 
 ## Senaryolar
 
-- **Senaryo 1 (konaklama belli)**: `senaryo_1_rota_olustur(oturum, sehir_id,
+- **Kamusal MVP:** `gunluk_rota_olustur(oturum, sehir_id, tercihler)` tam
+  olarak bir gün üretir ve konaklama kararı üretmez.
+
+- **Tarihsel Senaryo 1 (konaklama belli)**: `senaryo_1_rota_olustur(oturum, sehir_id,
   konaklama_noktasi, gun_sayisi, tercihler)`. Adayları çeker (konaklama
   noktasından `_MAKSIMUM_ADAY_MESAFESI_METRE` içindekiler + zorunlu
   duraklar) → skorlar → en iyi N'i seçer → günlere kümeler → her günü
   slot şablonuna göre dizer (kahvaltı/gezilecek, öğle yemeği ≤20 km,
   öğleden sonra gezilecek/kafe, akşam yemeği).
-- **Senaryo 2 (konaklama belli değil)**: `senaryo_2_rota_olustur(oturum,
+- **Tarihsel Senaryo 2 (konaklama belli değil)**: `senaryo_2_rota_olustur(oturum,
   sehir_id, gun_sayisi, tercihler)`. Aynı skorlamayla önce en iyi adayları
   seçer, ağırlık merkezini hesaplar, o merkeze en yakın/en kaliteli
   `KONAKLAMA` yerini önerir, sonra **Senaryo 1'i o önerilen noktayla
-  çağırır** (kod tekrarını önler).
+  çağırır** (kod tekrarını önler). Bu iki tarihsel fonksiyon public create
+  endpoint'ine bağlı değildir.
 
 ## Bilinen Basitleştirmeler
 

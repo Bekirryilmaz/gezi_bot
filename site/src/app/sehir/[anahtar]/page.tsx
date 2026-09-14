@@ -6,7 +6,7 @@ import { FiltreSatiri } from "@/components/ui/FiltreSatiri";
 import { YerKarti } from "@/components/ui/YerKarti";
 import { RevealListe, RevealOge } from "@/components/hareket/Reveal";
 import { CTA_FILTRE_TEMIZLE } from "@/lib/marka";
-import { sehirleriGetir, yerleriGetir } from "@/lib/api";
+import { apiDurumu, sehirleriGetir, yerleriGetir } from "@/lib/api";
 import { ANA_KATEGORILER } from "@/lib/sabitler";
 
 type Props = {
@@ -29,13 +29,19 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
   const { anahtar } = await params;
   const { kategori } = await searchParams;
 
-  const [sehirler, liste] = await Promise.all([
-    sehirleriGetir().catch(() => []),
+  const [sehirSonucu, listeSonucu] = await Promise.allSettled([
+    sehirleriGetir(),
     yerleriGetir(anahtar, {
       anaKategori: kategori,
       limit: 60,
-    }).catch(() => ({ yerler: [], toplam_sayi: 0 })),
+    }),
   ]);
+  const sehirler = sehirSonucu.status === "fulfilled" ? sehirSonucu.value : [];
+  const liste =
+    listeSonucu.status === "fulfilled"
+      ? listeSonucu.value
+      : { yerler: [], toplam_sayi: 0 };
+  const listeHatasi = listeSonucu.status === "rejected" ? listeSonucu.reason : null;
   const yerler = liste.yerler;
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
   const baslik = sehir?.isim ?? anahtar;
@@ -76,7 +82,9 @@ export default async function SehirKesifSayfasi({ params, searchParams }: Props)
           {liste.toplam_sayi.toLocaleString("tr-TR")} yer işaretli
         </p>
 
-        {yerler.length === 0 ? (
+        {listeHatasi ? (
+          <BosDurum className="mt-6" tip={apiDurumu(listeHatasi)} />
+        ) : yerler.length === 0 ? (
           <BosDurum
             className="mt-6"
             tip={kategori ? "filtre" : "veri"}

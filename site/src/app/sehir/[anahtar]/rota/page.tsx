@@ -1,13 +1,9 @@
 import { SayfaHero } from "@/components/layout/SayfaHero";
-import { RotaSihirbazi } from "@/components/RotaSihirbazi";
-import { bolgeleriGetir, sehirleriGetir } from "@/lib/api";
+import { GunlukRotaSihirbazi } from "@/components/GunlukRotaSihirbazi";
+import { sehirleriGetir } from "@/lib/api";
 
 type Props = {
   params: Promise<{ anahtar: string }>;
-  searchParams: Promise<{
-    konaklama_yer_id?: string;
-    konaklama_bolge?: string;
-  }>;
 };
 
 export async function generateMetadata({ params }: Props) {
@@ -17,18 +13,14 @@ export async function generateMetadata({ params }: Props) {
   const isim = sehir?.isim ?? anahtar;
   return {
     title: `${isim} rota planlayıcı`,
-    description: `${isim} için gün gün rota kur. Konaklama bölgen belli olsun veya alternatiflerden seç; her durağın skor kırılımı açık.`,
+    description: `${isim} için ilgi alanlarına göre tek günlük Akıllı Rota oluştur.`,
     robots: { index: false, follow: true },
   };
 }
 
-export default async function RotaSayfasi({ params, searchParams }: Props) {
+export default async function RotaSayfasi({ params }: Props) {
   const { anahtar } = await params;
-  const sorgu = await searchParams;
-  const [sehirler, bolgeler] = await Promise.all([
-    sehirleriGetir().catch(() => []),
-    bolgeleriGetir(anahtar).catch(() => []),
-  ]);
+  const sehirler = await sehirleriGetir().catch(() => []);
   const sehir = sehirler.find((s) => s.anahtar === anahtar);
   const isim = sehir?.isim ?? anahtar;
 
@@ -37,17 +29,11 @@ export default async function RotaSayfasi({ params, searchParams }: Props) {
       <SayfaHero
         etiket="Rota"
         baslik={`${isim} için rotan`}
-        ozet="Kaç günün ve ne aradığın belli olsun. Konaklama bölgen varsa oradan başla; yoksa alternatiflerden birini seç."
+        ozet="Bugün ne aradığını seç; Akıllı Rota tek günlük bir plan oluştursun."
       />
 
       <div className="kabuk py-12">
-        <RotaSihirbazi
-          sehirAnahtari={anahtar}
-          sehirIsim={isim}
-          baslangicKonaklamaYerId={sorgu.konaklama_yer_id ?? null}
-          baslangicKonaklamaBolge={sorgu.konaklama_bolge ?? null}
-          bolgeler={bolgeler}
-        />
+        <GunlukRotaSihirbazi sehirAnahtari={anahtar} sehirIsim={isim} />
       </div>
     </main>
   );

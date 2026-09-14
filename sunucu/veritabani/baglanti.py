@@ -13,6 +13,7 @@ from collections.abc import Generator
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 load_dotenv()
@@ -21,9 +22,29 @@ VARSAYILAN_VERITABANI_URL = "postgresql+psycopg://gezi_kullanici:gezi_sifre@loca
 
 VERITABANI_URL = os.environ.get("VERITABANI_URL", VARSAYILAN_VERITABANI_URL)
 
+
+def veritabani_yapilandirmasini_dogrula(veritabani_url: str, ortam: str) -> None:
+    """Canli ortamda prototip parolasi veya implicit URL ile acilisi engeller."""
+    if ortam.lower() not in {"production", "prod", "canli"}:
+        return
+    if "VERITABANI_URL" not in os.environ or veritabani_url == VARSAYILAN_VERITABANI_URL:
+        raise RuntimeError("Production ortaminda VERITABANI_URL acikca tanimlanmalidir.")
+    if make_url(veritabani_url).password == "gezi_sifre":
+        raise RuntimeError("Production ortaminda varsayilan development DB parolasi kullanilamaz.")
+
+
+veritabani_yapilandirmasini_dogrula(VERITABANI_URL, os.environ.get("UYGULAMA_ORTAMI", "development"))
+
 # echo=False -> her SQL sorgusunu konsola basmasin. Gelistirme sirasinda SQL
 # sorgularini gormek istersen VERITABANI_SQL_LOGLA=1 ortam degiskenini ac.
-motor = create_engine(VERITABANI_URL, echo=os.environ.get("VERITABANI_SQL_LOGLA") == "1")
+motor = create_engine(
+    VERITABANI_URL,
+    echo=os.environ.get("VERITABANI_SQL_LOGLA") == "1",
+    pool_pre_ping=True,
+    connect_args={
+        "connect_timeout": int(os.environ.get("VERITABANI_BAGLANTI_ZAMAN_ASIMI_SN", "3")),
+    },
+)
 
 OturumUretici = sessionmaker(bind=motor, autoflush=False, autocommit=False)
 

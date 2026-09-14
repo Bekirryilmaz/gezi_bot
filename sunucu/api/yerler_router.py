@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 from ortak.sabitler import DeneyimEksen
 from sunucu.api.semalar import (
     BolgeProfiliCevap,
-    OrnekYorum,
     SehirCevap,
     SehirIstatistikleri,
     YerDetay,
@@ -18,7 +17,7 @@ from sunucu.api.semalar import (
     YerOzet,
 )
 from sunucu.veritabani.baglanti import oturum_al
-from sunucu.veritabani.modeller import BolgeProfili, Sehir, Yorum
+from sunucu.veritabani.modeller import BolgeProfili, Sehir
 from sunucu.veritabani.sorgular import (
     sehir_yer_sayilari,
     sehir_yerlerini_sayfa_getir,
@@ -43,42 +42,6 @@ def _sehri_veritabanindan_bul(oturum: Session, sehir_anahtari: str) -> Sehir:
             f"Once 'python -m sunucu.veritabani.aktarim.calistir --sehir {sehir_anahtari}' calistir.",
         )
     return sehir
-
-
-def _ornek_yorumlari_getir(oturum: Session, yer_id: str, adet: int = 5) -> list[OrnekYorum]:
-    """Dengeli bir izlenim vermek icin en olumlu birkac ve en olumsuz
-    birkac yorumu birlikte dondurur -- sadece en yuksek puanlilari
-    gostermek yanilti bir izlenim yaratabilir."""
-    yarisi = max(1, adet // 2)
-    olumlu = (
-        oturum.query(Yorum)
-        .filter(Yorum.yer_id == yer_id, Yorum.duygu_skoru.isnot(None))
-        .order_by(Yorum.duygu_skoru.desc())
-        .limit(yarisi)
-        .all()
-    )
-    olumsuz = (
-        oturum.query(Yorum)
-        .filter(Yorum.yer_id == yer_id, Yorum.duygu_skoru.isnot(None))
-        .order_by(Yorum.duygu_skoru.asc())
-        .limit(adet - yarisi)
-        .all()
-    )
-    gorulen_idler: set[str] = set()
-    sonuc: list[OrnekYorum] = []
-    for yorum in [*olumlu, *olumsuz]:
-        if yorum.id in gorulen_idler:
-            continue
-        gorulen_idler.add(yorum.id)
-        sonuc.append(
-            OrnekYorum(
-                yazar_takma_adi=yorum.yazar_takma_adi,
-                yorum_metni=yorum.yorum_metni,
-                kaynakta_puan=yorum.kaynakta_puan,
-                duygu_etiketi=yorum.duygu_etiketi,
-            )
-        )
-    return sonuc
 
 
 @yonlendirici.get("/sehirler", response_model=list[SehirCevap])
@@ -129,14 +92,13 @@ def yerleri_listele(
 @yonlendirici.get("/sehirler/{sehir_anahtari}/bolgeler", response_model=list[BolgeProfiliCevap])
 def bolgeleri_listele(sehir_anahtari: str, oturum: Session = Depends(oturum_al)) -> list[BolgeProfiliCevap]:
     """Bir sehrin kendisi (sehir merkezi) VE tum ilceleri icin tanitim
-    duygu profillerini dondurur (bkz. Bolge Profili -- veri/duygu_analizi/
-    bolge_profili_cikarici.py). Sehir merkezi kaydi (varsa) her zaman ilk
-    sirada gelir, ilceler ise en cok yorumdan turetilene gore siralanir."""
+    tanitimlarini dondurur. Sehir merkezi kaydi (varsa) her zaman ilk
+    sirada gelir; ilceler yorum sayisina gore siralanmaz."""
     sehir = _sehri_veritabanindan_bul(oturum, sehir_anahtari)
     profiller = (
         oturum.query(BolgeProfili)
         .filter(BolgeProfili.sehir_id == sehir.id)
-        .order_by(BolgeProfili.ilce_mi.asc(), BolgeProfili.kullanilan_yorum_sayisi.desc())
+        .order_by(BolgeProfili.ilce_mi.asc(), BolgeProfili.bolge_adi.asc())
         .all()
     )
     return [
@@ -166,14 +128,13 @@ def sehir_istatistikleri(
 
 @yonlendirici.get("/yerler/{yer_id}", response_model=YerDetay)
 def yer_detayi(yer_id: str, oturum: Session = Depends(oturum_al)) -> YerDetay:
-    """Bir yerin tum detaylarini (yer profili, duygu ozeti, ornek yorumlar dahil) getirir."""
+    """Bir yerin kamusal allow-list detaylarini getirir."""
     sonuc = yer_ve_koordinat_getir(oturum, yer_id)
     if sonuc is None:
         raise HTTPException(status_code=404, detail=f"'{yer_id}' id'li yer bulunamadi.")
 
     yer, enlem, boylam = sonuc
-    ornek_yorumlar = _ornek_yorumlari_getir(oturum, yer_id)
-    return YerDetay.yerden_olustur(yer, enlem, boylam, ornek_yorumlar)
+    return YerDetay.yerden_olustur(yer, enlem, boylam)
 
 
 @yonlendirici.get("/sehirler-tanimli", response_model=list[str], include_in_schema=False)

@@ -3,6 +3,7 @@ veritabani gerektirmeden calisir."""
 
 from __future__ import annotations
 
+from sunucu.rota_motoru.rota_olusturucu import _en_iyi_n_adayi_sec
 from sunucu.rota_motoru.skorlama import yer_uygunluk_puani
 from sunucu.rota_motoru.veri_tipleri import AdayYer, RotaTercihleri
 
@@ -93,12 +94,36 @@ def test_kaynak_kalitesi_katkisi_esit_skorlari_ayirir():
     assert yer_uygunluk_puani(yuksek_puanli, tercihler).toplam_puan > yer_uygunluk_puani(dusuk_puanli, tercihler).toplam_puan
 
 
-def test_sponsorlu_mekan_bonus_ekler():
-    yer = _ornek_yer(ozellikler={"sponsorlu_mekan": True})
-    sonuc = yer_uygunluk_puani(yer, RotaTercihleri())
+def test_sponsor_bayragi_organik_skoru_ve_kirilimi_degistirmez():
+    organik = _ornek_yer(ozellikler={"sponsorlu_mekan": False})
+    sponsorlu = _ornek_yer(ozellikler={"sponsorlu_mekan": True})
+    tercihler = RotaTercihleri(ilgi_agirliklari={"tarihi_kulturel_puani": 1.0})
 
-    assert sonuc.kirilim["sponsorlu_bonusu"] == 30
-    assert sonuc.toplam_puan >= 30
+    organik_sonuc = yer_uygunluk_puani(organik, tercihler)
+    sponsorlu_sonuc = yer_uygunluk_puani(sponsorlu, tercihler)
+
+    assert sponsorlu_sonuc == organik_sonuc
+    assert all("sponsor" not in anahtar for anahtar in sponsorlu_sonuc.kirilim)
+
+
+def test_sponsor_bayragi_organik_aday_sirasini_degistirmez():
+    tercihler = RotaTercihleri(ilgi_agirliklari={"tarihi_kulturel_puani": 1.0})
+    rakip = _ornek_yer(
+        id="rakip",
+        deneyim_puanlari={"tarihi_kulturel_puani": 70},
+    )
+
+    def karar(sponsorlu_mu: bool) -> list[tuple[str, float]]:
+        incelenen = _ornek_yer(
+            id="incelenen",
+            ozellikler={"sponsorlu_mekan": sponsorlu_mu},
+        )
+        return [
+            (sonuc.yer.id, sonuc.skor.toplam_puan)
+            for sonuc in _en_iyi_n_adayi_sec([rakip, incelenen], tercihler, 2)
+        ]
+
+    assert karar(True) == karar(False)
 
 
 def test_sehrin_klasigi_bonus_ekler():

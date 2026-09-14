@@ -37,9 +37,8 @@ const ORNEK_YER: YerOzet = {
   ilce: "Sahil",
   enlem: 41.3,
   boylam: 36.3,
-  kaynakta_puan_ortalamasi: 4.6,
-  duygu_skoru_ortalama: 0.82,
   kapak_fotografi_url: null,
+  ticari_bildirim: null,
 };
 
 const ORNEK_FOTOLU: YerOzet = {

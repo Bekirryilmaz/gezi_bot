@@ -40,6 +40,23 @@ cd sunucu
 ..\.venv_test\Scripts\python.exe -m alembic upgrade head
 ```
 
+Mevcut bir veritabanında `upgrade` çalıştırmadan baseline denetimi:
+
+```text
+cd sunucu
+..\.venv_test\Scripts\python.exe -m alembic current
+..\.venv_test\Scripts\python.exe -m alembic heads
+..\.venv_test\Scripts\python.exe -m alembic history
+cd ..
+.\.venv_test\Scripts\python.exe -m sunucu.veritabani.sema_baseline
+```
+
+Denetim Alembic revizyonunu, PostGIS'i, tablo/kolon ve kritik indeksleri
+salt-okunur karşılaştırır; drift durumunda kod `1`, erişim yoksa `2` döner.
+Gerçek ortamda migration öncesi PostgreSQL yedeği alınır ve geri yükleme
+ayrı bir kopyada denenir; bu denetim otomatik `upgrade`, `downgrade` veya
+tablo/indeks silme çalıştırmaz.
+
 Yerel Postgres yoksa (başka makine): PostGIS 14+ ve şu SQL yeter. `altyapi/`
 içindeki compose yalnız opsiyonel yedek yoldur; bu geliştirme makinesinde
 kullanılmaz.
@@ -90,12 +107,12 @@ Kütüphanesiz, deterministik. Zincir: skorlama → açısal kümeleme → günl
 slot dizimi. Her skor `kirilim` taşır. Ayrıntı: [`rota_motoru/README.md`](rota_motoru/README.md).
 
 ```text
-.\.venv_test\Scripts\python.exe -m pytest sunucu/rota_motoru/testler/ -v
+.\.venv_test\Scripts\python.exe -m pytest
 ```
 
-Sitenin Senaryo 2 akışı: `POST /rotalar/olustur-alternatifler` → kullanıcı
-seçer → `POST /rotalar/{id}/konaklama-bolgesi-oner`. Eski
-`POST /rotalar/olustur` konaklama yoksa hâlâ otel önerir (geriye uyumluluk).
+Kamusal MVP akışı yalnız `POST /v1/gunluk-planlar` kullanır. Çok günlük ve
+konaklama devam yazmaları `410 Gone` ile kapalıdır; tarihsel tablolar ve
+salt-okunur kayıt uçları veri kaybı olmadan korunur.
 
 ## Klasör yapısı
 
@@ -105,10 +122,12 @@ sunucu/
     modeller.py            SQLAlchemy (Sehir, Yer, Yorum, BolgeProfili, …)
     baglanti.py
     sorgular.py            Keşif vitrini filtresi burada
+    sema_baseline.py       Salt-okunur migration/model drift denetimi
     migrasyonlar/          Alembic 0001–0004
     aktarim/               JSONL → PostgreSQL
   api/
     uygulama.py            FastAPI giriş
+    altyapi.py             Request ID, JSON log, tipli hata ve write limiti
     semalar.py             Dışarıya açık Pydantic (modeller.py değil)
     yerler_router.py
     rotalar_router.py

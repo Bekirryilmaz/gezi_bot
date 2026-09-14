@@ -23,15 +23,9 @@ export function YerKarti({
   className?: string;
 }) {
   const baglanti = href ?? `/yer/${yer.id}`;
-  const puan =
-    yer.kaynakta_puan_ortalamasi != null
-      ? yer.kaynakta_puan_ortalamasi.toFixed(1)
-      : yer.duygu_skoru_ortalama != null
-        ? (yer.duygu_skoru_ortalama * 5).toFixed(1)
-        : null;
   const ozetMetin = ozet ?? altKategoriEtiketi(yer.alt_kategori);
   const rozetler: ReactNode[] = [];
-  if (sponsorlu) {
+  if (sponsorlu || yer.ticari_bildirim === "sponsorlu") {
     rozetler.push(
       <Rozet key="sp" tur="sponsorlu">
         Sponsorlu
@@ -58,7 +52,6 @@ export function YerKarti({
         alt=""
         oran="kart"
         kategori={yer.ana_kategori}
-        rozet={puan ? <Rozet tur="skor">{puan}</Rozet> : null}
       />
       <div className="flex min-w-0 flex-1 flex-col gap-2 p-4">
         <h3 className="min-w-0">

@@ -44,14 +44,13 @@ CORS: API tarafında `API_IZINLI_ORIGINLER` varsayılanı `http://localhost:3000
 |-----|----------|
 | `/` | Hero + Keşfet / Bölgeler / Rota |
 | `/sehir/[anahtar]` | Keşif listesi, kategori chip (konaklama yok) |
-| `/yer/[id]` | Tanıtım + duygu özeti + yan bilgiler (UUID) |
-| `/sehir/[anahtar]/bolgeler` | Şehir + ilçe profilleri |
-| `/sehir/[anahtar]/rota` | Rota sihirbazı |
+| `/yer/[id]` | Allow-list tanıtım + olgusal yan bilgiler (UUID) |
+| `/sehir/[anahtar]/bolgeler` | Şehir + ilçe tanıtımları |
+| `/sehir/[anahtar]/rota` | Tek günlük Akıllı Rota |
 
-Sihirbaz: senaryo → tercihler (gün 1–5, 6 eksen, ucuz/sakin) → (senaryo 2 ise)
-alternatifler → sonuç. Site Senaryo 2’de
-`POST /rotalar/olustur-alternatifler` ve
-`POST /rotalar/{id}/konaklama-bolgesi-oner` kullanır.
+Sihirbaz yalnız günlük tercihleri alır ve `POST /v1/gunluk-planlar` çağırır.
+Gün sayısı, konaklama ve çok günlük alternatif seçimi public akışta yoktur.
+Loading, empty, insufficient, unavailable ve error durumları ayrı gösterilir.
 
 Hedef URL’ler (`/yer/{sehir}/{slug}`, `/sehir/.../gezilecek-yerler`, ilçe
 sayfası, `/rehber/{slug}`) plan’da; bu kodda henüz yok.
@@ -63,13 +62,13 @@ sayfası, `/rehber/{slug}`) plan’da; bu kodda henüz yok.
 | `src/lib/api.ts` | Tek HTTP sarmalayıcı — bileşen içine ham `fetch` yazma |
 | `src/lib/types.ts` | Python `semalar.py` ile hizalı tipler |
 | `src/lib/sabitler.ts` | Site sabitleri |
-| `src/components/RotaSihirbazi.tsx` | Rota akışı |
+| `src/components/GunlukRotaSihirbazi.tsx` | Public tek günlük rota akışı |
 | `src/app/layout.tsx` | Kök layout + metadata |
 | `next.config.ts` | `/backend` rewrite |
 
 ## Notlar
 
-- Ham yorum metni / yorumcu adı render edilmez.
+- Ham yorum/yazar, örnek ifade, duygu/puan, yorum hacmi ve iç skor render edilmez.
 - Site içi harita yok.
 - Keşif listesi API `limit`/`offset`/`toplam_sayi` döner; “daha fazla yükle” UI yok.
 - `robots.txt` / `sitemap.xml` / sayfa başına JSON-LD henüz yok (T-06).
