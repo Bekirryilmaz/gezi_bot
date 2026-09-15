@@ -12,7 +12,7 @@ Bu dosya dokumanlar/kategori_taksonomisi.md ile birebir eslesir. Taksonomiyi
 degistirdiginde iki dosyayi da guncelle, aralarinda fark olmasin.
 """
 
-from enum import Enum
+from enum import Enum, StrEnum
 
 
 class AnaKategori(str, Enum):
@@ -57,6 +57,7 @@ class YemeIcmeAltKategori(str, Enum):
     FINE_DINING_ROMANTIK = "fine_dining_romantik"
     SOKAK_LEZZETI = "sokak_lezzeti"
     KAFE = "kafe"
+    INTERNET_KAFE = "internet_kafe"
     TATLI_PASTANE = "tatli_pastane"
     KAHVE_UZMANLIK = "kahve_uzmanlik"
     MEYHANE_BAR = "meyhane_bar"
@@ -70,6 +71,66 @@ ANA_KATEGORI_ALT_KATEGORILERI: dict[str, type[Enum]] = {
     AnaKategori.KONAKLAMA.value: KonaklamaAltKategori,
     AnaKategori.YEME_ICME.value: YemeIcmeAltKategori,
 }
+
+
+class AmacEslemeSeviyesi(StrEnum):
+    """Kategori kimliginin amac fact'i uretip uretmedigi."""
+
+    DIRECT_PURPOSE_FACT = "direct_purpose_fact"
+    WEAK_CANDIDATE_HINT = "weak_candidate_hint"
+    NO_PURPOSE_INFERENCE = "no_purpose_inference"
+
+
+class KimlikKaliteSinifi(StrEnum):
+    """Yalniz dahili karar/operasyon; kamusal skor degildir."""
+
+    DOGRULANMIS = "dogrulanmis"
+    GUCLU = "guclu"
+    KULLANILABILIR = "kullanilabilir"
+    SUPHELI = "supheli"
+    KARANTINA = "karantina"
+
+
+# Yayimlanmis yer.alt_kategori -> acik amac fact'leri (yalniz DIRECT).
+# Sozlukte olmayan kategoriden amac uydurulmaz.
+# dokumanlar/kategori_taksonomisi.md #8.4
+ALT_KATEGORI_AMAC_ESLEMESI: dict[str, tuple[str, ...]] = {
+    YemeIcmeAltKategori.KAFE.value: ("kahve_icmek",),
+    YemeIcmeAltKategori.KAHVE_UZMANLIK.value: ("kahve_icmek",),
+    YemeIcmeAltKategori.RESTORAN_LOKANTA.value: ("yemek_yemek",),
+    YemeIcmeAltKategori.KEBAP_IZGARA.value: ("yemek_yemek",),
+    YemeIcmeAltKategori.DENIZ_MAHSULLERI.value: ("yemek_yemek",),
+    YemeIcmeAltKategori.EV_YEMEKLERI_ESNAF.value: ("yemek_yemek",),
+    YemeIcmeAltKategori.SOKAK_LEZZETI.value: ("yemek_yemek",),
+    YemeIcmeAltKategori.FINE_DINING_ROMANTIK.value: ("yemek_yemek",),
+    YemeIcmeAltKategori.MEYHANE_BAR.value: ("yemek_yemek",),
+    YemeIcmeAltKategori.TATLI_PASTANE.value: ("tatli_yemek",),
+    GezilecekYerAltKategori.TARIHI_KULTUREL.value: ("tarihi_kulturel_ziyaret",),
+    GezilecekYerAltKategori.EGLENCE_AKTIVITE.value: ("eglence",),
+    GezilecekYerAltKategori.DOGA_MANZARA.value: ("acik_hava",),
+    GezilecekYerAltKategori.PLAJ_SU.value: ("acik_hava",),
+}
+
+# Zayif ipucu hard fact degildir; yalniz siralama/operasyon.
+ALT_KATEGORI_AMAC_ZAYIF_IPUCU: dict[str, tuple[str, ...]] = {}
+
+ONERIYE_UYGUN_KIMLIK_SINIFLARI: frozenset[str] = frozenset(
+    {
+        KimlikKaliteSinifi.DOGRULANMIS.value,
+        KimlikKaliteSinifi.GUCLU.value,
+        KimlikKaliteSinifi.KULLANILABILIR.value,
+    }
+)
+
+
+def amac_esleme_seviyesi(alt_kategori: str | None, amac: str | None) -> AmacEslemeSeviyesi:
+    if not alt_kategori or not amac:
+        return AmacEslemeSeviyesi.NO_PURPOSE_INFERENCE
+    if amac in ALT_KATEGORI_AMAC_ESLEMESI.get(alt_kategori, ()):
+        return AmacEslemeSeviyesi.DIRECT_PURPOSE_FACT
+    if amac in ALT_KATEGORI_AMAC_ZAYIF_IPUCU.get(alt_kategori, ()):
+        return AmacEslemeSeviyesi.WEAK_CANDIDATE_HINT
+    return AmacEslemeSeviyesi.NO_PURPOSE_INFERENCE
 
 
 class Aktivite(str, Enum):
@@ -116,6 +177,139 @@ class DuyguEtiketi(str, Enum):
     OLUMLU = "olumlu"
     NOTR = "notr"
     OLUMSUZ = "olumsuz"
+
+
+class DahiliSinyalAilesi(StrEnum):
+    """Yalniz dahili gozlem adaylarinda kullanilan canonical sinyal aileleri."""
+
+    SESSIZ_ORTAM = "sessiz_ortam"
+    SOHBET_UYGUNLUGU = "sohbet_uygunlugu"
+    CALISMA_UYGUNLUGU = "calisma_uygunlugu"
+    AILE_UYGUNLUGU = "aile_uygunlugu"
+    COCUK_UYGUNLUGU = "cocuk_uygunlugu"
+    PARTNER_UYGUNLUGU = "partner_uygunlugu"
+    ARKADAS_GRUBU_UYGUNLUGU = "arkadas_grubu_uygunlugu"
+    ACIK_ALAN = "acik_alan"
+    MANZARA = "manzara"
+    KALABALIKLIK = "kalabaliklik"
+    WIFI = "wifi"
+    OTOPARK = "otopark"
+    PRIZ = "priz"
+    REZERVASYON = "rezervasyon"
+    CANLI_MUZIK = "canli_muzik"
+    KAHVE = "kahve"
+    YEMEK = "yemek"
+    KAHVALTI = "kahvalti"
+    TATLI = "tatli"
+    EGLENCE = "eglence"
+    TARIHI_KULTUREL = "tarihi_kulturel"
+    ACIK_HAVA = "acik_hava"
+    FIYAT_ALGISI = "fiyat_algisi"
+    GENEL_DUYGU = "genel_duygu"
+
+
+class GozlemTuru(StrEnum):
+    """Dahili sinyalin olgu, deneyim veya genel duygu ayrimi."""
+
+    FACT_SIGNAL = "fact_signal"
+    EXPERIENCE_SIGNAL = "experience_signal"
+    SENTIMENT_SIGNAL = "sentiment_signal"
+
+
+class SinyalYonu(StrEnum):
+    """Bir spanin ilgili aileyi destekleme veya ona karsi olma yonu."""
+
+    SUPPORT = "support"
+    COUNTER = "counter"
+
+
+class CikarimYontemi(StrEnum):
+    """Aday gozlemin yeniden uretilebilir cikarim yontemi."""
+
+    DETERMINISTIK_KURAL = "deterministik_kural"
+    DUYGU_MODELI = "duygu_modeli"
+    GERIYE_UYUMLU = "geriye_uyumlu"
+
+
+class ZamansalDurum(StrEnum):
+    """Aday sinyalin zaman bakimindan bilinen dar durumu."""
+
+    UNKNOWN = "unknown"
+    CURRENT = "current"
+    HISTORICAL = "historical"
+
+
+class AdaySozlesmeSurumu(StrEnum):
+    """AdayGozlem parse ve dogrulama sozlesmesi."""
+
+    CANONICAL_V1 = "canonical-v1"
+    LEGACY = "legacy"
+
+
+# (aile, gozlem_turu, yon) -> izinli canonical degerler.
+DAHILI_SINYAL_DEGER_SOZLUGU: dict[
+    tuple[str, str, str], tuple[bool | str, ...]
+] = {
+    ("wifi", "fact_signal", "support"): (True,),
+    ("wifi", "fact_signal", "counter"): (False,),
+    ("wifi", "experience_signal", "support"): (
+        "kotu_degil",
+        "cok_yavas_degil",
+        True,
+    ),
+    ("wifi", "experience_signal", "counter"): (
+        "kotu",
+        "cok_yavas",
+        "cekmiyor",
+        False,
+    ),
+    ("sessiz_ortam", "experience_signal", "support"): (True,),
+    ("sessiz_ortam", "experience_signal", "counter"): (False,),
+    ("aile_uygunlugu", "experience_signal", "support"): (True,),
+    ("aile_uygunlugu", "experience_signal", "counter"): (False,),
+    ("cocuk_uygunlugu", "experience_signal", "support"): (True,),
+    ("cocuk_uygunlugu", "experience_signal", "counter"): (False,),
+    ("calisma_uygunlugu", "experience_signal", "support"): (True,),
+    ("calisma_uygunlugu", "experience_signal", "counter"): (False,),
+    ("acik_alan", "fact_signal", "support"): (True,),
+    ("acik_alan", "fact_signal", "counter"): (False,),
+    ("manzara", "fact_signal", "support"): (True,),
+    ("manzara", "fact_signal", "counter"): (False,),
+    ("manzara", "experience_signal", "support"): ("guzel",),
+    ("manzara", "experience_signal", "counter"): ("gorunmuyor", "goremedik"),
+    ("fiyat_algisi", "experience_signal", "support"): ("uygun", "pahali_degil"),
+    ("fiyat_algisi", "experience_signal", "counter"): ("pahali",),
+    ("otopark", "fact_signal", "support"): (True,),
+    ("otopark", "fact_signal", "counter"): (False,),
+    ("otopark", "experience_signal", "counter"): ("park_sorunu",),
+    ("rezervasyon", "experience_signal", "counter"): (
+        "rezervasyonsuz_yer_bulunamadi",
+    ),
+    ("canli_muzik", "fact_signal", "support"): (True,),
+    ("canli_muzik", "fact_signal", "counter"): (False,),
+    ("canli_muzik", "experience_signal", "support"): ("cok_yuksek_degil",),
+    ("canli_muzik", "experience_signal", "counter"): ("cok_yuksek",),
+    ("kalabaliklik", "experience_signal", "support"): ("kalabalik",),
+    ("kalabaliklik", "experience_signal", "counter"): ("sakin",),
+}
+
+for _sentiment_ailesi in (
+    "manzara",
+    "fiyat_algisi",
+    "yemek",
+    "kalabaliklik",
+    "kahvalti",
+    "sessiz_ortam",
+    "genel_duygu",
+):
+    DAHILI_SINYAL_DEGER_SOZLUGU[
+        (_sentiment_ailesi, "sentiment_signal", "support")
+    ] = ("olumlu",)
+    DAHILI_SINYAL_DEGER_SOZLUGU[
+        (_sentiment_ailesi, "sentiment_signal", "counter")
+    ] = ("olumsuz",)
+
+KARAR_DISI_DAHILI_SINYAL_AILELERI: frozenset[str] = frozenset({"genel_duygu"})
 
 
 class FiyatAlgisi(str, Enum):
@@ -209,7 +403,7 @@ OZEL_ETIKETLER: tuple[str, ...] = tuple(etiket.value for etiket in OzelEtiket)
 class ZamanDilimi(str, Enum):
     """Gun ici zaman dilimleri. Rota motoru bir duragi hangi saatte
     onerecegini bu anahtarlara gore karar verir.
-    dokumanlar/kategori_taksonomisi.md #8."""
+    dokumanlar/kategori_taksonomisi.md #9."""
 
     SABAH = "sabah"
     OGLE = "ogle"
@@ -311,7 +505,7 @@ KATEGORI_ZAMAN_DILIMLERI: dict[str, list[str]] = {
 
 # Ana kategori -> mekan ici ziyaret suresine EKLENEN lojistik tampon (dk).
 # Park, kuyruk, garson/hesap, tuvalet/dinlenme gibi insan payi.
-# dokumanlar/kategori_taksonomisi.md #9.
+# dokumanlar/kategori_taksonomisi.md #10.
 MEKAN_BEKLEME_SURELERI_DK: dict[str, int] = {
     AnaKategori.YEME_ICME.value: 30,
     AnaKategori.GEZILECEK_YER.value: 15,

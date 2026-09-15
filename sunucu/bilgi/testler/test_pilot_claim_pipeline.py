@@ -10,6 +10,7 @@ from sunucu.auth.servis import admin_olustur
 from sunucu.bilgi.pilot_claimleri import (
     adaylari_yaz,
     kaynak_boolean_normalize,
+    kaynak_hakki_uygun_mu,
     kaynak_haklari_uygun_mu,
     osm_politikasini_uygula,
     satirdan_adaylar,
@@ -18,8 +19,8 @@ from sunucu.bilgi.public import yer_pratik_bilgileri
 from sunucu.veritabani.admin_modelleri import IncelemeDosyasi
 from sunucu.veritabani.baglanti import motor
 from sunucu.veritabani.bilgi_modelleri import Iddia, IddiaSurumu, KanitBaglantisi, KaynakPolitikasi
-from sunucu.veritabani.kimlik_modelleri import Sube
-from sunucu.veritabani.modeller import Yer, YerKaynak
+from sunucu.veritabani.kimlik_modelleri import Sube, YerKimligi
+from sunucu.veritabani.modeller import Sehir, Yer, YerKaynak
 from sunucu.veritabani.yayin_modelleri import YayinKaydi
 
 
@@ -48,9 +49,25 @@ def _oturum():
 
 
 def _gecici_kaynak_bagi(oturum: Session) -> tuple[Yer, Sube, str]:
-    yer = oturum.query(Yer).first()
-    assert yer is not None
-    sube = oturum.query(Sube).filter_by(legacy_yer_id=yer.id).one()
+    ek = uuid.uuid4().hex
+    sehir = Sehir(isim=f"Pilot Claim Sehri {ek}")
+    oturum.add(sehir)
+    oturum.flush()
+    yer = Yer(
+        sehir_id=sehir.id,
+        isim=f"Pipeline test yeri {ek}",
+        ana_kategori="yeme_icme",
+        alt_kategori="kafe",
+        ilce="Atakum",
+        adres="Test Sokak 1",
+        konum="SRID=4326;POINT(36.33 41.28)",
+    )
+    kimlik = YerKimligi(sehir_id=sehir.id)
+    oturum.add_all([yer, kimlik])
+    oturum.flush()
+    sube = Sube(yer_kimligi_id=kimlik.id, legacy_yer_id=yer.id, guncel_isim=yer.isim)
+    oturum.add(sube)
+    oturum.flush()
     kaynak_id = f"node/{uuid.uuid4().int}"
     oturum.add(
         YerKaynak(
@@ -113,6 +130,111 @@ def test_unknown_boolean_ve_gecersiz_iletisim_candidate_uretmez():
     assert "wifi" not in aileler
     assert "telefon" not in aileler
     assert "web_sitesi" not in aileler
+
+
+def test_hak_kapisi_kullanim_amacina_gore_ayrilir():
+    from types import SimpleNamespace
+
+    from sunucu.bilgi import pilot_claimleri
+
+    google_politikasi = SimpleNamespace(
+        kamusal_gosterim="yasak",
+        turev_iddia="yasak",
+        ai_isleme="izinli",
+        uzun_sureli_saklama="bilinmiyor",
+        gecerli_baslangic=None,
+        gecerli_bitis=None,
+    )
+
+    assert pilot_claimleri.kaynak_hakki_uygun_mu(
+        google_politikasi, amac="ai_isleme"
+    ) == (True, None)
+    assert (
+        pilot_claimleri.kaynak_hakki_uygun_mu(
+            google_politikasi, amac="kamusal_gosterim"
+        )[0]
+        is False
+    )
+    assert (
+        pilot_claimleri.kaynak_hakki_uygun_mu(
+            google_politikasi, amac="turev_iddia"
+        )[0]
+        is False
+    )
+
+
+def test_google_dahili_nlp_politikasi_public_ve_turev_kapisini_acmaz():
+    baglanti, islem, oturum = _oturum()
+    try:
+        from sunucu.bilgi.pilot_claimleri import google_dahili_nlp_politikasini_uygula
+
+        politika = google_dahili_nlp_politikasini_uygula(oturum)
+        assert politika.kaynak == "google_maps"
+        assert politika.ai_isleme == "izinli"
+        assert politika.kamusal_gosterim != "izinli"
+        assert politika.turev_iddia != "izinli"
+        assert kaynak_hakki_uygun_mu(politika, amac="ai_isleme") == (True, None)
+        assert kaynak_haklari_uygun_mu(politika)[0] is False
+    finally:
+        islem.rollback()
+        baglanti.close()
+
+
+def test_osm_public_pipeline_tum_gerekli_haklari_korumaya_devam_eder():
+    from types import SimpleNamespace
+
+    osm_politikasi = SimpleNamespace(
+        kamusal_gosterim="izinli",
+        turev_iddia="izinli",
+        ai_isleme="izinli",
+        uzun_sureli_saklama="izinli",
+        gecerli_baslangic=None,
+        gecerli_bitis=None,
+    )
+
+    assert kaynak_haklari_uygun_mu(osm_politikasi) == (True, None)
+
+
+def test_bilinmeyen_db_hak_degeri_crash_yerine_fail_closed_doner():
+    from types import SimpleNamespace
+
+    politika = SimpleNamespace(
+        kamusal_gosterim="beklenmeyen_deger",
+        turev_iddia="izinli",
+        ai_isleme="izinli",
+        uzun_sureli_saklama="izinli",
+        gecerli_baslangic=None,
+        gecerli_bitis=None,
+    )
+    uygun, neden = kaynak_hakki_uygun_mu(politika, amac="kamusal_gosterim")
+    assert uygun is False
+    assert neden == "kaynak_politikasi_hak_degeri_gecersiz"
+
+
+def test_public_osm_gate_tek_eksik_hakta_kapanir():
+    from types import SimpleNamespace
+
+    for eksik_alan in (
+        "kamusal_gosterim",
+        "turev_iddia",
+        "ai_isleme",
+        "uzun_sureli_saklama",
+    ):
+        alanlar = {
+            "kamusal_gosterim": "izinli",
+            "turev_iddia": "izinli",
+            "ai_isleme": "izinli",
+            "uzun_sureli_saklama": "izinli",
+        }
+        alanlar[eksik_alan] = "bilinmiyor"
+        politika = SimpleNamespace(
+            **alanlar,
+            gecerli_baslangic=None,
+            gecerli_bitis=None,
+        )
+        uygun, neden = kaynak_haklari_uygun_mu(politika)
+        assert uygun is False, eksik_alan
+        assert neden == "display_derivative_processing_retention_hakki_yetersiz"
 
 
 def test_unknown_ve_geri_cekilmis_hak_candidate_yazmaz():

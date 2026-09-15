@@ -70,15 +70,18 @@ test("teknik hata boş sonuç gibi gösterilmez", async ({ page }) => {
   await expect(alan.getByRole("alert")).toContainText("Geçici teknik hata");
 });
 
-test("düşük coverage sonucu sayıyı doldurmadan insufficient durumunu açıklar", async ({
+test("yemek amacı kategori fact ile hedefli seçenek üretir ve sayıyı uydurmaz", async ({
   page,
 }) => {
   await page.goto("/");
   const alan = page.locator("#bugun-ne-yapalim");
   await alan.getByLabel("Bugün için ihtiyacın").fill("Samsun'da yemek yemek istiyorum.");
   await alan.getByRole("button", { name: "Bugün için seçenek bul" }).click();
-  await expect(alan.getByText(/Yalnız 1 destekli seçenek bulduk/)).toBeVisible();
-  await expect(
-    alan.getByRole("list", { name: "Bugün için seçenekler" }).getByRole("listitem"),
-  ).toHaveCount(1);
+  await expect(alan.getByText("Şunu anladım:", { exact: true })).toBeVisible();
+  const kartlar = alan
+    .getByRole("list", { name: "Bugün için seçenekler" })
+    .getByRole("listitem");
+  const adet = await kartlar.count();
+  expect(adet).toBeGreaterThanOrEqual(3);
+  expect(adet).toBeLessThanOrEqual(5);
 });

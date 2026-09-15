@@ -8,9 +8,17 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import Session, aliased
 
 from ortak.sabitler import OzelEtiket
+from sunucu.bilgi.aggregation import AGREGASYON_SURUMU
 from sunucu.bilgi.domain import BilgiDurumu
-from sunucu.karar_motoru.domain import BilgiReferansi, KararAdayi, KararBaglami, KararMotoru, KararSonucu
-from sunucu.veritabani.bilgi_modelleri import Iddia, IddiaSurumu
+from sunucu.karar_motoru.domain import (
+    BilgiReferansi,
+    DahiliSinyalReferansi,
+    KararAdayi,
+    KararBaglami,
+    KararMotoru,
+    KararSonucu,
+)
+from sunucu.veritabani.bilgi_modelleri import DahiliSinyalOzeti, Iddia, IddiaSurumu
 from sunucu.veritabani.karar_modelleri import KararIzi
 from sunucu.veritabani.kimlik_modelleri import Sube, YerKimligi
 from sunucu.veritabani.modeller import Sehir, Yer
@@ -71,6 +79,30 @@ def adaylari_toplu_getir(
             )
         )
 
+    dahili_sinyaller: dict[str, list[DahiliSinyalReferansi]] = {sube_id: [] for sube_id in sube_idleri}
+    if sube_idleri:
+        for ozet in oturum.scalars(
+            select(DahiliSinyalOzeti).where(
+                DahiliSinyalOzeti.sube_id.in_(sube_idleri),
+                DahiliSinyalOzeti.agregasyon_surumu == AGREGASYON_SURUMU,
+                DahiliSinyalOzeti.durum == "aktif",
+            )
+        ):
+            ozet_govde = dict(ozet.ozet or {})
+            dahili_sinyaller.setdefault(str(ozet.sube_id), []).append(
+                DahiliSinyalReferansi(
+                    sube_id=str(ozet.sube_id),
+                    aile=ozet.aile,
+                    agregasyon_surumu=ozet.agregasyon_surumu,
+                    guven_sinifi=ozet.guven_sinifi,
+                    durum=ozet.durum,
+                    preference_eligible=bool(ozet_govde.get("preference_eligible")),
+                    destekliyor=bool(ozet_govde.get("preference_eligible"))
+                    and ozet_govde.get("conflict_level") == "none"
+                    and int(ozet_govde.get("supporting_observation_count") or 0) > 0,
+                )
+            )
+
     adaylar: list[KararAdayi] = []
     for satir in satirlar:
         yer, sehir, sube, kimlik, yayin = (
@@ -98,6 +130,12 @@ def adaylari_toplu_getir(
                 bilgiler=tuple(bilgiler.get(str(sube.id), ())),
                 sponsorlu=yer.ozellikler.get(OzelEtiket.SPONSORLU_MEKAN.value)
                 in (True, "true", "evet", "1", 1),
+                alt_kategori=yer.alt_kategori,
+                dahili_sinyaller=tuple(dahili_sinyaller.get(str(sube.id), ())),
+                kimlik_kalite_sinifi=getattr(
+                    sube, "kimlik_kalite_sinifi", None
+                )
+                or "kullanilabilir",
             )
         )
     siralama = {yer_id: i for i, yer_id in enumerate(benzersiz)}
@@ -111,7 +149,7 @@ def kararlari_degerlendir(
     *,
     request_id: str,
     correlation_id: str | None = None,
-) -> tuple[list[KararSonucu], str]:
+) -> tuple[list[KararSonucu], str, list[KararAdayi]]:
     trace_reference = f"decision:{request_id}:{uuid4().hex[:12]}"
     motor = KararMotoru()
     adaylar = adaylari_toplu_getir(oturum, yer_idleri)
@@ -164,4 +202,4 @@ def kararlari_degerlendir(
         )
     )
     oturum.commit()
-    return sonuclar, trace_reference
+    return sonuclar, trace_reference, adaylar

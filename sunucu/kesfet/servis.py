@@ -8,9 +8,10 @@ from sunucu.arama.domain import AramaSonucuTuru, SOMUT_KOSULLAR
 from sunucu.arama.semalar import AramaSonucuSemasi
 from sunucu.arama.servis import ara
 from sunucu.bugun_ne_yapalim.gelistirme_izi import iz_artir, iz_guncelle
-from sunucu.karar_motoru.domain import KararSonucu, KosulDurumu, NedenKodu
+from sunucu.karar_motoru.domain import KararAdayi, KararSonucu, KosulDurumu, NedenKodu
 from sunucu.karar_motoru.semalar import KararSonucuSemasi
 from sunucu.karar_motoru.servis import kararlari_degerlendir
+from sunucu.karar_motoru.siralama import oneri_listesini_sec
 from sunucu.kesfet.semalar import (
     KesfetDegerlendirmeCevabi,
     KesfetDegerlendirmeTalebi,
@@ -29,12 +30,81 @@ def _desteklenen_tercihler(karar: KararSonucu) -> tuple[str, ...]:
     return tuple(
         gerekce.ilgili_kosul or ""
         for gerekce in karar.gerekceler
-        if gerekce.kod is NedenKodu.TERCIH_DESTEKLENIYOR
+        if gerekce.kod
+        in {NedenKodu.TERCIH_DESTEKLENIYOR, NedenKodu.DENEYIM_SINYALI_DESTEKLIYOR}
     )
 
 
+_AMAC_CUMLESI = {
+    "kahve_icmek": "Kahve için uygun bir yer",
+    "yemek_yemek": "Yemek için uygun bir yer",
+    "tatli_yemek": "Tatlı için uygun bir yer",
+    "kahvalti_yapmak": "Kahvaltı için uygun bir yer",
+    "tarihi_kulturel_ziyaret": "Tarih ve kültür gezisi için uygun bir yer",
+    "eglence": "Eğlence için uygun bir yer",
+    "acik_hava": "Açık hava için uygun bir yer",
+}
+
+_DENEYIM_ETIKETI = {
+    "sohbet": "sohbet",
+    "sohbet_uygunlugu": "sohbet",
+    "sessiz_ortam": "sakinlik",
+    "aile_uygunlugu": "aile",
+    "cocuk_uygunlugu": "çocuk",
+    "calisma_uygunlugu": "çalışma",
+    "manzara": "manzara",
+    "kahvalti": "kahvaltı",
+    "tatli": "tatlı",
+    "wifi": "bağlantı",
+    "otopark": "otopark",
+    "acik_alan": "açık alan",
+}
+
+
+def _neden_metni(baglam_amac: str | None, karar: KararSonucu) -> str:
+    amac_cumle = _AMAC_CUMLESI.get(baglam_amac or "", "Bu ziyaret için uygun bir yer")
+    parcalar = [f"{amac_cumle}."]
+    dogrulananlar = [
+        SOMUT_KOSULLAR[g.ilgili_kosul].etiket
+        for g in karar.gerekceler
+        if g.kod is NedenKodu.ZORUNLU_KOSUL_DOGRULANDI and g.ilgili_kosul in SOMUT_KOSULLAR
+    ]
+    if dogrulananlar:
+        parcalar.append(f"{', '.join(dogrulananlar)} isteğini yayımlanmış bilgiyle karşılıyor.")
+    deneyim_etiketleri: list[str] = []
+    for gerekce in karar.gerekceler:
+        if gerekce.kod is not NedenKodu.DENEYIM_SINYALI_DESTEKLIYOR:
+            continue
+        etiket = _DENEYIM_ETIKETI.get(gerekce.ilgili_kosul or "", "")
+        if etiket and etiket not in deneyim_etiketleri:
+            deneyim_etiketleri.append(etiket)
+    if deneyim_etiketleri:
+        parcalar.append(
+            f"{', '.join(deneyim_etiketleri)} deneyimi açısından destekleyici sinyal var."
+        )
+    return " ".join(parcalar)
+
+
 def _fark_metni(aday: _DegerlendirilmisAday, ilk: _DegerlendirilmisAday | None) -> str:
-    tercihler = _desteklenen_tercihler(aday.karar)
+    deneyim = [
+        gerekce.ilgili_kosul
+        for gerekce in aday.karar.gerekceler
+        if gerekce.kod is NedenKodu.DENEYIM_SINYALI_DESTEKLIYOR
+    ]
+    if deneyim:
+        etiketler = [
+            _DENEYIM_ETIKETI.get(kod or "", "")
+            for kod in deneyim
+        ]
+        etiketler = [etiket for etiket in etiketler if etiket]
+        if etiketler:
+            return f"{', '.join(etiketler)} deneyimi açısından destekleyici sinyal var."
+        return "Deneyim sinyali bu tercihi destekliyor."
+    tercihler = tuple(
+        gerekce.ilgili_kosul or ""
+        for gerekce in aday.karar.gerekceler
+        if gerekce.kod is NedenKodu.TERCIH_DESTEKLENIYOR
+    )
     if tercihler:
         etiketler = [SOMUT_KOSULLAR[kod].etiket for kod in tercihler if kod in SOMUT_KOSULLAR]
         if etiketler:
@@ -46,26 +116,6 @@ def _fark_metni(aday: _DegerlendirilmisAday, ilk: _DegerlendirilmisAday | None) 
         return f"{tur.capitalize()} türüyle ilk seçenekten ayrılıyor."
     tur = (aday.arama.alt_kategori or aday.arama.ana_kategori or "mekân").replace("_", " ")
     return f"{tur.capitalize()} kimliği ve konumu yayımlanmış bir seçenek."
-
-
-def _secim_yap(adaylar: list[_DegerlendirilmisAday], hedef: int) -> list[_DegerlendirilmisAday]:
-    """Önce farklı destek imzalarını korur; yeni bir puan veya yeniden sıralama üretmez."""
-    secilen: list[_DegerlendirilmisAday] = []
-    gorulen: set[tuple[str, ...]] = set()
-    for aday in adaylar:
-        if aday.imza in gorulen:
-            continue
-        secilen.append(aday)
-        gorulen.add(aday.imza)
-        if len(secilen) == hedef:
-            return secilen
-    for aday in adaylar:
-        if aday in secilen:
-            continue
-        secilen.append(aday)
-        if len(secilen) == hedef:
-            break
-    return secilen
 
 
 def kesfet_degerlendir(
@@ -126,7 +176,10 @@ def kesfet_degerlendir(
         )
 
     yer_idleri = [sonuc.yer.place_id for sonuc in yer_sonuclari if sonuc.yer]
-    kararlar, trace = kararlari_degerlendir(oturum, baglam, yer_idleri, request_id=request_id)
+    kararlar, trace, karar_aday_listesi = kararlari_degerlendir(
+        oturum, baglam, yer_idleri, request_id=request_id
+    )
+    karar_adaylari = {aday.yer_id: aday for aday in karar_aday_listesi}
     iz_guncelle(oturum, decision_evaluated_count=len(kararlar))
     iz_artir(oturum, "unknown_critical_count", sum(
         karar.uygunluk is KosulDurumu.DEGERLENDIRILEMIYOR for karar in kararlar
@@ -137,10 +190,14 @@ def kesfet_degerlendir(
     ))
     karar_by_id = {karar.yer_id: karar for karar in kararlar if karar.yer_id}
     degerlendirilen: list[_DegerlendirilmisAday] = []
+    uygun_karar_adaylari: list[KararAdayi] = []
     for sonuc in yer_sonuclari:
         assert sonuc.yer is not None
         karar = karar_by_id.get(sonuc.yer.place_id)
         if karar is None or karar.uygunluk is not KosulDurumu.UYGUN:
+            continue
+        karar_adayi = karar_adaylari.get(sonuc.yer.place_id)
+        if karar_adayi is None:
             continue
         imza = (
             *_desteklenen_tercihler(karar),
@@ -148,31 +205,27 @@ def kesfet_degerlendir(
             sonuc.cografya.ilce_id or "",
         )
         degerlendirilen.append(_DegerlendirilmisAday(sonuc, karar, imza))
-    secilen = _secim_yap(degerlendirilen, talep.hedef_sayi)
+        uygun_karar_adaylari.append(karar_adayi)
+    secilen_adaylar = oneri_listesini_sec(baglam, uygun_karar_adaylari, talep.hedef_sayi)
+    degerlenen_by_id = {
+        aday.arama.yer.place_id: aday for aday in degerlendirilen if aday.arama.yer is not None
+    }
+    secilen = [
+        degerlenen_by_id[aday.yer_id]
+        for aday in secilen_adaylar
+        if aday.yer_id in degerlenen_by_id
+    ]
     secenekler: list[KesfetSecenegiSemasi] = []
     ilk = secilen[0] if secilen else None
     for aday in secilen:
         assert aday.arama.yer is not None
-        amac_metni = {
-            "kahve_icmek": "Kahve içmek", "yemek_yemek": "Yemek yemek",
-            "tarihi_kulturel_ziyaret": "Tarih ve kültür gezisi",
-        }.get(baglam.amac, "Bu ziyaret")
-        neden = f"{amac_metni} için uygunluğunu doğrulayabildik."
-        dogrulananlar = [
-            SOMUT_KOSULLAR[g.ilgili_kosul].etiket
-            for g in aday.karar.gerekceler
-            if g.kod is NedenKodu.ZORUNLU_KOSUL_DOGRULANDI
-            and g.ilgili_kosul in SOMUT_KOSULLAR
-        ]
-        if dogrulananlar:
-            neden += f" {', '.join(dogrulananlar)} isteğini de karşılıyor."
         secenekler.append(
             KesfetSecenegiSemasi(
                 yer=aday.arama.yer,
                 cografya=aday.arama.cografya,
                 ana_kategori=aday.arama.ana_kategori,
                 alt_kategori=aday.arama.alt_kategori,
-                neden_bu=neden,
+                neden_bu=_neden_metni(baglam.amac, aday.karar),
                 anlamli_fark=_fark_metni(aday, None if aday is ilk else ilk),
                 karar_sonucu=KararSonucuSemasi.domainden(aday.karar),
             )

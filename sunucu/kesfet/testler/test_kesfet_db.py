@@ -99,3 +99,27 @@ def test_ilk_elli_unknown_amac_claimi_olan_gec_adayi_gizlemez(oturum: Session):
     destekli, _ = _yer_ekle(oturum, sehir, ilce, f"Z Destekli {ek}", amac_var=True)
     cevap = kesfet_degerlendir(oturum, _talep(ek, sehir), request_id="ilk-elli")
     assert str(destekli.id) in {x.yer.place_id for x in cevap.secenekler}
+
+
+def test_karantinali_kimlik_oneride_ve_havuzda_yoktur(oturum: Session):
+    sehir = oturum.query(Sehir).filter(Sehir.arama_isim == "samsun").one()
+    ilce = oturum.query(Ilce).filter_by(sehir_id=sehir.id, arama_isim="atakum").one()
+    ad = f"Karantina {uuid.uuid4().hex[:8]}"
+    yer, _ = _yer_ekle(oturum, sehir, ilce, f"{ad} Kirli", amac_var=True)
+    sube = oturum.query(Sube).filter_by(legacy_yer_id=yer.id).one()
+    sube.durum = "karantina"
+    sube.kimlik_kalite_sinifi = "karantina"
+    oturum.flush()
+    cevap = kesfet_degerlendir(oturum, _talep(ad, sehir), request_id="karantina")
+    assert str(yer.id) not in {x.yer.place_id for x in cevap.secenekler}
+
+
+def test_ayni_isimli_iki_canonical_listede_tek_kalir(oturum: Session):
+    sehir = oturum.query(Sehir).filter(Sehir.arama_isim == "samsun").one()
+    ilce = oturum.query(Ilce).filter_by(sehir_id=sehir.id, arama_isim="atakum").one()
+    ad = f"Cift Restoran {uuid.uuid4().hex[:8]}"
+    _yer_ekle(oturum, sehir, ilce, ad, amac_var=True)
+    _yer_ekle(oturum, sehir, ilce, ad, amac_var=True)
+    cevap = kesfet_degerlendir(oturum, _talep(ad, sehir), request_id="cift")
+    isimler = [secenek.yer.isim for secenek in cevap.secenekler]
+    assert isimler.count(ad) <= 1

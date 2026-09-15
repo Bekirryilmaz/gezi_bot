@@ -1,9 +1,9 @@
 ---
 title: "Şamandıra — Dokümantasyon Dizini"
-version: "1.9"
+version: "2.0"
 status: "dokumantasyon-kurali"
 phase: "urun-mimarisi"
-last_update: "2026-09-14"
+last_update: "2026-09-16"
 depends:
   - "00-product/00-urun-felsefesi.md"
   - "00-product/01-bilgi-mimarisi.md"
@@ -11,6 +11,7 @@ depends:
   - "00-product/03-karar-motoru.md"
   - "00-product/04-sistem-mimarisi.md"
   - "04-ai/05-ai-bilgi-motoru.md"
+  - "04-ai/06-dahili-nlp-sinyal-mimarisi.md"
   - "00-product/06-akilli-rota-motoru.md"
   - "02-ux/07-ux-karar-akislari.md"
   - "03-design/08-tasarim-ilkeleri.md"
@@ -37,20 +38,21 @@ Yeni belgelerin tek kalıcı yeri proje deposunun docs dizinidir. Kullanıcını
 4. [03 Karar Motoru](./00-product/03-karar-motoru.md) — kabul edilmiş karar kuralları.
 5. [04 Sistem Mimarisi](./00-product/04-sistem-mimarisi.md) — kabul edilmiş mimari referans; uygulanmış sistem değildir.
 6. [05 AI Bilgi Motoru](./04-ai/05-ai-bilgi-motoru.md) — kullanıcının Akıllı Rota görevindeki açık beyanıyla kabul edilmiş referans. Dosyasındaki tarihsel durum ifadesi değiştirilmemiştir. Kanıt, bilgi, güven, mekân, Bir İz katkısı ve yayın sınırlarını tanımlar.
-7. [06 Akıllı Rota Motoru](./00-product/06-akilli-rota-motoru.md) — kullanıcının UX Karar Akışları görevindeki açık beyanıyla kabul edilmiş referans. Dosyasındaki tarihsel durum ifadesi değiştirilmemiştir; uygulanmış özellik anlamına gelmez. Günlük rota, düzenleme, kayıt, paylaşım ve ücretsiz/Premium sınırlarını tanımlar.
-8. [07 UX Karar Akışları](./02-ux/07-ux-karar-akislari.md) — kullanıcının Tasarım İlkeleri görevindeki açık beyanıyla kabul edilmiş referans. Dosyasındaki tarihsel durum ifadesi değiştirilmemiştir; uygulanmış veya kullanıcılarla doğrulanmış olduğu anlamına gelmez. Karar akışlarını, kullanıcı kontrolünü, erişilebilirliği ve kesinti davranışlarını tanımlar.
-9. [08 Tasarım İlkeleri](./03-design/08-tasarim-ilkeleri.md) — kabul edilmiş 00–07 üzerine kurulan nihai tasarım anayasası önerisi; kabul ve kullanıcı doğrulaması bekler. İstenen 36 başlığı, 10 tasarım yasasını, değerlendirme ölçütlerini, 48 maddelik öz eleştiriyi, alternatif yaklaşımları ve öz eleştiri sonrası nihai ilkeleri içerir. Kod, hero, wireframe, renk paleti veya bileşen üretmez.
+7. [06 Dahili NLP Sinyal Mimarisi](./04-ai/06-dahili-nlp-sinyal-mimarisi.md) — FAZ 25.2 uygulama sözleşmesi. Fact/experience/sentiment ayrımını, canonical sinyal ailelerini, amaç-bazlı kaynak haklarını ve otomatik yayın yasağını tanımlar.
+8. [06 Akıllı Rota Motoru](./00-product/06-akilli-rota-motoru.md) — kullanıcının UX Karar Akışları görevindeki açık beyanıyla kabul edilmiş referans. Dosyasındaki tarihsel durum ifadesi değiştirilmemiştir; uygulanmış özellik anlamına gelmez. Günlük rota, düzenleme, kayıt, paylaşım ve ücretsiz/Premium sınırlarını tanımlar.
+9. [07 UX Karar Akışları](./02-ux/07-ux-karar-akislari.md) — kullanıcının Tasarım İlkeleri görevindeki açık beyanıyla kabul edilmiş referans. Dosyasındaki tarihsel durum ifadesi değiştirilmemiştir; uygulanmış veya kullanıcılarla doğrulanmış olduğu anlamına gelmez. Karar akışlarını, kullanıcı kontrolünü, erişilebilirliği ve kesinti davranışlarını tanımlar.
+10. [08 Tasarım İlkeleri](./03-design/08-tasarim-ilkeleri.md) — kabul edilmiş 00–07 üzerine kurulan nihai tasarım anayasası önerisi; kabul ve kullanıcı doğrulaması bekler. İstenen 36 başlığı, 10 tasarım yasasını, değerlendirme ölçütlerini, 48 maddelik öz eleştiriyi, alternatif yaklaşımları ve öz eleştiri sonrası nihai ilkeleri içerir. Kod, hero, wireframe, renk paleti veya bileşen üretmez.
 
-10. [09 Ürün Ekosistemi](./09-business/09-urun-ekosistemi.md) — kabul edilmiş 00–08 üzerine kurulan ürün ekosistemi önerisi; kabul bekler. Mekan, kullanıcı, şehir ve bilgi yaşam döngülerini; Bir İz, kişisel hafıza, paylaşım, ücretsiz/Premium hakları ve ticari sürdürülebilirliği tanımlar. 14 Mermaid diyagramı, 48 maddelik öz eleştiri, alternatif mimariler ve nihai ilkeler içerir. Kod veya UI üretmez.
+11. [09 Ürün Ekosistemi](./09-business/09-urun-ekosistemi.md) — kabul edilmiş 00–08 üzerine kurulan ürün ekosistemi önerisi; kabul bekler. Mekan, kullanıcı, şehir ve bilgi yaşam döngülerini; Bir İz, kişisel hafıza, paylaşım, ücretsiz/Premium hakları ve ticari sürdürülebilirliği tanımlar. 14 Mermaid diyagramı, 48 maddelik öz eleştiri, alternatif mimariler ve nihai ilkeler içerir. Kod veya UI üretmez.
 
-11. [10 Design System](./03-design/10-design-system.md) — kabul edilmiş 00–09 üzerine kurulan tasarım sistemi anayasası önerisi; ayrıca kabul ve doğrulama bekler. 60 ana başlık, yedi zorunlu değerlendirme başlığını taşıyan 48 bileşen sözleşmesi, 22 Mermaid diyagramı, 32 kabul senaryosu, 60 maddelik öz eleştiri, dış sistem karşılaştırmaları ve nihai ilkeler içerir. Web, mobil, tablet, admin, Premium, Akıllı Rota, AI ve Yer yüzeyleri için ortak kuralları tanımlar; kod veya UI üretmez.
+12. [10 Design System](./03-design/10-design-system.md) — kabul edilmiş 00–09 üzerine kurulan tasarım sistemi anayasası önerisi; ayrıca kabul ve doğrulama bekler. 60 ana başlık, yedi zorunlu değerlendirme başlığını taşıyan 48 bileşen sözleşmesi, 22 Mermaid diyagramı, 32 kabul senaryosu, 60 maddelik öz eleştiri, dış sistem karşılaştırmaları ve nihai ilkeler içerir. Web, mobil, tablet, admin, Premium, Akıllı Rota, AI ve Yer yüzeyleri için ortak kuralları tanımlar; kod veya UI üretmez.
 
-12. [11 Ekran Mimarisi](./03-design/11-ekran-mimarisi.md) — kabul edilmiş 00–10 üzerine kurulan ekran mimarisi önerisi; ayrıca kabul ve kullanıcı doğrulaması bekler. Otuz ekranın her birini on beş başlıkla tanımlar; navigation, deep link, URL, web/mobil/tablet, geri dönüş, geçmiş, filtre, durum, oturum ve yetkilendirme sözleşmelerini içerir. 35 Mermaid diyagramı, 18 kullanıcı senaryosu, 70 maddelik öz eleştiri, alternatif mimariler ve nihai ilkeler bulunur. Yalnız mimari dokümantasyondur; kod, UI veya wireframe üretmez.
+13. [11 Ekran Mimarisi](./03-design/11-ekran-mimarisi.md) — kabul edilmiş 00–10 üzerine kurulan ekran mimarisi önerisi; ayrıca kabul ve kullanıcı doğrulaması bekler. Otuz ekranın her birini on beş başlıkla tanımlar; navigation, deep link, URL, web/mobil/tablet, geri dönüş, geçmiş, filtre, durum, oturum ve yetkilendirme sözleşmelerini içerir. 35 Mermaid diyagramı, 18 kullanıcı senaryosu, 70 maddelik öz eleştiri, alternatif mimariler ve nihai ilkeler bulunur. Yalnız mimari dokümantasyondur; kod, UI veya wireframe üretmez.
 
-13. [12 Görsel Tasarım Dili](./03-design/12-gorsel-tasarim-dili.md)
-14. [13 Bileşen ve Etkileşim Sözleşmeleri](./03-design/13-bilesen-ve-etkilesim-sozlesmeleri.md) — kabul edilmiş 00–12 kaynaklarının davranış karşılığı. İstenen 48 konu ve dört tamamlayıcı bölüm; her bölümde amaç, kullanıcı beklentisi, davranış kuralları, istisnalar ve kabul kriterleri vardır. B01–B48 ile E01–E30 kapsamı eşlenmiştir. 30 Mermaid diyagramı, 77 örnek senaryo, 50 öz eleştiri ve 20 maddelik nihai Interaction Contract içerir. Belge incelemeye hazırdır; kod, UI, Figma veya yeni ürün fikri değildir.
+14. [12 Görsel Tasarım Dili](./03-design/12-gorsel-tasarim-dili.md)
+15. [13 Bileşen ve Etkileşim Sözleşmeleri](./03-design/13-bilesen-ve-etkilesim-sozlesmeleri.md) — kabul edilmiş 00–12 kaynaklarının davranış karşılığı. İstenen 48 konu ve dört tamamlayıcı bölüm; her bölümde amaç, kullanıcı beklentisi, davranış kuralları, istisnalar ve kabul kriterleri vardır. B01–B48 ile E01–E30 kapsamı eşlenmiştir. 30 Mermaid diyagramı, 77 örnek senaryo, 50 öz eleştiri ve 20 maddelik nihai Interaction Contract içerir. Belge incelemeye hazırdır; kod, UI, Figma veya yeni ürün fikri değildir.
 
-15. [14 Ürün Özellik Haritası](./09-business/14-urun-ozellik-haritasi.md) — FAZ 14 gelişim planı. 40 ana bölüm, 32 sorumluluk kaydı, 30 Mermaid diyagramı, 40 kabul senaryosu, 60 maddelik öz eleştiri ve nihai ürün yol haritası içerir. MVP/v1/v2 sırası, gerçek değere bağlı Premium, kurumsal kapsam, ticari büyüme ve yayın kapıları tanımlanır. Kabul edilmiş günlük Akıllı Rota ile ayrı kapsam kararı gerektiren çok günlük Akıllı Gezi açıkça ayrılır. Kod, UI veya uygulanmış ürün değildir.
+16. [14 Ürün Özellik Haritası](./09-business/14-urun-ozellik-haritasi.md) — FAZ 14 gelişim planı. 40 ana bölüm, 32 sorumluluk kaydı, 30 Mermaid diyagramı, 40 kabul senaryosu, 60 maddelik öz eleştiri ve nihai ürün yol haritası içerir. MVP/v1/v2 sırası, gerçek değere bağlı Premium, kurumsal kapsam, ticari büyüme ve yayın kapıları tanımlanır. Kabul edilmiş günlük Akıllı Rota ile ayrı kapsam kararı gerektiren çok günlük Akıllı Gezi açıkça ayrılır. Kod, UI veya uygulanmış ürün değildir.
 
 **14 Eylül 2026 — FAZ 14 kaynak ve kapsam kaydı:** 00–12 kabul edilmiş referans kümesidir; 13, dizinde ayrıca kabulü kayıtlı olmayan tamamlayıcı davranış kaynağıdır. 14'teki sürümleme ve geliştirme sırası planlama kararıdır; çok günlük Akıllı Gezi yeni ürün genişlemesidir. Belgenin tamamlanması kapsam değişikliği, araştırma sonucu veya ürün yayını anlamına gelmez. Kaynak gövdeleri korunmuştur. Sonraki çalışma uygulama farkı, pilot kapasitesi ve doğrulama planıdır; henüz yazılmamıştır.
 
@@ -102,6 +104,7 @@ Her yeni belge başında title, version, status, phase, last_update, depends, af
 - [03 Karar Motoru](./00-product/03-karar-motoru.md)
 - [04 Sistem Mimarisi](./00-product/04-sistem-mimarisi.md)
 - [05 AI Bilgi Motoru](./04-ai/05-ai-bilgi-motoru.md)
+- [06 Dahili NLP Sinyal Mimarisi](./04-ai/06-dahili-nlp-sinyal-mimarisi.md)
 - [06 Akıllı Rota Motoru](./00-product/06-akilli-rota-motoru.md)
 - [07 UX Karar Akışları](./02-ux/07-ux-karar-akislari.md)
 - [08 Tasarım İlkeleri](./03-design/08-tasarim-ilkeleri.md)
@@ -135,3 +138,22 @@ docs altındaki bütün yeni ürün ve geliştirme belgeleri; klasör sahipliği
 - [faz25-1-promotion-veri-stratejisi.md](./01-research/faz25-1-promotion-veri-stratejisi.md)
 
 Canlı doğrulamalar ve teknik ölçümler kayıtlıdır; kaynak hakları/coğrafi veri/saha gold bağımlılıkları nedeniyle ürün geçişi NO-GO.
+
+## FAZ 25.2 dahili NLP sinyal sözleşmesi — 15 Eylül 2026
+
+- [06 Dahili NLP Sinyal Mimarisi](./04-ai/06-dahili-nlp-sinyal-mimarisi.md)
+- [faz25-2-sonuc.md](./01-research/faz25-2-sonuc.md)
+
+Canonical fact/experience/sentiment ayrımı, amaç-bazlı hak kapıları ve
+otomatik yayın yasağı uygulama sözleşmesi olarak kaydedilmiştir.
+Development NLP/aggregation/ilçe/OSM ve 126+30 ölçümleri sonuç belgesindedir.
+Akıllı Rota geçişi NO-GO; production DB, commit ve push yoktur.
+
+## FAZ 25.3 kimlik temizliği ve sıralama — 16 Eylül 2026
+
+- [faz25-3-sonuc.md](./01-research/faz25-3-sonuc.md)
+
+Kirli kimlik karantina, quality-first sıralama, `internet_kafe` amaç yasağı,
+0015 veri korumalı downgrade ve 126+30 yeniden ölçüm kayıtlıdır.
+Bugün Ne Yapalım kahve/yemek/tarih için sınırlı GO; Akıllı Rota NO-GO.
+Production DB, commit ve push yoktur.

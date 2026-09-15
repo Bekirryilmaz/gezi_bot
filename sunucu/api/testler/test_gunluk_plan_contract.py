@@ -82,6 +82,9 @@ def test_gunluk_endpoint_bir_gun_dondurur_ve_idempotent_tekrarlar(monkeypatch):
     monkeypatch.setattr(rotalar_router, "gunluk_rota_olustur", sahte_motor)
     uygulama.dependency_overrides[oturum_al] = _sahte_oturum
     try:
+        from sunucu.api.testler.conftest import _yazma_sayacini_sifirla
+
+        _yazma_sayacini_sifirla()
         istemci = TestClient(uygulama)
         basliklar = {"Idempotency-Key": "daily-repeat-1"}
         ilk = istemci.post("/v1/gunluk-planlar", headers=basliklar, json={"sehir_anahtari": "samsun"})

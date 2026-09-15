@@ -42,6 +42,8 @@ class IncelemeDosyasiCevabi(BaseModel):
     nesne_id: str
     durum: str
     risk_sinifi: str
+    oncelik_puani: int = 0
+    triyaj_sinifi: str | None = None
     onerilen_eylem: str | None
     karar_gerekcesi: str | None
     surum: int
@@ -116,3 +118,38 @@ class AuditCevabi(BaseModel):
     istek_id: str
     korelasyon_id: str
     olusturulma_zamani: datetime
+
+
+class BirinciElGozlemTalebi(BaseModel):
+    sube_id: str = Field(min_length=8, max_length=80)
+    aile: str = Field(min_length=2, max_length=50)
+    deger: Any
+    ozet: str = Field(min_length=8, max_length=2000)
+    gerekce: str = Field(min_length=8, max_length=2000)
+
+
+class BirinciElGozlemCevabi(BaseModel):
+    gozlem_id: str
+    iddia_id: str
+    iddia_surumu_id: str
+    inceleme_dosyasi_id: str
+    yayin_durumu: str
+    otomatik_yayin: bool
+
+
+class DahiliSinyalOzetCevabi(BaseModel):
+    id: str
+    sube_id: str
+    yer_id: str | None
+    mekan_adi: str
+    aile: str
+    guven_sinifi: str
+    durum: str
+    preference_eligible: bool
+    unique_review_count: int | None = None
+    conflict_level: str | None = None
+
+
+class DahiliSinyalSayfasiCevabi(BaseModel):
+    kayitlar: list[DahiliSinyalOzetCevabi]
+    toplam: int

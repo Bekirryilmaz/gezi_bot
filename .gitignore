@@ -15,6 +15,7 @@ veri/cikti/ham/**/*.jsonl
 veri/cikti/islenmis/**/*.jsonl
 veri/cikti/islenmis/**/*.parquet
 veri/cikti/raporlar/*.md
+veri/cikti/raporlar/**/*.json
 !veri/cikti/**/.gitkeep
 
 # Duygu analizi modelleri (HuggingFace onbellegi, buyuk boyutlu)

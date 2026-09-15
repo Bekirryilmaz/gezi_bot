@@ -27,7 +27,11 @@ def _json_donusturucu(deger: Any) -> Any:
     raise TypeError(f"'{type(deger)}' tipi JSON'a donusturulemiyor")
 
 
-def jsonl_yaz(dosya_yolu: str | Path, kayitlar: list[BaseModel], ekle_modu: bool = False) -> None:
+def jsonl_yaz(
+    dosya_yolu: str | Path,
+    kayitlar: list[BaseModel | dict[str, Any]],
+    ekle_modu: bool = False,
+) -> None:
     """Pydantic modellerinden olusan bir listeyi JSONL dosyasina yazar.
 
     ekle_modu=True ise dosyanin sonuna ekler (var olan veriyi silmez),
@@ -38,7 +42,8 @@ def jsonl_yaz(dosya_yolu: str | Path, kayitlar: list[BaseModel], ekle_modu: bool
     kip = "a" if ekle_modu else "w"
     with dosya_yolu.open(kip, encoding="utf-8") as dosya:
         for kayit in kayitlar:
-            satir = json.dumps(kayit.model_dump(mode="json"), ensure_ascii=False, default=_json_donusturucu)
+            payload = kayit.model_dump(mode="json") if isinstance(kayit, BaseModel) else kayit
+            satir = json.dumps(payload, ensure_ascii=False, default=_json_donusturucu)
             dosya.write(satir + "\n")
 
 
@@ -49,7 +54,11 @@ def jsonl_tek_satir_ekle(dosya_yolu: str | Path, kayit: BaseModel) -> None:
     dosya_yolu = Path(dosya_yolu)
     dosya_yolu.parent.mkdir(parents=True, exist_ok=True)
     with dosya_yolu.open("a", encoding="utf-8") as dosya:
-        satir = json.dumps(kayit.model_dump(mode="json"), ensure_ascii=False, default=_json_donusturucu)
+        satir = json.dumps(
+            kayit.model_dump(mode="json"),
+            ensure_ascii=False,
+            default=_json_donusturucu,
+        )
         dosya.write(satir + "\n")
 
 

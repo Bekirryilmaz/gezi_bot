@@ -84,6 +84,8 @@ class IncelemeDosyasi(Taban):
     nesne_id: Mapped[str] = mapped_column(String(100), nullable=False)
     durum: Mapped[str] = mapped_column(String(30), nullable=False, default="bekliyor")
     risk_sinifi: Mapped[str] = mapped_column(String(20), nullable=False, default="dusuk")
+    oncelik_puani: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    triyaj_sinifi: Mapped[str | None] = mapped_column(String(30))
     onerilen_eylem: Mapped[str | None] = mapped_column(String(80))
     komut_payload: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     # Deterministik veri isi insan onayi bekleyen bir dosya acabilir. Null,
@@ -99,4 +101,7 @@ class IncelemeDosyasi(Taban):
     guncellenme_zamani: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
-    __table_args__ = (Index("ix_inceleme_kuyruk", "durum", "dosya_turu", "risk_sinifi"),)
+    __table_args__ = (
+        Index("ix_inceleme_kuyruk", "durum", "dosya_turu", "risk_sinifi"),
+        Index("ix_inceleme_oncelik", "durum", "oncelik_puani"),
+    )

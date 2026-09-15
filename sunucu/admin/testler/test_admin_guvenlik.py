@@ -20,7 +20,7 @@ from sunucu.veritabani.admin_modelleri import (
     IncelemeDosyasi,
 )
 from sunucu.veritabani.baglanti import motor, oturum_al
-from sunucu.veritabani.bilgi_modelleri import Iddia
+from sunucu.veritabani.bilgi_modelleri import Iddia, IddiaSurumu
 from sunucu.veritabani.kimlik_modelleri import EslemeAdayi, Sube
 from sunucu.veritabani.modeller import Yer
 
@@ -153,4 +153,52 @@ def test_claim_kuyrugu_aile_durum_mekan_ve_sayfalama_sunar(admin_ortami):
     detay = client.get(f"/v1/admin/claimler/{govde['kayitlar'][0]['id']}")
     assert detay.status_code == 200
     assert detay.json()["mekan_adi"] and detay.json()["public_preview"]["aile"] == "wifi"
+    client.post("/v1/admin/logout", headers={"X-CSRF-Token": csrf})
+
+
+def test_admin_dahili_sinyal_ve_birinci_el_gozlem_public_yayinlamaz(admin_ortami):
+    client, oturum, yonetici, gozlemci, _ = admin_ortami
+    yer = oturum.query(Yer).first()
+    assert yer is not None
+    sube = oturum.query(Sube).filter_by(legacy_yer_id=yer.id).one()
+    csrf = _login(client, gozlemci.eposta)
+    assert client.get("/v1/admin/dahili-sinyaller").status_code == 200
+    yasak = client.post(
+        "/v1/admin/gozlemler",
+        headers={"X-CSRF-Token": csrf},
+        json={
+            "sube_id": sube.id,
+            "aile": "wifi",
+            "deger": True,
+            "ozet": "Mekanda wifi dogrulandi yerinde.",
+            "gerekce": "Birinci el gozlem kaydi icin yeterli gerekce.",
+        },
+    )
+    assert yasak.status_code == 403
+    client.post("/v1/admin/logout", headers={"X-CSRF-Token": csrf})
+    csrf = _login(client, yonetici.eposta)
+    cevap = client.post(
+        "/v1/admin/gozlemler",
+        headers={"X-CSRF-Token": csrf},
+        json={
+            "sube_id": sube.id,
+            "aile": "wifi",
+            "deger": True,
+            "ozet": "Mekanda wifi dogrulandi yerinde.",
+            "gerekce": "Birinci el gozlem kaydi icin yeterli gerekce.",
+        },
+    )
+    assert cevap.status_code == 200, cevap.text
+    govde = cevap.json()
+    assert govde["otomatik_yayin"] is False
+    assert govde["yayin_durumu"] == "inceleme_bekliyor"
+    iddia = oturum.get(Iddia, govde["iddia_id"])
+    assert iddia is not None
+    surum = (
+        oturum.query(IddiaSurumu)
+        .filter_by(iddia_id=iddia.id, surum_no=iddia.aktif_surum_no)
+        .one()
+    )
+    assert surum.yayin_durumu == "inceleme_bekliyor"
+    assert "/v1/admin/dahili-sinyaller" not in __import__("sunucu.api.uygulama", fromlist=["uygulama"]).uygulama.openapi()["paths"]
     client.post("/v1/admin/logout", headers={"X-CSRF-Token": csrf})

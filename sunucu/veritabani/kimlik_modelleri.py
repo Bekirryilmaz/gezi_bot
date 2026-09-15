@@ -32,9 +32,12 @@ class Sube(Taban):
     guncel_isim: Mapped[str] = mapped_column(String(255), nullable=False)
     durum: Mapped[str] = mapped_column(String(20), nullable=False, default="aktif")
     yonlendirilen_sube_id: Mapped[str | None] = mapped_column(ForeignKey("subeler.id", ondelete="RESTRICT"))
+    kimlik_kalite_sinifi: Mapped[str] = mapped_column(String(20), nullable=False, default="kullanilabilir")
+    kimlik_kalite_kirilim: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     olusturulma_zamani: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    __table_args__ = (Index("ix_sube_kimlik_kalite", "kimlik_kalite_sinifi", "durum"),)
 
 
 class YerAlias(Taban):

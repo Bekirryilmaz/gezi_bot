@@ -10,10 +10,11 @@ from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine, text
-from sqlalchemy.engine import URL, make_url
+from sqlalchemy.engine import URL, Engine, make_url
 from sqlalchemy.exc import SQLAlchemyError
 from sunucu.veritabani.baglanti import VERITABANI_URL
 from sunucu.veritabani.migrasyonlar.karsilastirma import nesneyi_karsilastir
+from sunucu.veritabani.testler.gecici_veritabani import admin_url_adaylari
 
 REPO_KOKU = Path(__file__).resolve().parents[3]
 SUNUCU_KOKU = REPO_KOKU / "sunucu"
@@ -46,18 +47,30 @@ def _baseline(veritabani_url: str) -> dict[str, object]:
 
 @pytest.fixture
 def gecici_veritabani_uretici() -> Generator[Callable[[], str], None, None]:
-    admin_url = make_url(
-        os.environ.get(
-            "TEST_ADMIN_VERITABANI_URL", "postgresql+psycopg://postgres@localhost:5432/postgres"
-        )
-    )
     olusturulanlar: list[str] = []
-    try:
-        admin_motor = create_engine(admin_url, isolation_level="AUTOCOMMIT")
-        with admin_motor.connect() as baglanti:
-            baglanti.execute(text("SELECT 1"))
-    except SQLAlchemyError as hata:
-        pytest.fail(f"Gecici PostgreSQL veritabani olusturulamiyor: {type(hata).__name__}")
+    admin_motor: Engine | None = None
+    admin_url: URL | None = None
+    son_hata: SQLAlchemyError | None = None
+    for aday_url in admin_url_adaylari():
+        aday_motor = create_engine(aday_url, isolation_level="AUTOCOMMIT")
+        try:
+            with aday_motor.connect() as baglanti:
+                veritabani_acabilir = baglanti.execute(
+                    text("SELECT rolsuper FROM pg_roles WHERE rolname = current_user")
+                ).scalar_one()
+        except SQLAlchemyError as hata:
+            son_hata = hata
+            aday_motor.dispose()
+            continue
+        if not veritabani_acabilir:
+            aday_motor.dispose()
+            continue
+        admin_motor = aday_motor
+        admin_url = aday_url
+        break
+    if admin_motor is None or admin_url is None:
+        hata_turu = type(son_hata).__name__ if son_hata else "BilinmeyenHata"
+        pytest.fail(f"Gecici PostgreSQL veritabani olusturulamiyor: {hata_turu}")
 
     uygulama_url = make_url(VERITABANI_URL)
     if not uygulama_url.username:
@@ -100,7 +113,7 @@ def test_fresh_db_head_schema_check_ve_baseline(
 ) -> None:
     url = gecici_veritabani_uretici()
     _alembic(url, "upgrade", "head")
-    assert "0014" in _alembic(url, "current").stdout
+    assert "0016" in _alembic(url, "current").stdout
     assert "No new upgrade operations detected" in _alembic(url, "check").stdout
 
     rapor = _baseline(url)

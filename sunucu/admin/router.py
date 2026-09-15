@@ -13,9 +13,13 @@ from sunucu.admin.semalar import (
     AdminLoginTalebi,
     AuditCevabi,
     BirlestirmeCevabi,
+    BirinciElGozlemCevabi,
+    BirinciElGozlemTalebi,
     ClaimIncelemeCevabi,
     ClaimOzetCevabi,
     ClaimSayfasiCevabi,
+    DahiliSinyalOzetCevabi,
+    DahiliSinyalSayfasiCevabi,
     EslemeAdayiCevabi,
     IkinciIncelemeTalebi,
     IncelemeDosyasiCevabi,
@@ -41,6 +45,7 @@ from sunucu.auth.servis import (
 from sunucu.veritabani.admin_modelleri import AdminAuditOlayi, AdminKullanici, IncelemeDosyasi
 from sunucu.veritabani.baglanti import oturum_al
 from sunucu.veritabani.bilgi_modelleri import (
+    DahiliSinyalOzeti,
     Gozlem,
     Iddia,
     IddiaSurumu,
@@ -166,7 +171,11 @@ def kuyruk(
 ) -> list[IncelemeDosyasi]:
     sorgu = oturum.query(IncelemeDosyasi).filter(IncelemeDosyasi.durum != "tamamlandi")
     dosyalar = (
-        sorgu.order_by(IncelemeDosyasi.risk_sinifi.desc(), IncelemeDosyasi.olusturulma_zamani)
+        sorgu.order_by(
+            IncelemeDosyasi.oncelik_puani.desc(),
+            IncelemeDosyasi.risk_sinifi.desc(),
+            IncelemeDosyasi.olusturulma_zamani,
+        )
         .limit(200)
         .all()
     )
@@ -464,3 +473,96 @@ def audit_listele(
         for olay in olaylar
         if baglam.kapsam_izinli_mi(nesne_sehir_id(oturum, olay.nesne_turu, olay.nesne_id))
     ]
+
+
+@yonlendirici.get("/dahili-sinyaller", response_model=DahiliSinyalSayfasiCevabi)
+def dahili_sinyaller(
+    aile: str | None = Query(default=None, max_length=50),
+    durum: str | None = Query(default=None, max_length=30),
+    oturum: Session = Depends(oturum_al),
+    baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.INCELEME_GOR)),
+) -> DahiliSinyalSayfasiCevabi:
+    sorgu = (
+        oturum.query(DahiliSinyalOzeti, Sube, Yer)
+        .join(Sube, Sube.id == DahiliSinyalOzeti.sube_id)
+        .join(Yer, Yer.id == Sube.legacy_yer_id)
+    )
+    if aile:
+        sorgu = sorgu.filter(DahiliSinyalOzeti.aile == aile)
+    if durum:
+        sorgu = sorgu.filter(DahiliSinyalOzeti.durum == durum)
+    kayitlar = []
+    for ozet, sube, yer in sorgu.order_by(Sube.guncel_isim, DahiliSinyalOzeti.aile).limit(300):
+        if not baglam.kapsam_izinli_mi(nesne_sehir_id(oturum, "sube", sube.id)):
+            continue
+        govde = dict(ozet.ozet or {})
+        kayitlar.append(
+            DahiliSinyalOzetCevabi(
+                id=ozet.id,
+                sube_id=sube.id,
+                yer_id=yer.id,
+                mekan_adi=yer.isim,
+                aile=ozet.aile,
+                guven_sinifi=ozet.guven_sinifi,
+                durum=ozet.durum,
+                preference_eligible=bool(govde.get("preference_eligible")),
+                unique_review_count=govde.get("unique_review_count"),
+                conflict_level=govde.get("conflict_level"),
+            )
+        )
+    return DahiliSinyalSayfasiCevabi(kayitlar=kayitlar, toplam=len(kayitlar))
+
+
+@yonlendirici.get("/dahili-sinyaller/{ozet_id}", response_model=DahiliSinyalOzetCevabi)
+def dahili_sinyal_detay(
+    ozet_id: str,
+    oturum: Session = Depends(oturum_al),
+    baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.INCELEME_GOR)),
+) -> DahiliSinyalOzetCevabi:
+    satir = (
+        oturum.query(DahiliSinyalOzeti, Sube, Yer)
+        .join(Sube, Sube.id == DahiliSinyalOzeti.sube_id)
+        .join(Yer, Yer.id == Sube.legacy_yer_id)
+        .filter(DahiliSinyalOzeti.id == ozet_id)
+        .first()
+    )
+    if satir is None:
+        raise HTTPException(status_code=404, detail="Dahili sinyal bulunamadi.")
+    ozet, sube, yer = satir
+    nesne_yetkisini_dogrula(oturum, baglam, "sube", sube.id)
+    govde = dict(ozet.ozet or {})
+    return DahiliSinyalOzetCevabi(
+        id=ozet.id,
+        sube_id=sube.id,
+        yer_id=yer.id,
+        mekan_adi=yer.isim,
+        aile=ozet.aile,
+        guven_sinifi=ozet.guven_sinifi,
+        durum=ozet.durum,
+        preference_eligible=bool(govde.get("preference_eligible")),
+        unique_review_count=govde.get("unique_review_count"),
+        conflict_level=govde.get("conflict_level"),
+    )
+
+
+@yonlendirici.post("/gozlemler", response_model=BirinciElGozlemCevabi)
+def birinci_el_gozlem(
+    talep: BirinciElGozlemTalebi,
+    request: Request,
+    oturum: Session = Depends(oturum_al),
+    baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.CLAIM_INCELE)),
+) -> BirinciElGozlemCevabi:
+    from sunucu.admin.gozlem_servisi import birinci_el_gozlem_yaz
+
+    sonuc = birinci_el_gozlem_yaz(
+        oturum,
+        baglam=baglam,
+        sube_id=talep.sube_id,
+        aile=talep.aile,
+        deger=talep.deger,
+        ozet=talep.ozet,
+        gerekce=talep.gerekce,
+        istek_id=_istek_id(request),
+    )
+    oturum.commit()
+    return BirinciElGozlemCevabi(**sonuc)

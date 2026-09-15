@@ -20,7 +20,7 @@ def karar_degerlendir(talep: KararDegerlendirmeTalebi, request: Request, oturum:
     request_id = getattr(request.state, "request_id", str(uuid4()))
     baglam = talep.baglam.domaine(talep.giris_kanali)
     try:
-        sonuclar, trace = kararlari_degerlendir(oturum, baglam, talep.aday_yer_idleri, request_id=request_id)
+        sonuclar, trace, _adaylar = kararlari_degerlendir(oturum, baglam, talep.aday_yer_idleri, request_id=request_id)
     except SQLAlchemyError:
         oturum.rollback()
         return hata_cevabi(

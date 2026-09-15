@@ -17,7 +17,8 @@ from urllib.parse import urlparse
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
-from sunucu.bilgi.domain import HakDurumu
+from ortak.sabitler import ALT_KATEGORI_AMAC_ESLEMESI
+from sunucu.bilgi.domain import HakDurumu, KullanimAmaci
 from sunucu.veritabani.admin_modelleri import IncelemeDosyasi
 from sunucu.veritabani.baglanti import OturumUretici
 from sunucu.veritabani.bilgi_modelleri import (
@@ -34,15 +35,7 @@ from sunucu.veritabani.yayin_modelleri import YayinKaydi
 
 OSM_KAYNAK = "openstreetmap"
 VARSAYILAN_KATEGORILER = ("kafe", "restoran_lokanta", "tarihi_kulturel")
-AMAC_ESLEMESI = {
-    "kafe": ("kahve_icmek",),
-    "restoran_lokanta": ("yemek_yemek",),
-    "tarihi_kulturel": ("tarihi_kulturel_ziyaret",),
-    "tatli_pastane": ("tatli_yemek",),
-    "eglence_aktivite": ("eglence",),
-    "doga_manzara": ("acik_hava",),
-    "plaj_su": ("acik_hava",),
-}
+AMAC_ESLEMESI = ALT_KATEGORI_AMAC_ESLEMESI
 
 # Sayisal esik bilincli olarak yoktur. Bu aileler ancak operasyon karariyla
 # azami yasa kavusur; o zamana kadar yeniden toplama/dogrulama olayi eskitir.
@@ -95,6 +88,30 @@ FRESHNESS_POLITIKALARI: dict[str, dict[str, str | int | None]] = {
         "yeniden_dogrulama": "Yeni OSM cekimi veya resmi tarife kontrolu.",
         "azami_yas_gun": None,
     },
+    "otopark": {
+        "kategori": "olanak",
+        "gerekce": "Park imkani degisebilir.",
+        "yeniden_dogrulama": "Yeni OSM cekimi veya yerel dogrulama.",
+        "azami_yas_gun": None,
+    },
+    "acik_alan": {
+        "kategori": "ortam",
+        "gerekce": "Bahce/teras donanimi degisebilir.",
+        "yeniden_dogrulama": "Yeni OSM cekimi veya yerel dogrulama.",
+        "azami_yas_gun": None,
+    },
+    "rezervasyon": {
+        "kategori": "olanak",
+        "gerekce": "Rezervasyon politikasi degisebilir.",
+        "yeniden_dogrulama": "Yeni OSM cekimi veya isletmeci bildirimi.",
+        "azami_yas_gun": None,
+    },
+    "calisma_saatleri": {
+        "kategori": "zaman",
+        "gerekce": "Acilis saatleri degisebilir.",
+        "yeniden_dogrulama": "Yeni OSM cekimi veya resmi duyuru.",
+        "azami_yas_gun": None,
+    },
 }
 
 OSM_HAK_DAYANAGI = (
@@ -102,6 +119,11 @@ OSM_HAK_DAYANAGI = (
     "OSM verisini ticari kullanima uygun acik veri olarak tanimlar. Resmi kosullar: "
     "https://www.openstreetmap.org/copyright (ODbL, OpenStreetMap ve katilimcilari atfi, "
     "turev veritabani icin ayni lisans kosulu)."
+)
+GOOGLE_KAYNAK = "google_maps"
+GOOGLE_DAHILI_NLP_HAK_DAYANAGI = (
+    "Google Maps yorumlari FAZ 25.2 karariyla yalniz dahili AI isleme icin "
+    "kullanilir; kamusal gosterim, turev iddia ve public publication kapisi kapali kalir."
 )
 
 
@@ -213,9 +235,13 @@ def metin_candidate_degeri(deger: Any) -> str | None:
     return temiz if temiz and temiz.casefold() not in _BOS_YER_TUTUCULAR else None
 
 
-def kaynak_haklari_uygun_mu(
-    politika: KaynakPolitikasi | None, *, simdi: datetime | None = None
+def kaynak_hakki_uygun_mu(
+    politika: KaynakPolitikasi | None,
+    *,
+    amac: KullanimAmaci | str,
+    simdi: datetime | None = None,
 ) -> tuple[bool, str | None]:
+    """Politikanin yalniz istenen kullanim amacina izin verip vermedigini dondurur."""
     simdi = simdi or datetime.now(UTC)
     if politika is None:
         return False, "kaynak_politikasi_yok"
@@ -223,13 +249,27 @@ def kaynak_haklari_uygun_mu(
         return False, "kaynak_politikasi_henuz_gecerli_degil"
     if politika.gecerli_bitis and politika.gecerli_bitis <= simdi:
         return False, "kaynak_politikasi_geri_cekilmis_veya_suresi_dolmus"
-    alanlar = (
-        politika.kamusal_gosterim,
-        politika.turev_iddia,
-        politika.ai_isleme,
-        politika.uzun_sureli_saklama,
-    )
-    if any(deger != HakDurumu.IZINLI.value for deger in alanlar):
+    kullanim_amaci = KullanimAmaci(amac)
+    try:
+        hak_durumu = HakDurumu(getattr(politika, kullanim_amaci.value))
+    except (AttributeError, TypeError, ValueError):
+        return False, "kaynak_politikasi_hak_degeri_gecersiz"
+    if hak_durumu is not HakDurumu.IZINLI:
+        return False, f"{kullanim_amaci.value}_hakki_yetersiz"
+    return True, None
+
+
+def kaynak_haklari_uygun_mu(
+    politika: KaynakPolitikasi | None, *, simdi: datetime | None = None
+) -> tuple[bool, str | None]:
+    """Geriye uyumlu public pipeline kapisi; dort hakkin tamamini arar."""
+    for amac in KullanimAmaci:
+        uygun, neden = kaynak_hakki_uygun_mu(politika, amac=amac, simdi=simdi)
+        if not uygun:
+            if neden and neden.endswith("_hakki_yetersiz"):
+                return False, "display_derivative_processing_retention_hakki_yetersiz"
+            return False, neden
+    if politika is None:
         return False, "display_derivative_processing_retention_hakki_yetersiz"
     return True, None
 
@@ -244,6 +284,23 @@ def osm_politikasini_uygula(oturum: Session) -> KaynakPolitikasi:
     politika.ai_isleme = HakDurumu.IZINLI.value
     politika.uzun_sureli_saklama = HakDurumu.IZINLI.value
     politika.dayanak_notu = OSM_HAK_DAYANAGI
+    politika.gecerli_baslangic = datetime.now(UTC)
+    politika.gecerli_bitis = None
+    oturum.flush()
+    return politika
+
+
+def google_dahili_nlp_politikasini_uygula(oturum: Session) -> KaynakPolitikasi:
+    """Google yorumlarini yalniz dahili AI isleme icin acar; public/turev kapali kalir."""
+    politika = oturum.query(KaynakPolitikasi).filter_by(kaynak=GOOGLE_KAYNAK).first()
+    if politika is None:
+        politika = KaynakPolitikasi(kaynak=GOOGLE_KAYNAK)
+        oturum.add(politika)
+    politika.kamusal_gosterim = HakDurumu.YASAK.value
+    politika.turev_iddia = HakDurumu.YASAK.value
+    politika.ai_isleme = HakDurumu.IZINLI.value
+    politika.uzun_sureli_saklama = HakDurumu.BILINMIYOR.value
+    politika.dayanak_notu = GOOGLE_DAHILI_NLP_HAK_DAYANAGI
     politika.gecerli_baslangic = datetime.now(UTC)
     politika.gecerli_bitis = None
     oturum.flush()
@@ -346,10 +403,16 @@ def satirdan_adaylar(satir: dict[str, Any]) -> list[AdayKaydi]:
         ("wifi", "wifi"),
         ("engelli_erisimi", "tekerlekli_sandalye_erisimi"),
         ("ucretsiz", "ucretsiz"),
+        ("otopark", "otopark"),
+        ("acik_alan", "acik_alan"),
+        ("rezervasyon_gerekli", "rezervasyon"),
     ):
         deger = kaynak_boolean_normalize(ozellikler.get(kaynak_alani), aile=aile)
         if deger is not None:
             ekle(aile, f"ozellikler.{kaynak_alani}", deger)
+    saatler = metin_candidate_degeri(ozellikler.get("opening_hours"))
+    if saatler is not None:
+        ekle("calisma_saatleri", "ozellikler.opening_hours", saatler)
     return adaylar
 
 

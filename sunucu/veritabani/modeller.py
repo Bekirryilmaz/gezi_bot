@@ -26,7 +26,6 @@ from datetime import datetime
 from geoalchemy2 import Geography
 from sqlalchemy import (
     Computed,
-    JSON,
     DateTime,
     Float,
     ForeignKey,
@@ -40,7 +39,6 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ortak.sabitler import AnaKategori
 from sunucu.veritabani.temel import Taban
 
 
@@ -68,7 +66,7 @@ class Sehir(Taban):
         DateTime(timezone=True), server_default=func.now()
     )
 
-    yerler: Mapped[list["Yer"]] = relationship(back_populates="sehir")
+    yerler: Mapped[list[Yer]] = relationship(back_populates="sehir")
 
     def __repr__(self) -> str:
         return f"<Sehir {self.isim}>"
@@ -84,7 +82,9 @@ class Yer(Taban):
     __tablename__ = "yerler"
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
-    sehir_id: Mapped[str] = mapped_column(ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False)
+    sehir_id: Mapped[str] = mapped_column(
+        ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False
+    )
 
     isim: Mapped[str] = mapped_column(String(255), nullable=False)
     arama_isim: Mapped[str] = mapped_column(
@@ -119,7 +119,12 @@ class Yer(Taban):
     duygu_skoru_ortalama: Mapped[float | None] = mapped_column(Float)
     deneyim_puanlari: Mapped[dict] = mapped_column(JSONB, default=dict)
     yer_profili: Mapped[dict] = mapped_column(
-        JSONB, default=dict, comment="dokumanlar/kategori_taksonomisi.md #6 -- YerProfili (fiyat algisi, ulasim, kalabalik zamanlar, ziyaretci profili)"
+        JSONB,
+        default=dict,
+        comment=(
+            "dokumanlar/kategori_taksonomisi.md #6 -- YerProfili "
+            "(fiyat algisi, ulasim, kalabalik zamanlar, ziyaretci profili)"
+        ),
     )
     duygu_ozeti: Mapped[str | None] = mapped_column(
         Text, comment="yer_profili'nden sentezlenen, kullaniciya gosterilecek samimi tanitim metni"
@@ -133,10 +138,12 @@ class Yer(Taban):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
-    sehir: Mapped["Sehir"] = relationship(back_populates="yerler")
-    kaynaklar: Mapped[list["YerKaynak"]] = relationship(back_populates="yer", cascade="all, delete-orphan")
-    yorumlar: Mapped[list["Yorum"]] = relationship(back_populates="yer", cascade="all, delete-orphan")
-    konaklama_detayi: Mapped["KonaklamaDetay | None"] = relationship(
+    sehir: Mapped[Sehir] = relationship(back_populates="yerler")
+    kaynaklar: Mapped[list[YerKaynak]] = relationship(
+        back_populates="yer", cascade="all, delete-orphan"
+    )
+    yorumlar: Mapped[list[Yorum]] = relationship(back_populates="yer", cascade="all, delete-orphan")
+    konaklama_detayi: Mapped[KonaklamaDetay | None] = relationship(
         back_populates="yer", cascade="all, delete-orphan", uselist=False
     )
 
@@ -175,7 +182,9 @@ class BolgeProfili(Taban):
     __tablename__ = "bolge_profilleri"
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
-    sehir_id: Mapped[str] = mapped_column(ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False)
+    sehir_id: Mapped[str] = mapped_column(
+        ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False
+    )
 
     bolge_adi: Mapped[str] = mapped_column(String(100), nullable=False)
     ilce_mi: Mapped[bool] = mapped_column(default=False)
@@ -194,9 +203,11 @@ class BolgeProfili(Taban):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
-    sehir: Mapped["Sehir"] = relationship()
+    sehir: Mapped[Sehir] = relationship()
 
-    __table_args__ = (UniqueConstraint("sehir_id", "bolge_adi", name="ux_bolge_profilleri_sehir_bolge"),)
+    __table_args__ = (
+        UniqueConstraint("sehir_id", "bolge_adi", name="ux_bolge_profilleri_sehir_bolge"),
+    )
 
     def __repr__(self) -> str:
         return f"<BolgeProfili {self.bolge_adi}>"
@@ -220,11 +231,17 @@ class YerKaynak(Taban):
     kaynak_url: Mapped[str | None] = mapped_column(String(500))
     cekilme_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     kaynakta_gozlemlenme_zamani: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    sisteme_alinma_zamani: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    veri_batch_id: Mapped[str | None] = mapped_column(ForeignKey("veri_batchleri.id", ondelete="SET NULL"))
-    sube_id: Mapped[str] = mapped_column(ForeignKey("subeler.id", ondelete="RESTRICT"), nullable=False)
+    sisteme_alinma_zamani: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    veri_batch_id: Mapped[str | None] = mapped_column(
+        ForeignKey("veri_batchleri.id", ondelete="SET NULL")
+    )
+    sube_id: Mapped[str] = mapped_column(
+        ForeignKey("subeler.id", ondelete="RESTRICT"), nullable=False
+    )
 
-    yer: Mapped["Yer"] = relationship(back_populates="kaynaklar")
+    yer: Mapped[Yer] = relationship(back_populates="kaynaklar")
 
     __table_args__ = (
         UniqueConstraint("kaynak", "kaynak_id", name="ux_yer_kaynaklari_kaynak_kimlik"),
@@ -240,13 +257,15 @@ class KonaklamaDetay(Taban):
 
     __tablename__ = "konaklama_detaylari"
 
-    yer_id: Mapped[str] = mapped_column(ForeignKey("yerler.id", ondelete="CASCADE"), primary_key=True)
+    yer_id: Mapped[str] = mapped_column(
+        ForeignKey("yerler.id", ondelete="CASCADE"), primary_key=True
+    )
     gecelik_fiyat_araligi_min: Mapped[float | None] = mapped_column(Float)
     gecelik_fiyat_araligi_max: Mapped[float | None] = mapped_column(Float)
     rezervasyon_linkleri: Mapped[dict] = mapped_column(JSONB, default=dict)
     oda_sayisi: Mapped[int | None] = mapped_column(Integer)
 
-    yer: Mapped["Yer"] = relationship(back_populates="konaklama_detayi")
+    yer: Mapped[Yer] = relationship(back_populates="konaklama_detayi")
 
 
 class Yorum(Taban):
@@ -277,7 +296,7 @@ class Yorum(Taban):
         DateTime(timezone=True), server_default=func.now()
     )
 
-    yer: Mapped["Yer"] = relationship(back_populates="yorumlar")
+    yer: Mapped[Yer] = relationship(back_populates="yorumlar")
 
     __table_args__ = (
         UniqueConstraint("kaynak", "kaynak_yorum_id", name="ux_yorumlar_kaynak_kimlik"),
@@ -312,7 +331,9 @@ class KullaniciRotasi(Taban):
     __tablename__ = "kullanici_rotalari"
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
-    sehir_id: Mapped[str] = mapped_column(ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False)
+    sehir_id: Mapped[str] = mapped_column(
+        ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False
+    )
 
     tercihler: Mapped[dict] = mapped_column(JSONB, nullable=False)
     gunler: Mapped[list] = mapped_column(JSONB, default=list)
@@ -324,19 +345,41 @@ class KullaniciRotasi(Taban):
 
 
 # Ayrik domain dosyalari metadata'ya kaydedilir; public API bunlari import etmez.
-from sunucu.veritabani.bilgi_modelleri import (  # noqa: E402,F401
-    Gozlem, Iddia, IddiaSurumu, KanitBaglantisi, KaynakPolitikasi, VeriBatch,
-)
-from sunucu.veritabani.kimlik_modelleri import (  # noqa: E402,F401
-    EslemeAdayi, EslemeKarari, Sube, YerAlias, YerBirlestirmesi, YerKimligi,
-)
-from sunucu.veritabani.yayin_modelleri import (  # noqa: E402,F401
-    EtkiBaglantisi, GecersizlestirmeOlayi, GeriCekmeKaydi, PublicProjection, YayinKaydi,
-)
 from sunucu.veritabani.admin_modelleri import (  # noqa: E402,F401
-    AdminAuditOlayi, AdminKullanici, AdminKullaniciRolu, AdminOturum, AdminRol, IncelemeDosyasi,
+    AdminAuditOlayi,
+    AdminKullanici,
+    AdminKullaniciRolu,
+    AdminOturum,
+    AdminRol,
+    IncelemeDosyasi,
+)
+from sunucu.veritabani.arama_modelleri import Ilce  # noqa: E402,F401
+from sunucu.veritabani.bilgi_modelleri import (  # noqa: E402,F401
+    DahiliGozlemAdayi,
+    DahiliSinyalOzeti,
+    Gozlem,
+    Iddia,
+    IddiaSurumu,
+    IlceSiniri,
+    KanitBaglantisi,
+    KaynakPolitikasi,
+    VeriBatch,
 )
 from sunucu.veritabani.karar_modelleri import (  # noqa: E402,F401
     KararIzi,
 )
-from sunucu.veritabani.arama_modelleri import Ilce  # noqa: E402,F401
+from sunucu.veritabani.kimlik_modelleri import (  # noqa: E402,F401
+    EslemeAdayi,
+    EslemeKarari,
+    Sube,
+    YerAlias,
+    YerBirlestirmesi,
+    YerKimligi,
+)
+from sunucu.veritabani.yayin_modelleri import (  # noqa: E402,F401
+    EtkiBaglantisi,
+    GecersizlestirmeOlayi,
+    GeriCekmeKaydi,
+    PublicProjection,
+    YayinKaydi,
+)

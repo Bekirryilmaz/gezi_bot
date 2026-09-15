@@ -51,6 +51,11 @@ def nesne_sehir_id(oturum: Session, nesne_turu: str, nesne_id: str) -> str | Non
     if nesne_turu == "esleme_adayi":
         aday = oturum.get(EslemeAdayi, nesne_id)
         return nesne_sehir_id(oturum, "sube", aday.sol_sube_id) if aday else None
+    if nesne_turu == "dahili_sinyal":
+        from sunucu.veritabani.bilgi_modelleri import DahiliSinyalOzeti
+
+        ozet = oturum.get(DahiliSinyalOzeti, nesne_id)
+        return nesne_sehir_id(oturum, "sube", ozet.sube_id) if ozet else None
     return None
 
 

@@ -29,6 +29,10 @@ from veri.ortak.metin_araclari import turkce_kucuk_harf
 # eslesme icin), bu yuzden hem "Kebapçı" hem "En iyi kebap" gibi varyasyonlar
 # tek bir "kebap" anahtariyla yakalanir.
 METIN_TABANLI_KATEGORI_ESLEMESI: dict[str, tuple[AnaKategori, str]] = {
+    "internet cafe": (AnaKategori.YEME_ICME, "internet_kafe"),
+    "internet kafe": (AnaKategori.YEME_ICME, "internet_kafe"),
+    "internet_cafe": (AnaKategori.YEME_ICME, "internet_kafe"),
+    "internetcafe": (AnaKategori.YEME_ICME, "internet_kafe"),
     "kafe": (AnaKategori.YEME_ICME, "kafe"),
     "kahve": (AnaKategori.YEME_ICME, "kahve_uzmanlik"),
     "pastane": (AnaKategori.YEME_ICME, "tatli_pastane"),
@@ -159,7 +163,11 @@ def metinden_kategori_esle(metin: str | None) -> tuple[AnaKategori, str] | None:
     if not metin:
         return None
     kucuk_metin = turkce_kucuk_harf(metin)
-    for anahtar_metin, sonuc in METIN_TABANLI_KATEGORI_ESLEMESI.items():
+    for anahtar_metin, sonuc in sorted(
+        METIN_TABANLI_KATEGORI_ESLEMESI.items(),
+        key=lambda parca: len(parca[0]),
+        reverse=True,
+    ):
         if anahtar_metin in kucuk_metin:
             return sonuc
     return None

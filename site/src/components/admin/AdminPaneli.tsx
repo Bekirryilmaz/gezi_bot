@@ -16,11 +16,12 @@ import {
   type ClaimInceleme,
   type ClaimOzet,
   type ClaimSayfasi,
+  type DahiliSinyalOzet,
   type EslemeAdayi,
   type IncelemeDosyasi,
 } from "@/lib/admin-api";
 
-type Sekme = "kuyruk" | "kimlik" | "claim" | "audit";
+type Sekme = "kuyruk" | "kimlik" | "claim" | "sinyal" | "audit";
 
 function EylemFormu({
   eylem,
@@ -122,6 +123,7 @@ export function AdminPaneli() {
   const [claimMekan, setClaimMekan] = useState("");
   const [audit, setAudit] = useState<AuditOlayi[]>([]);
   const [claim, setClaim] = useState<ClaimInceleme | null>(null);
+  const [sinyaller, setSinyaller] = useState<DahiliSinyalOzet[]>([]);
   const [hata, setHata] = useState("");
   const [sekme, setSekme] = useState<Sekme>("kuyruk");
 
@@ -136,18 +138,20 @@ export function AdminPaneli() {
       if (claimAile) claimParametreleri.set("aile", claimAile);
       if (claimDurum) claimParametreleri.set("durum", claimDurum);
       if (claimMekan) claimParametreleri.set("mekan", claimMekan);
-      const [yeniKuyruk, yeniAdaylar, yeniBirlestirmeler, yeniClaimler] =
+      const [yeniKuyruk, yeniAdaylar, yeniBirlestirmeler, yeniClaimler, yeniSinyaller] =
         await Promise.all([
           adminIstek<IncelemeDosyasi[]>("/kuyruk"),
           adminIstek<EslemeAdayi[]>("/kimlik/esleme-adaylari"),
           adminIstek<Birlestirme[]>("/kimlik/birlestirmeler"),
           adminIstek<ClaimSayfasi>(`/claimler?${claimParametreleri}`),
+          adminIstek<{ kayitlar: DahiliSinyalOzet[] }>("/dahili-sinyaller"),
         ]);
       setKuyruk(yeniKuyruk);
       setAdaylar(yeniAdaylar);
       setBirlestirmeler(yeniBirlestirmeler);
       setClaimler(yeniClaimler.kayitlar);
       setClaimToplam(yeniClaimler.toplam);
+      setSinyaller(yeniSinyaller.kayitlar);
       if (ben.yetkiler.includes("audit_gor"))
         setAudit(await adminIstek<AuditOlayi[]>("/audit"));
       setDurum("hazir");
@@ -218,7 +222,7 @@ export function AdminPaneli() {
       </header>
       <main className="kabuk py-6 sm:py-10">
         <nav aria-label="Admin bölümleri" className="mb-6 flex gap-2 overflow-x-auto">
-          {(["kuyruk", "kimlik", "claim", "audit"] as Sekme[])
+          {(["kuyruk", "kimlik", "claim", "sinyal", "audit"] as Sekme[])
             .filter((s) => s !== "audit" || kimlik?.yetkiler.includes("audit_gor"))
             .map((s) => (
               <button
@@ -558,6 +562,101 @@ export function AdminPaneli() {
                 </div>
               </article>
             )}
+          </section>
+        )}
+        {sekme === "sinyal" && (
+          <section className="grid gap-6">
+            <h2 className="text-lg font-semibold">Dahili sinyal ve birinci el gözlem</h2>
+            <form
+              className="border-bordo/15 grid max-w-xl gap-3 rounded-lg border bg-white p-4"
+              onSubmit={async (event) => {
+                event.preventDefault();
+                const veri = new FormData(event.currentTarget);
+                setHata("");
+                try {
+                  await adminIstek("/gozlemler", {
+                    method: "POST",
+                    body: JSON.stringify({
+                      sube_id: String(veri.get("sube_id") || ""),
+                      aile: String(veri.get("aile") || ""),
+                      deger: veri.get("deger") === "true",
+                      ozet: String(veri.get("ozet") || ""),
+                      gerekce: String(veri.get("gerekce") || ""),
+                    }),
+                  });
+                  await yenile();
+                } catch (error) {
+                  setHata(
+                    error instanceof Error ? error.message : "Gözlem kaydedilemedi.",
+                  );
+                }
+              }}
+            >
+              <p className="text-sm">
+                Bu form doğrudan yayınlamaz; gözlem mevcut inceleme kuyruğuna düşer.
+              </p>
+              <label className="grid gap-1 text-xs font-medium">
+                Şube ID
+                <input
+                  name="sube_id"
+                  required
+                  className="border-bordo/20 rounded border p-2"
+                />
+              </label>
+              <label className="grid gap-1 text-xs font-medium">
+                Aile
+                <input
+                  name="aile"
+                  required
+                  defaultValue="wifi"
+                  className="border-bordo/20 rounded border p-2"
+                />
+              </label>
+              <label className="grid gap-1 text-xs font-medium">
+                Değer
+                <select name="deger" className="border-bordo/20 rounded border p-2">
+                  <option value="true">var</option>
+                  <option value="false">yok</option>
+                </select>
+              </label>
+              <label className="grid gap-1 text-xs font-medium">
+                Gözlem özeti
+                <textarea
+                  name="ozet"
+                  required
+                  minLength={8}
+                  rows={2}
+                  className="border-bordo/20 rounded border p-2"
+                />
+              </label>
+              <label className="grid gap-1 text-xs font-medium">
+                Gerekçe
+                <textarea
+                  name="gerekce"
+                  required
+                  minLength={8}
+                  rows={2}
+                  className="border-bordo/20 rounded border p-2"
+                />
+              </label>
+              <button className="bg-bordo w-fit rounded px-4 py-2 text-sm text-white">
+                İncelemeye gönder
+              </button>
+            </form>
+            <div className="grid gap-2">
+              {sinyaller.map((sinyal) => (
+                <article
+                  key={sinyal.id}
+                  className="border-bordo/15 rounded border bg-white p-3 text-sm"
+                >
+                  <strong>{sinyal.mekan_adi}</strong>
+                  <span className="mt-1 block">
+                    {sinyal.aile} · {sinyal.durum} ·{" "}
+                    {sinyal.preference_eligible ? "tercihe açık" : "karar dışı"}
+                  </span>
+                </article>
+              ))}
+            </div>
           </section>
         )}
         {sekme === "audit" && (

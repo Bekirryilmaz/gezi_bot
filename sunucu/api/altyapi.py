@@ -94,6 +94,10 @@ class ApiGuvenlikMiddleware(BaseHTTPMiddleware):
         self._istekler: dict[str, deque[float]] = defaultdict(deque)
         self._kilit = Lock()
 
+    def yazma_sayacini_sifirla(self) -> None:
+        with self._kilit:
+            self._istekler.clear()
+
     def _request_id(self, request: Request) -> str:
         aday = request.headers.get("X-Request-ID", "")
         return aday if _GUVENLI_REQUEST_ID.fullmatch(aday) else str(uuid4())

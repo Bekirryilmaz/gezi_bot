@@ -49,8 +49,14 @@ class KaynakHaklari:
     ai_isleme: HakDurumu = HakDurumu.BILINMIYOR
     uzun_sureli_saklama: HakDurumu = HakDurumu.BILINMIYOR
 
-    def izinli_mi(self, amac: KullanimAmaci) -> bool:
-        return HakDurumu(getattr(self, amac.value)) is HakDurumu.IZINLI
+    def izinli_mi(self, amac: KullanimAmaci | str) -> bool:
+        """Yalniz istenen kullanim amacinin hakkini kontrol eder."""
+        kullanim_amaci = KullanimAmaci(amac)
+        return HakDurumu(getattr(self, kullanim_amaci.value)) is HakDurumu.IZINLI
+
+    def amaclar_izinli_mi(self, *amaclar: KullanimAmaci | str) -> bool:
+        """Bir akis icin acikca gereken amaclarin tamamini kontrol eder."""
+        return all(self.izinli_mi(amac) for amac in amaclar)
 
 
 @dataclass(frozen=True)

@@ -60,10 +60,15 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as baglanti:
+        # Her revizyon kendi isleminde biter. Boylece 0015 gibi veri
+        # korumali bir downgrade hata verince onceki revizyonun (0016)
+        # basarili isi geri alinmaz; alembic_version 0015'te kalir ve
+        # 0015 tablolari sessizce silinmez.
         context.configure(
             connection=baglanti,
             target_metadata=target_metadata,
             include_object=nesneyi_karsilastir,
+            transaction_per_migration=True,
         )
 
         with context.begin_transaction():

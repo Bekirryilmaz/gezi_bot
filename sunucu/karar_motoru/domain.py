@@ -7,7 +7,9 @@ from datetime import date, datetime, time
 from enum import StrEnum
 from typing import Any
 
+from ortak.sabitler import AmacEslemeSeviyesi, KimlikKaliteSinifi, amac_esleme_seviyesi
 from sunucu.bilgi.domain import BilgiDurumu
+from sunucu.kimlik.kalite import oneriye_uygun_mu
 from sunucu.yayin.domain import YayinUygunlukDurumu
 
 
@@ -51,10 +53,12 @@ class NedenKodu(StrEnum):
     TERCIH_DESTEKLENIYOR = "tercih_destekleniyor"
     TERCIH_DESTEKLENMIYOR = "tercih_desteklenmiyor"
     TERCIH_BILINMIYOR = "tercih_bilinmiyor"
+    DENEYIM_SINYALI_DESTEKLIYOR = "deneyim_sinyali_destekliyor"
     KULLANICI_TARAFINDAN_REDDEDILDI = "kullanici_tarafindan_reddedildi"
     KULLANICI_TARAFINDAN_SABITLENDI = "kullanici_tarafindan_sabitlendi"
     KRITIK_GIRDI_ANLASILMADI = "kritik_girdi_anlasilmadi"
     SERVIS_GECICI_KULLANILAMIYOR = "servis_gecici_kullanilamiyor"
+    KIMLIK_ONERIYE_UYGUN_DEGIL = "kimlik_oneriye_uygun_degil"
 
 
 NEDEN_METINLERI: dict[NedenKodu, str] = {
@@ -74,10 +78,12 @@ NEDEN_METINLERI: dict[NedenKodu, str] = {
     NedenKodu.TERCIH_DESTEKLENIYOR: "Belirtilen tercih destekleniyor.",
     NedenKodu.TERCIH_DESTEKLENMIYOR: "Belirtilen tercih desteklenmiyor; bu bir zorunlu engel degildir.",
     NedenKodu.TERCIH_BILINMIYOR: "Belirtilen tercih icin yeterli bilgi yok.",
+    NedenKodu.DENEYIM_SINYALI_DESTEKLIYOR: "Deneyim sinyali bu tercihi destekliyor.",
     NedenKodu.KULLANICI_TARAFINDAN_REDDEDILDI: "Bu yer ayni baglamda kullanici tarafindan reddedildi.",
     NedenKodu.KULLANICI_TARAFINDAN_SABITLENDI: "Bu yer kullanici tarafindan secildi; zorunlu kapilar yine uygulandi.",
     NedenKodu.KRITIK_GIRDI_ANLASILMADI: "Karari degistirebilecek kritik bir girdi netlestirilmeli.",
     NedenKodu.SERVIS_GECICI_KULLANILAMIYOR: "Karar icin gereken servis gecici olarak kullanilamiyor.",
+    NedenKodu.KIMLIK_ONERIYE_UYGUN_DEGIL: "Bu yerin kimligi oneri icin yeterli guvenlikte degil.",
 }
 
 
@@ -190,6 +196,17 @@ class BilgiReferansi:
 
 
 @dataclass(frozen=True)
+class DahiliSinyalReferansi:
+    sube_id: str
+    aile: str
+    agregasyon_surumu: str
+    guven_sinifi: str
+    durum: str
+    preference_eligible: bool
+    destekliyor: bool
+
+
+@dataclass(frozen=True)
 class KararAdayi:
     yer_id: str
     canonical_id: str
@@ -201,6 +218,9 @@ class KararAdayi:
     yayin_surumu: int
     bilgiler: tuple[BilgiReferansi, ...] = ()
     sponsorlu: bool = False
+    alt_kategori: str | None = None
+    dahili_sinyaller: tuple[DahiliSinyalReferansi, ...] = ()
+    kimlik_kalite_sinifi: str = KimlikKaliteSinifi.KULLANILABILIR.value
 
 
 @dataclass(frozen=True)
@@ -287,6 +307,11 @@ class KararMotoru:
                 kullanilan_iddia_surumleri=tuple(sorted(set(kullanilan))), trace_reference=trace_reference,
             )
 
+        # 0. Kimlik kalitesi: karantina/supheli oneri havuzuna girmez.
+        if not oneriye_uygun_mu(aday.kimlik_kalite_sinifi):
+            engeller.append(_gerekce(NedenKodu.KIMLIK_ONERIYE_UYGUN_DEGIL))
+            return sonuc(KararSonucuTuru.KAPSAM_DISI, KosulDurumu.UYGUN_DEGIL)
+
         # 1. Canonical/publication kapisi.
         if aday.yayin_durumu not in {YayinUygunlukDurumu.YAYINLANABILIR, YayinUygunlukDurumu.SINIRLI_YAYINLANABILIR}:
             engeller.append(_gerekce(NedenKodu.YAYIN_UYGUN_DEGIL))
@@ -342,33 +367,52 @@ class KararMotoru:
         if bilinmeyenler:
             return sonuc(KararSonucuTuru.KRITIK_BILGI_BILINMIYOR, KosulDurumu.DEGERLENDIRILEMIYOR)
 
-        # 4. Amac destegi ayri bir iddia ailesidir; yoksa olumlu karar kurulmaz.
+        # 4. Amac: yalniz DIRECT kategori eslemesi fact'tir; yoksa yayımlanabilir claim.
         if baglam.amac:
-            amac_bilgileri = [b for b in ailelere.get("amac_destegi", ()) if b.yayinlanabilir and b.bilgi_durumu is BilgiDurumu.BILINIYOR]
-            if not amac_bilgileri:
-                bilinmeyenler.append(_gerekce(NedenKodu.AMAC_BILINMIYOR, baglam.amac))
-                return sonuc(KararSonucuTuru.KRITIK_BILGI_BILINMIYOR, KosulDurumu.DEGERLENDIRILEMIYOR)
-            amac_bilgisi = sorted(amac_bilgileri, key=lambda b: (b.surum_no, b.iddia_id))[-1]
-            kullanilan.append(f"{amac_bilgisi.iddia_id}:{amac_bilgisi.surum_no}")
-            if not _deger_eslesiyor(amac_bilgisi.deger, baglam.amac, Karsilastirma.ICERIR):
-                engeller.append(_gerekce(NedenKodu.AMAC_DESTEKLENMIYOR, baglam.amac))
-                return sonuc(KararSonucuTuru.IHTIYACLA_UYUSMUYOR, KosulDurumu.UYGUN_DEGIL)
-            gerekceler.append(_gerekce(NedenKodu.AMAC_DESTEKLENIYOR, baglam.amac))
-
-        # 5-6. Tercihler yalniz hard kapilardan sonra odun/gerekce uretir.
-        eslesen_tercih = False
-        for tercih in baglam.tercihler:
-            bilgiler = [b for b in ailelere.get(tercih.iddia_ailesi, ()) if b.yayinlanabilir and b.bilgi_durumu is BilgiDurumu.BILINIYOR]
-            if not bilgiler:
-                odunler.append(_gerekce(NedenKodu.TERCIH_BILINMIYOR, tercih.kod))
-                continue
-            bilgi = sorted(bilgiler, key=lambda b: (b.surum_no, b.iddia_id))[-1]
-            kullanilan.append(f"{bilgi.iddia_id}:{bilgi.surum_no}")
-            if _deger_eslesiyor(bilgi.deger, tercih.beklenen_deger, tercih.karsilastirma):
-                eslesen_tercih = True
-                gerekceler.append(_gerekce(NedenKodu.TERCIH_DESTEKLENIYOR, tercih.kod))
+            if amac_esleme_seviyesi(aday.alt_kategori, baglam.amac) is AmacEslemeSeviyesi.DIRECT_PURPOSE_FACT:
+                gerekceler.append(_gerekce(NedenKodu.AMAC_DESTEKLENIYOR, baglam.amac))
             else:
-                odunler.append(_gerekce(NedenKodu.TERCIH_DESTEKLENMIYOR, tercih.kod))
+                amac_bilgileri = [
+                    b
+                    for b in ailelere.get("amac_destegi", ())
+                    if b.yayinlanabilir and b.bilgi_durumu is BilgiDurumu.BILINIYOR
+                ]
+                if not amac_bilgileri:
+                    bilinmeyenler.append(_gerekce(NedenKodu.AMAC_BILINMIYOR, baglam.amac))
+                    return sonuc(KararSonucuTuru.KRITIK_BILGI_BILINMIYOR, KosulDurumu.DEGERLENDIRILEMIYOR)
+                amac_bilgisi = sorted(amac_bilgileri, key=lambda b: (b.surum_no, b.iddia_id))[-1]
+                kullanilan.append(f"{amac_bilgisi.iddia_id}:{amac_bilgisi.surum_no}")
+                if not _deger_eslesiyor(amac_bilgisi.deger, baglam.amac, Karsilastirma.ICERIR):
+                    engeller.append(_gerekce(NedenKodu.AMAC_DESTEKLENMIYOR, baglam.amac))
+                    return sonuc(KararSonucuTuru.IHTIYACLA_UYUSMUYOR, KosulDurumu.UYGUN_DEGIL)
+                gerekceler.append(_gerekce(NedenKodu.AMAC_DESTEKLENIYOR, baglam.amac))
+
+        # 5-6. Tercihler hard kapilardan sonra; dahili experience hard PASS/FAIL uretmez.
+        dahili_aile = {sinyal.aile: sinyal for sinyal in aday.dahili_sinyaller}
+        for tercih in baglam.tercihler:
+            bilgiler = [
+                b
+                for b in ailelere.get(tercih.iddia_ailesi, ())
+                if b.yayinlanabilir and b.bilgi_durumu is BilgiDurumu.BILINIYOR
+            ]
+            if bilgiler:
+                bilgi = sorted(bilgiler, key=lambda b: (b.surum_no, b.iddia_id))[-1]
+                kullanilan.append(f"{bilgi.iddia_id}:{bilgi.surum_no}")
+                if _deger_eslesiyor(bilgi.deger, tercih.beklenen_deger, tercih.karsilastirma):
+                    gerekceler.append(_gerekce(NedenKodu.TERCIH_DESTEKLENIYOR, tercih.kod))
+                else:
+                    odunler.append(_gerekce(NedenKodu.TERCIH_DESTEKLENMIYOR, tercih.kod))
+                continue
+            dahili = dahili_aile.get(tercih.iddia_ailesi)
+            if (
+                dahili is not None
+                and dahili.preference_eligible
+                and dahili.destekliyor
+                and tercih.beklenen_deger is not False
+            ):
+                gerekceler.append(_gerekce(NedenKodu.DENEYIM_SINYALI_DESTEKLIYOR, tercih.kod))
+                continue
+            odunler.append(_gerekce(NedenKodu.TERCIH_BILINMIYOR, tercih.kod))
 
         tur = KararSonucuTuru.KOSULA_BAGLI_ONERILEBILIR if odunler or aday.yayin_durumu is YayinUygunlukDurumu.SINIRLI_YAYINLANABILIR else KararSonucuTuru.ONERILEBILIR
         return sonuc(tur, KosulDurumu.UYGUN)

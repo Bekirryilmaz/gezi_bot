@@ -89,6 +89,20 @@ class SehirAyari(BaseModel):
                 return bolge_adi
         return slug
 
+    def cografi_bbox(self, tampon_derece: float = 0.4) -> tuple[float, float, float, float] | None:
+        """Ilce merkezlerinden türetilen (min_enlem, max_enlem, min_boylam, max_boylam)."""
+        noktalar = [koordinat for koordinat in self.ilce_merkezleri.values() if len(koordinat) >= 2]
+        if not noktalar:
+            return None
+        enlemler = [float(nokta[0]) for nokta in noktalar]
+        boylamlar = [float(nokta[1]) for nokta in noktalar]
+        return (
+            min(enlemler) - tampon_derece,
+            max(enlemler) + tampon_derece,
+            min(boylamlar) - tampon_derece,
+            max(boylamlar) + tampon_derece,
+        )
+
     def bolge_basliklarini_getir(self, bolge_adi: str) -> list[str]:
         """Bir bolge (sehir merkezi veya bir ilce) icin Eksi Sozluk'te
         aranacak baslik(lar)i dondurur. `eksi_sozluk_bolge_basliklari` icinde

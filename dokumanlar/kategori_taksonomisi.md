@@ -59,7 +59,8 @@ Tasarım mantığı katmanlıdır:
 | `ev_yemekleri_esnaf` | Ev yemeği, esnaf lokantası, salaş/otantik mekanlar |
 | `fine_dining_romantik` | Özel/romantik akşam yemeği mekanları |
 | `sokak_lezzeti` | Sokak lezzetleri, büfe, hızlı yemek |
-| `kafe` | Genel kafe |
+| `kafe` | Genel kafe (kahve içme amacı için doğrudan aday) |
+| `internet_kafe` | Bilgisayar/oyun salonu; kahve amacı türetilmez |
 | `tatli_pastane` | Tatlıcı, pastane, dondurmacı |
 | `kahve_uzmanlik` | Üçüncü nesil/uzmanlık kahve mekanları |
 | `meyhane_bar` | Alkollü içki eşliğinde yemek mekanları |
@@ -235,7 +236,121 @@ kod hiçbir değişiklik gerektirmeden çalışır.
 
 ---
 
-## 8. Kategori — zaman dilimi eşleştirmesi (`KATEGORI_ZAMAN_DILIMLERI`)
+## 8. Dahili gözlem sinyali taksonomisi
+
+Bu taksonomi ham veya işlenmiş kaynaklardan çıkarılan, yalnız iç incelemede
+kullanılan `AdayGozlem` kayıtlarının ortak sözlüğüdür. Sinyal; kanıtlanmış
+iddia, kullanıcıya dönük uygunluk kararı, puan veya yayın değildir. Yeni aile
+eklemek önce bu tabloyu, sonra `ortak/sabitler.py::DahiliSinyalAilesi`
+sabitini değiştirmeyi gerektirir.
+
+Canonical aileler:
+
+`sessiz_ortam`, `sohbet_uygunlugu`, `calisma_uygunlugu`, `aile_uygunlugu`,
+`cocuk_uygunlugu`, `partner_uygunlugu`, `arkadas_grubu_uygunlugu`,
+`acik_alan`, `manzara`, `kalabaliklik`, `wifi`, `otopark`, `priz`,
+`rezervasyon`, `canli_muzik`, `kahve`, `yemek`, `kahvalti`, `tatli`,
+`eglence`, `tarihi_kulturel`, `acik_hava`, `fiyat_algisi`, `genel_duygu`.
+
+`genel_duygu` yalnız BERT'in karar dışı genel `sentiment_signal` ailesidir.
+Karar tercihi, hard constraint, sıralama veya public iddia ailesi değildir.
+
+### 8.1. Gözlem türleri ve yön
+
+| Gözlem türü | Anlam | Örnek |
+|---|---|---|
+| `fact_signal` | Varlık/yokluk gibi doğrulanabilir, açık kaynak ifadesi | `wifi var`, `otopark yok`, `bahcesi var` |
+| `experience_signal` | Belirli ziyaretçinin yaşadığı koşul veya amaç deneyimi | `wifi cok yavas`, `cocuklarla cok rahat`, `rezervasyonsuz yer bulamadik` |
+| `sentiment_signal` | Genel beğeni/tepki; somut karar iddiası değildir | `guzel`, `mukemmel`, `kaliteli`, `en iyi`, `romantik` |
+
+Yön yalnız `support` veya `counter` olur. Yön, iddianın doğruluğu değil,
+spanın ilgili aile için destekleyici mi karşı mı olduğunu anlatır. Değer,
+varlık/yoklukta boolean; deneyimde ise açık ve sürümlü küçük bir değer
+sözlüğüdür. Genel BERT duygusu explicit aspect polarity için fallback olamaz;
+yalnız `sentiment_signal` üretiminde kullanılabilir.
+
+Canonical candidate varsayılan ve strict `canonical-v1` sözleşmesini kullanır.
+Aile, tür, yön ve değer kombinasyonu aşağıdaki küçük sözlükte bulunmalıdır;
+keyfi JSON değeri kabul edilmez. Sürüm alanı bulunmayan payload yalnız tarihî
+zorunlu ve opsiyonel alanların exact shape'ini değiştirmeden taşıyorsa otomatik
+`legacy` tanınır. Serialize edilen legacy model açık
+`sozlesme_surumu=legacy` marker'ını korur; tam model dump şekli,
+`otomatik_yayinlanabilir=false` ve `cikarim_yontemi=geriye_uyumlu` izleriyle
+roundtrip edilebilir. Bunun dışındaki canonical izli yeni payload, marker'ı
+`legacy` olarak verilse dahi strict canonical doğrulamaya girer; canonical
+producer marker değiştirerek bu sözleşmeyi bypass edemez.
+
+| Aile | Tür | Support değerleri | Counter değerleri |
+|---|---|---|---|
+| `wifi` | `fact_signal` | `true` | `false` |
+| `wifi` | `experience_signal` | `kotu_degil`, `cok_yavas_degil` | `kotu`, `cok_yavas`, `cekmiyor` |
+| `sessiz_ortam`, `aile_uygunlugu`, `cocuk_uygunlugu`, `calisma_uygunlugu` | `experience_signal` | `true` | `false` |
+| `acik_alan`, `manzara`, `otopark`, `canli_muzik` | `fact_signal` | `true` | `false` |
+| `manzara` | `experience_signal` | `guzel` | `gorunmuyor`, `goremedik` |
+| `fiyat_algisi` | `experience_signal` | `uygun`, `pahali_degil` | `pahali` |
+| `otopark` | `experience_signal` | — | `park_sorunu` |
+| `rezervasyon` | `experience_signal` | — | `rezervasyonsuz_yer_bulunamadi` |
+| `canli_muzik` | `experience_signal` | `cok_yuksek_degil` | `cok_yuksek` |
+| `kalabaliklik` | `experience_signal` | `kalabalik` | `sakin` |
+| `manzara`, `fiyat_algisi`, `yemek`, `kalabaliklik`, `kahvalti`, `sessiz_ortam`, `genel_duygu` | `sentiment_signal` | `olumlu` | `olumsuz` |
+
+Fact karşı ifadesinin yakınındaki `degil` gibi açık olumsuzluk yönü tersine
+çevirebilir; bu nedenle `wifi yok degil` support `true` olur. String deneyim
+değerlerinde yalnız yukarıdaki ters karşılığı tanımlıysa yön çevrilir; karşılık
+belirsizse candidate üretilmez.
+
+### 8.2. İzlenebilirlik ve yayın sınırı
+
+Her canonical aday kaynak, kaynak yorum/kayıt kimliği veya tam yorum içeriği
+ile kaynak-yerden türetilen dahili review fingerprint'i, şube adayı,
+aile/konu, yön/değer, gözlem türü, çıkarım yöntemi, model ve kural sürümü,
+güven sınıfı ile güven kırılımı, zamansal durum, span hash'i ve dahili
+referans taşır. Ham span geçici `ai_isleme` sırasında kullanılabilir; kalıcı
+candidate çıktısında tutulması ayrıca `uzun_sureli_saklama=izinli` gerektirir.
+Bu hak yoksa yalnız span hash'i ve dahili referans yazılır. Dokümana,
+fixture'a veya kamusal çıktıya kaynak ham metni/yazar olarak kopyalanmaz.
+`otomatik_yayinlanabilir` her durumda `false` kalır.
+
+### 8.3. Hard constraint kuralları
+
+1. `AdayGozlem` doğrudan hard constraint olamaz.
+2. `sentiment_signal` ve `experience_signal`, sayıları veya güven sınıfları ne
+   olursa olsun hard constraint olamaz.
+3. Yalnız doğrulanmış, güncel, şubeye doğru bağlanmış, kullanım amacı için
+   hakları izinli bir `fact_signal`; İddia/Geçerlilik ve yayın kapılarından
+   geçtikten sonra Karar Motoru tarafından hard constraint girdisi olabilir.
+4. `counter` sinyali sessizce olumluya çevrilemez; çelişkiyi veya bilinmeyeni
+   görünür kılar. Destek sayısı karşı kanıtı iptal etmez.
+5. `wifi`, `otopark`, `priz`, `rezervasyon` gibi ailelerde kaynakta açık
+   var/yok ifadesi bulunmadığında değer tahmin edilmez. Genel duygu, yer puanı
+   veya kategori bu boşluğu dolduramaz.
+
+### 8.4. Yayımlanmış kategori → amaç fact eşlemesi
+
+Yayımlanmış `Yer.alt_kategori` kimliği, aşağıdaki **doğrudan** eşlemelerde amaç
+fact'idir. Eşlemede olmayan kategoriden amaç uydurulmaz. Google yorumu veya
+dahili experience sinyali amaç fact'i üretemez. `internet_kafe` kahve amacı
+türetmez. `sokak_lezzeti` yemek amacı fact'idir; aile/partner bağlamı
+kategoriden türetilmez.
+
+Eşleme seviyeleri: `direct_purpose_fact`, `weak_candidate_hint` (hard fact
+değil), `no_purpose_inference`.
+
+| Alt kategori | Amaç fact | Seviye |
+|---|---|---|
+| `kafe`, `kahve_uzmanlik` | `kahve_icmek` | direct |
+| `internet_kafe` | — | no inference |
+| `restoran_lokanta`, `kebap_izgara`, `deniz_mahsulleri`, `ev_yemekleri_esnaf`, `sokak_lezzeti`, `fine_dining_romantik`, `meyhane_bar` | `yemek_yemek` | direct |
+| `tatli_pastane` | `tatli_yemek` | direct |
+| `tarihi_kulturel` | `tarihi_kulturel_ziyaret` | direct |
+| `eglence_aktivite` | `eglence` | direct |
+| `doga_manzara`, `plaj_su` | `acik_hava` | direct |
+
+Kod: `ortak/sabitler.py::ALT_KATEGORI_AMAC_ESLEMESI`, `amac_esleme_seviyesi`.
+
+---
+
+## 9. Kategori — zaman dilimi eşleştirmesi (`KATEGORI_ZAMAN_DILIMLERI`)
 
 Rota motorunun bir durağı günün *hangi diliminde* önereceğini belirler.
 İnsan gibi plan: kahvaltı sabah, fine dining akşam, gece hayatı gece.
@@ -274,7 +389,7 @@ zorunlu-durak kuralıyla aynı ruh: kullanıcı isteği saati ezer).
 
 ---
 
-## 9. Lojistik tampon süreleri (`MEKAN_BEKLEME_SURELERI_DK`)
+## 10. Lojistik tampon süreleri (`MEKAN_BEKLEME_SURELERI_DK`)
 
 `ortalama_ziyaret_suresi_dk` mekanın *içinde* geçirilen süredir. Buna ek olarak
 park etme, kuyruk, garson bekleme, hesabı kapatma, tuvalet/dinlenme gibi insan

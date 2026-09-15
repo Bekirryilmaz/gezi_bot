@@ -147,14 +147,20 @@ def ifade_duygusunu_belirle(ifade: str) -> DuyguEtiketi:
     return DuyguEtiketi.NOTR
 
 
-def konulari_tespit_et(metin: str, genel_duygu: DuyguEtiketi) -> list[KonuDuygusu]:
+def konulari_tespit_et(
+    metin: str,
+    genel_duygu: DuyguEtiketi,
+    *,
+    genel_duygu_fallback_kullan: bool = True,
+) -> list[KonuDuygusu]:
     """Bir yorum metninde gecen TUM konulari (KONU_ANAHTAR_KELIMELERI'ndeki)
     tespit edip, her biri icin o konunun GECTIGI ifadeye ozel bir duygu
     atar. Ilgili ifadede sozlukten hicbir duygu kelimesi bulunamazsa (NOTR
     donerse), o yorumun GENEL duygusu (modelin tahmini) varsayilan olarak
     kullanilir -- boylece 'guzel bir yerdi, manzarasi da vardi' gibi konu
     ozelinde acik bir duygu ifadesi olmayan ama genel olarak olumlu olan
-    durumlar da makul sekilde etiketlenir."""
+    durumlar da makul sekilde etiketlenir. Dahili karar sinyali cikarimi bu
+    fallback'i kapatir; genel BERT duygusu explicit aspect polarity olamaz."""
     ifadeler = ifadelere_ayir(metin)
     konu_duygulari: list[KonuDuygusu] = []
     tespit_edilen_konular: set[str] = set()
@@ -166,7 +172,11 @@ def konulari_tespit_et(metin: str, genel_duygu: DuyguEtiketi) -> list[KonuDuygus
                 continue  # Ayni konu birden fazla ifadede geciyorsa, ILK gecistigi yeri kullan.
             if any(anahtar in ifade_kucuk for anahtar in anahtar_kelimeler):
                 yerel_duygu = ifade_duygusunu_belirle(ifade)
-                nihai_duygu = yerel_duygu if yerel_duygu != DuyguEtiketi.NOTR else genel_duygu
+                nihai_duygu = (
+                    yerel_duygu
+                    if yerel_duygu != DuyguEtiketi.NOTR or not genel_duygu_fallback_kullan
+                    else genel_duygu
+                )
                 konu_duygulari.append(KonuDuygusu(konu=konu, duygu_etiketi=nihai_duygu, gecen_ifade=ifade))
                 tespit_edilen_konular.add(konu)
 

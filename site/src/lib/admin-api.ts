@@ -96,6 +96,24 @@ export type AuditOlayi = {
   olusturulma_zamani: string;
 };
 
+export type DahiliSinyalOzet = {
+  id: string;
+  sube_id: string;
+  yer_id: string | null;
+  mekan_adi: string;
+  aile: string;
+  guven_sinifi: string;
+  durum: string;
+  preference_eligible: boolean;
+  unique_review_count: number | null;
+  conflict_level: string | null;
+};
+
+export type DahiliSinyalSayfasi = {
+  kayitlar: DahiliSinyalOzet[];
+  toplam: number;
+};
+
 export class AdminApiHatasi extends Error {
   constructor(
     public durum: number,

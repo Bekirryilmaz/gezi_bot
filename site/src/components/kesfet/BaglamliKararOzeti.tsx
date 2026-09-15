@@ -7,6 +7,22 @@ import type { KamusalYerDetayi, KararBaglami } from "@/lib/types";
 
 type SakliBaglam = { donus?: string; baglam?: KararBaglami };
 
+const DENEYIM_ETIKETI: Record<string, string> = {
+  sohbet: "sohbet",
+  sohbet_uygunlugu: "sohbet",
+  sessiz_ortam: "sakinlik",
+  aile_uygunlugu: "aile",
+  cocuk_uygunlugu: "çocuk",
+  calisma_uygunlugu: "çalışma",
+  manzara: "manzara",
+};
+
+function deneyimCumlesi(ilgili: string | null | undefined, yedek: string): string {
+  const etiket = DENEYIM_ETIKETI[ilgili ?? ""];
+  if (!etiket) return yedek;
+  return `${etiket} deneyimi açısından destekleyici sinyal var.`;
+}
+
 export function BaglamliKararOzeti({
   yerId,
   ilkDetay,
@@ -35,15 +51,29 @@ export function BaglamliKararOzeti({
   }, [yerId]);
 
   const karar = detay.karar_sonucu;
+  const dogrulananlar = (karar?.gerekceler ?? []).filter((gerekce) =>
+    ["zorunlu_kosul_dogrulandi", "amac_destekleniyor", "tercih_destekleniyor"].includes(
+      gerekce.kod,
+    ),
+  );
+  const deneyim = (karar?.gerekceler ?? []).filter(
+    (gerekce) => gerekce.kod === "deneyim_sinyali_destekliyor",
+  );
+  const henuz = [
+    ...(karar?.bilinmeyenler ?? []),
+    ...(karar?.onemli_odunler ?? []).filter(
+      (gerekce) => gerekce.kod === "tercih_bilinmiyor",
+    ),
+  ];
   return (
     <div className="space-y-10">
-      <section aria-labelledby="neden-baslik">
-        <h2 id="neden-baslik" className="yazi-alt text-bordo">
-          Bu ziyaret için neden düşünülebilir?
+      <section aria-labelledby="dogrulanan-baslik">
+        <h2 id="dogrulanan-baslik" className="yazi-alt text-bordo">
+          Doğruladığımız
         </h2>
-        {karar?.gerekceler.length ? (
+        {dogrulananlar.length ? (
           <ul className="text-ink/80 mt-4 grid gap-2">
-            {karar.gerekceler.map((gerekce) => (
+            {dogrulananlar.map((gerekce) => (
               <li key={`${gerekce.kod}-${gerekce.ilgili_kosul ?? ""}`}>
                 {gerekce.mesaj}
               </li>
@@ -56,14 +86,36 @@ export function BaglamliKararOzeti({
           </p>
         )}
       </section>
+      <section aria-labelledby="deneyim-baslik">
+        <h2 id="deneyim-baslik" className="yazi-alt text-bordo">
+          Deneyim sinyali
+        </h2>
+        {deneyim.length ? (
+          <ul className="text-ink/80 mt-4 grid gap-2">
+            {deneyim.map((gerekce) => (
+              <li key={`${gerekce.kod}-${gerekce.ilgili_kosul ?? ""}`}>
+                {deneyimCumlesi(gerekce.ilgili_kosul, gerekce.mesaj)}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-ink/65 mt-4">
+            Bu bağlam için paylaşılabilir bir deneyim sinyali yok; bu yokluk bir puan
+            değildir.
+          </p>
+        )}
+      </section>
       <section aria-labelledby="sinir-baslik">
         <h2 id="sinir-baslik" className="yazi-alt text-bordo">
-          Önemli ödün ve bilinmeyenler
+          Henüz doğrulayamadığımız
         </h2>
-        {karar?.onemli_odunler.length ? (
-          <ul className="mt-4 grid gap-2">
-            {karar.onemli_odunler.map((oge) => (
-              <li key={oge.kod}>{oge.mesaj}</li>
+        {henuz.length || detay.kritik_bilinmeyenler.length ? (
+          <ul className="border-deniz/15 mt-4 grid gap-2 border-l-2 pl-4">
+            {henuz.map((oge) => (
+              <li key={`${oge.kod}-${oge.ilgili_kosul ?? ""}`}>{oge.mesaj}</li>
+            ))}
+            {detay.kritik_bilinmeyenler.map((bilinmeyen) => (
+              <li key={bilinmeyen}>{bilinmeyen}</li>
             ))}
           </ul>
         ) : (
@@ -72,11 +124,6 @@ export function BaglamliKararOzeti({
             anlamına gelmez.
           </p>
         )}
-        <ul className="border-deniz/15 mt-4 grid gap-2 border-l-2 pl-4">
-          {detay.kritik_bilinmeyenler.map((bilinmeyen) => (
-            <li key={bilinmeyen}>{bilinmeyen}</li>
-          ))}
-        </ul>
       </section>
     </div>
   );

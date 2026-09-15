@@ -94,6 +94,7 @@ _ETIKET_KURALLARI: list[tuple[str, str | None, AnaKategori, str, list[Aktivite]]
     ("amenity", "marketplace", AnaKategori.GEZILECEK_YER, GezilecekYerAltKategori.ALISVERIS.value, []),
     ("shop", "mall", AnaKategori.GEZILECEK_YER, GezilecekYerAltKategori.ALISVERIS.value, []),
     ("shop", "gift", AnaKategori.GEZILECEK_YER, GezilecekYerAltKategori.ALISVERIS.value, []),
+    ("amenity", "internet_cafe", AnaKategori.YEME_ICME, YemeIcmeAltKategori.INTERNET_KAFE.value, []),
     ("amenity", "cafe", AnaKategori.YEME_ICME, YemeIcmeAltKategori.KAFE.value, []),
     ("amenity", "ice_cream", AnaKategori.YEME_ICME, YemeIcmeAltKategori.TATLI_PASTANE.value, []),
     ("shop", "pastry", AnaKategori.YEME_ICME, YemeIcmeAltKategori.TATLI_PASTANE.value, []),
@@ -160,6 +161,41 @@ def _restoran_incelt(alt_kategori: str, etiketler: dict) -> str:
     return alt_kategori
 
 
+_OSM_KORUNAN_ETIKETLER = (
+    "opening_hours",
+    "wheelchair",
+    "outdoor_seating",
+    "parking",
+    "internet_access",
+    "socket",
+    "reservation",
+    "cuisine",
+    "fee",
+)
+_OSM_IZINLI_DEGERLER: dict[str, frozenset[str]] = {
+    "wheelchair": frozenset({"yes", "no", "limited"}),
+    "outdoor_seating": frozenset({"yes", "no"}),
+    "parking": frozenset({"yes", "no", "street_side", "surface", "underground", "limited"}),
+    "internet_access": frozenset({"yes", "no", "wlan", "wifi"}),
+    "socket": frozenset({"yes", "no"}),
+    "reservation": frozenset({"yes", "no", "required", "recommended"}),
+    "fee": frozenset({"yes", "no"}),
+}
+
+
+def osm_etiketini_koru(anahtar: str, deger: str | None) -> str | None:
+    """yes/no/limited/required birbirine cevrilmez; bilinmeyen None kalir."""
+    if deger is None:
+        return None
+    temiz = str(deger).strip()
+    if not temiz:
+        return None
+    izinli = _OSM_IZINLI_DEGERLER.get(anahtar)
+    if izinli is None:
+        return temiz
+    return temiz if temiz in izinli else None
+
+
 def _evet_hayir_donustur(deger: str | None) -> bool | None:
     if deger == "yes":
         return True
@@ -169,25 +205,47 @@ def _evet_hayir_donustur(deger: str | None) -> bool | None:
 
 
 def _ozellikleri_cikar(etiketler: dict, alt_kategori: str) -> OzellikSeti:
-    # OSM'de fee=yes -> ucret var (bizim icin ucretsiz=False), fee=no -> ucretsiz=True
-    fee_degeri = etiketler.get("fee")
-    ucretsiz = {"yes": False, "no": True}.get(fee_degeri)
+    fee_ham = osm_etiketini_koru("fee", etiketler.get("fee"))
+    if fee_ham == "no":
+        ucretsiz = True
+    elif fee_ham == "yes":
+        ucretsiz = False
+    else:
+        ucretsiz = None
 
-    wifi = None
-    erisim = etiketler.get("internet_access")
-    if erisim in ("wlan", "yes"):
-        wifi = True
-    elif erisim == "no":
-        wifi = False
+    internet = osm_etiketini_koru("internet_access", etiketler.get("internet_access"))
+    wifi = True if internet in {"wlan", "wifi", "yes"} else False if internet == "no" else None
+
+    wheelchair = osm_etiketini_koru("wheelchair", etiketler.get("wheelchair"))
+    parking = osm_etiketini_koru("parking", etiketler.get("parking"))
+    outdoor = osm_etiketini_koru("outdoor_seating", etiketler.get("outdoor_seating"))
+    reservation = osm_etiketini_koru("reservation", etiketler.get("reservation"))
+    socket = osm_etiketini_koru("socket", etiketler.get("socket"))
+    cuisine = osm_etiketini_koru("cuisine", etiketler.get("cuisine"))
+    opening_hours = osm_etiketini_koru("opening_hours", etiketler.get("opening_hours"))
 
     alkol_servisi = True if alt_kategori in _ALKOLLU_VARSAYILAN_ALT_KATEGORILER else None
 
     return OzellikSeti(
         ucretsiz=ucretsiz,
         wifi=wifi,
-        engelli_erisimi=_evet_hayir_donustur(etiketler.get("wheelchair")),
+        engelli_erisimi=_evet_hayir_donustur(wheelchair),
         alkol_servisi=alkol_servisi,
-        aile_cocuk_dostu=_evet_hayir_donustur(etiketler.get("kids_area") or etiketler.get("family_friendly")),
+        aile_cocuk_dostu=_evet_hayir_donustur(
+            etiketler.get("kids_area") or etiketler.get("family_friendly")
+        ),
+        otopark=_evet_hayir_donustur(parking),
+        rezervasyon_gerekli=_evet_hayir_donustur(reservation),
+        opening_hours=opening_hours,
+        wheelchair=wheelchair,
+        outdoor_seating=outdoor,
+        parking=parking,
+        internet_access=internet,
+        socket=socket,
+        reservation=reservation,
+        cuisine=cuisine,
+        fee=fee_ham,
+        acik_alan=_evet_hayir_donustur(outdoor),
     )
 
 
@@ -286,6 +344,53 @@ def calistir(sehir_anahtari: str, cikti_dosyasi: Path | None = None) -> list[Yer
     jsonl_yaz(cikti_dosyasi, yerler)
     print(f"[BILGI] Sonuclar yazildi: {cikti_dosyasi}")
     return yerler
+
+
+def kaynak_idlerini_ayir(kaynak_idleri: list[str]) -> dict[str, list[int]]:
+    gruplar: dict[str, list[int]] = {"node": [], "way": [], "relation": []}
+    for kimlik in kaynak_idleri:
+        tur, ayirac, deger = kimlik.partition("/")
+        if not ayirac or tur not in gruplar or not deger.isdigit():
+            continue
+        gruplar[tur].append(int(deger))
+    return gruplar
+
+
+def osm_etiketlerini_cek(kaynak_idleri: list[str], *, paket: int = 100) -> dict[str, dict]:
+    """Var olan OSM kayit kimlikleri icin resmi OSM API etiketlerini ceker."""
+    import xml.etree.ElementTree as ET
+
+    import requests
+
+    gruplar = kaynak_idlerini_ayir(kaynak_idleri)
+    sonuclar: dict[str, dict] = {}
+    cokil_adlari = {"node": "nodes", "way": "ways", "relation": "relations"}
+    for tur, kimlikler in gruplar.items():
+        parametre = cokil_adlari[tur]
+        for bas in range(0, len(kimlikler), paket):
+            dilim = kimlikler[bas : bas + paket]
+            if not dilim:
+                continue
+            yanit = requests.get(
+                f"https://api.openstreetmap.org/api/0.6/{tur}s",
+                params={parametre: ",".join(str(deger) for deger in dilim)},
+                headers={"User-Agent": "Samandira/25.2 (osm-etiket; https://samandira.com)"},
+                timeout=60,
+            )
+            if yanit.status_code != 200:
+                continue
+            kok = ET.fromstring(yanit.content)
+            for element in kok:
+                if element.tag not in {"node", "way", "relation"}:
+                    continue
+                etiketler = {
+                    tag.get("k"): tag.get("v")
+                    for tag in element.findall("tag")
+                    if tag.get("k") and tag.get("v")
+                }
+                if etiketler:
+                    sonuclar[f"{element.tag}/{element.get('id')}"] = etiketler
+    return sonuclar
 
 
 def _ana() -> None:
