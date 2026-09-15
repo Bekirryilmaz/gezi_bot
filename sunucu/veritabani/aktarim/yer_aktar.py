@@ -24,6 +24,8 @@ from ortak.sabitler import VARSAYILAN_DENEYIM_PUANLARI
 from sunucu.veritabani.modeller import KonaklamaDetay, KullaniciRotasi, Yer, YerKaynak, Yorum
 from veri.ortak.birlesik_yer_modeli import BirlesikYer, KaynakReferansi
 from sunucu.kimlik.servis import aday_kaydet, legacy_yer_icin_kimlik_sagla
+from sunucu.arama.normalizasyon import turkce_arama_normalize
+from sunucu.veritabani.arama_modelleri import Ilce
 
 
 def _konum_noktasi_uret(enlem: float, boylam: float) -> WKTElement:
@@ -195,6 +197,21 @@ def _temel_alanlari_guncelle(yer: Yer, birlesik_yer: BirlesikYer) -> None:
     yer.kaynakta_puan_sayisi = birlesik_yer.kaynakta_puan_sayisi
 
 
+def _canonical_ilceyi_bagla(oturum: Session, yer: Yer) -> None:
+    """Serbest metni yalniz ayni sehirde tam normalize eslesme varsa baglar."""
+    normalize_ilce = turkce_arama_normalize(yer.ilce)
+    yer.ilce_id = None
+    if not normalize_ilce:
+        return
+    ilce = (
+        oturum.query(Ilce)
+        .filter(Ilce.sehir_id == yer.sehir_id, Ilce.arama_isim == normalize_ilce, Ilce.aktif_mi.is_(True))
+        .one_or_none()
+    )
+    if ilce is not None:
+        yer.ilce_id = ilce.id
+
+
 def _varsayilan_deneyim_puanlarini_uygula(yer: Yer) -> None:
     """`deneyim_puanlari` alani hala bossa (ilk aktarim), alt kategoriye
     gore varsayilan puanlari uygular. Zaten doluysa (daha once kuratorluk
@@ -250,6 +267,7 @@ def yer_yukle_veya_olustur(oturum: Session, sehir_id: str, birlesik_yer: Birlesi
         _eksik_kaynaklari_ekle(oturum, yer, birlesik_yer, veri_batch_id)
 
     _temel_alanlari_guncelle(yer, birlesik_yer)
+    _canonical_ilceyi_bagla(oturum, yer)
     _varsayilan_deneyim_puanlarini_uygula(yer)
 
     sube = legacy_yer_icin_kimlik_sagla(oturum, yer)

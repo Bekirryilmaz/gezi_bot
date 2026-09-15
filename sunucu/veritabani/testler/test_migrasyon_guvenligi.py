@@ -100,7 +100,7 @@ def test_fresh_db_head_schema_check_ve_baseline(
 ) -> None:
     url = gecici_veritabani_uretici()
     _alembic(url, "upgrade", "head")
-    assert "0012" in _alembic(url, "current").stdout
+    assert "0013" in _alembic(url, "current").stdout
     assert "No new upgrade operations detected" in _alembic(url, "check").stdout
 
     rapor = _baseline(url)

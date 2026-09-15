@@ -177,3 +177,182 @@ export type KararDegerlendirmeCevabi = {
   sonuclar: KararSonucu[];
   trace_reference: string;
 };
+
+export type KosulDurumu = "uygun" | "uygun_degil" | "degerlendirilemiyor";
+
+export type AramaSonucuTuru =
+  "yer_kimligi" | "kategori" | "sehir" | "ilce" | "baglamsal_aday";
+
+export type AramaCografya = {
+  sehir_id: string;
+  sehir_anahtari: string;
+  sehir_ismi: string;
+  ilce_id: string | null;
+  ilce_ismi: string | null;
+};
+
+export type AramaSonucu = {
+  sonuc_turu: AramaSonucuTuru;
+  etiket: string;
+  yer: {
+    place_id: string;
+    canonical_id: string;
+    branch_id: string;
+    isim: string;
+  } | null;
+  cografya: AramaCografya;
+  ana_kategori: string | null;
+  alt_kategori: string | null;
+  eslesme_nedeni:
+    | "tam_ad"
+    | "ad_baslangici"
+    | "yazim_yakinligi"
+    | "kategori"
+    | "sehir"
+    | "ilce"
+    | "baglam";
+  yayin_durumu: "yayinda";
+  kosul_durumlari: Record<string, KosulDurumu>;
+};
+
+export type AramaFiltreDurumu = {
+  sehir: string;
+  ilce: string | null;
+  tur: string | null;
+  zorunluKosullar: string[];
+  tercihler: string[];
+};
+
+export type AramaCevabi = {
+  sorgu: string;
+  sonuclar: AramaSonucu[];
+  uygulanan_filtreler: {
+    sehir_id: string;
+    ilce_id: string | null;
+    tur: string | null;
+    cografi_baglam: { sehir: string; ilce: string | null; alan: string | null };
+    zorunlu_kosullar: Array<Record<string, unknown>>;
+    tercihler: Array<Record<string, unknown>>;
+  };
+  sonraki_cursor: string | null;
+  degerlendirilemeyen_aday_sayisi: number;
+};
+
+export type AramaFiltreKatalogu = {
+  sehir_id: string;
+  sehir_anahtari: string;
+  ilceler: Array<{ id: string; isim: string; sehir_id: string }>;
+  turler: Array<{ kod: string; etiket: string }>;
+  somut_kosullar: Array<{ kod: string; etiket: string; iddia_ailesi: string }>;
+};
+
+export type KararBaglami = {
+  amac: string | null;
+  cografi_baglam: { sehir: string; ilce: string | null; alan: string | null };
+  zaman?: {
+    ziyaret_tarihi?: string | null;
+    baslangic?: string | null;
+    bitis?: string | null;
+  };
+  zorunlu_kosullar?: Array<Record<string, unknown>>;
+  tercihler?: Array<Record<string, unknown>>;
+  reddedilen_yerler?: string[];
+  sabitlenen_yerler?: string[];
+  anlasilmayan_kritik_girdiler?: string[];
+  bilgi_surumu?: string;
+  politika_surumu?: string;
+};
+
+export type KesfetSecenegi = {
+  yer: NonNullable<AramaSonucu["yer"]>;
+  cografya: AramaCografya;
+  ana_kategori: string | null;
+  alt_kategori: string | null;
+  neden_bu: string;
+  anlamli_fark: string;
+  karar_sonucu: KararSonucu;
+};
+
+export type KesfetCevabi = {
+  durum: "success" | "empty" | "insufficient";
+  secenekler: KesfetSecenegi[];
+  kimlik_eslesmeleri: Array<NonNullable<AramaSonucu["yer"]>>;
+  kullanilan_baglam: Record<string, unknown>;
+  sinirlama_nedeni: string;
+  degerlendirilemeyen_aday_sayisi: number;
+  daha_fazla_var_mi: boolean;
+  trace_reference: string | null;
+};
+
+export type IlceKapsami = {
+  id: string;
+  isim: string;
+  slug: string;
+  yayinlanmis_yer_turleri: string[];
+  ayri_sayfa_var: boolean;
+  kesfet_url: string;
+};
+
+export type SehirKapsami = {
+  sehir_id: string;
+  sehir_anahtari: string;
+  sehir_ismi: string;
+  manifest_surumu: string;
+  kimlik_aramasi_destekleniyor: boolean;
+  karar_kapsami_destekleniyor: boolean;
+  yayinlanmis_yer_sayisi: number;
+  desteklenen_yer_turleri: string[];
+  desteklenen_iddia_aileleri: string[];
+  ilceler: IlceKapsami[];
+  kapsam_aciklamasi: string;
+};
+
+export type IlceDetayi = {
+  cografya: {
+    sehir_id: string;
+    sehir_anahtari: string;
+    sehir_ismi: string;
+    ilce_id: string;
+    ilce_slug: string;
+    ilce_ismi: string;
+  };
+  ayri_sayfa_var: boolean;
+  ozgun_karar_bilgileri: string[];
+  yayinlanmis_yer_turleri: string[];
+  kesfet_url: string;
+  kapsam_aciklamasi: string;
+};
+
+export type KamusalYerDetayi = {
+  yer: NonNullable<AramaSonucu["yer"]>;
+  cografya: {
+    sehir_id: string;
+    sehir_anahtari: string;
+    sehir_ismi: string;
+    ilce_id: string | null;
+    ilce_slug: string | null;
+    ilce_ismi: string | null;
+  };
+  ana_kategori: string;
+  alt_kategori: string;
+  adres: string | null;
+  aciklama: string | null;
+  telefon: string | null;
+  web_sitesi: string | null;
+  enlem: number;
+  boylam: number;
+  fotograf_urlleri: string[];
+  pratik_bilgiler: Array<{
+    aile: string;
+    deger: unknown;
+    kapsam: Record<string, unknown>;
+    gecerlilik_baslangici: string | null;
+    gecerlilik_bitisi: string | null;
+    dogrulanma_zamani: string | null;
+    guncellik_anlami: string;
+  }>;
+  karar_sonucu: KararSonucu | null;
+  kritik_bilinmeyenler: string[];
+  kapsam_anlami: string;
+  duzeltme_girisi: { etiket: string; aciklama: string; href: string | null };
+};

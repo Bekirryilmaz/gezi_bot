@@ -12,6 +12,14 @@ import type {
   YerListeCevabi,
   YerOzet,
   VeriDurumu,
+  AramaCevabi,
+  AramaFiltreDurumu,
+  AramaFiltreKatalogu,
+  IlceDetayi,
+  KamusalYerDetayi,
+  KararBaglami,
+  KesfetCevabi,
+  SehirKapsami,
 } from "./types";
 
 export class ApiHatasi extends Error {
@@ -98,15 +106,17 @@ export function veriDurumuBelirle({
   return "ready";
 }
 
-async function apiGet<T>(yol: string): Promise<T> {
+async function apiGet<T>(yol: string, signal?: AbortSignal): Promise<T> {
   let yanit: Response;
   try {
     yanit = await fetch(`${apiKoku()}${yol}`, {
+      signal,
       ...(typeof window === "undefined"
         ? { next: { revalidate: 60 } }
         : { cache: "no-store" }),
     });
   } catch (hata) {
+    if (hata instanceof DOMException && hata.name === "AbortError") throw hata;
     throw new ApiHatasi(agHatasiMesaji(hata), null, "unavailable");
   }
   if (!yanit.ok) {
@@ -179,6 +189,66 @@ async function rotaPost<T>(yol: string, govde: unknown): Promise<T> {
   return yanit.json() as Promise<T>;
 }
 
+export async function kesfetDegerlendir(
+  talep: {
+    sorgu: string;
+    baglam: KararBaglami;
+    arama?: { ilce_id?: string | null; tur?: string | null };
+    hedef_sayi?: number;
+    haric_yerler?: string[];
+  },
+  signal?: AbortSignal,
+): Promise<KesfetCevabi> {
+  let yanit: Response;
+  try {
+    yanit = await fetch(`${apiKoku()}/v1/kesfet/degerlendir`, {
+      method: "POST",
+      signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(talep),
+      cache: "no-store",
+    });
+  } catch (hata) {
+    if (hata instanceof DOMException && hata.name === "AbortError") throw hata;
+    throw new ApiHatasi(agHatasiMesaji(hata), null, "unavailable");
+  }
+  if (!yanit.ok) throw await apiHatasiOlustur(yanit, "/v1/kesfet/degerlendir");
+  return yanit.json() as Promise<KesfetCevabi>;
+}
+
+export async function sehirKapsaminiGetir(sehir: string): Promise<SehirKapsami> {
+  return apiGet<SehirKapsami>(`/v1/sehirler/${sehir}/kapsam`);
+}
+
+export async function ilceDetayiniGetir(
+  sehir: string,
+  ilce: string,
+): Promise<IlceDetayi> {
+  return apiGet<IlceDetayi>(`/v1/sehirler/${sehir}/ilceler/${ilce}`);
+}
+
+export async function kamusalYerDetayiGetir(yerId: string): Promise<KamusalYerDetayi> {
+  return apiGet<KamusalYerDetayi>(`/v1/yerler/${yerId}`);
+}
+
+export async function kamusalYerDetayiniDegerlendir(
+  yerId: string,
+  baglam: KararBaglami,
+  signal?: AbortSignal,
+): Promise<KamusalYerDetayi> {
+  const yanit = await fetch(
+    `${apiKoku()}/v1/yerler/${encodeURIComponent(yerId)}/degerlendir`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(baglam),
+      signal,
+    },
+  );
+  if (!yanit.ok) throw await apiHatasiOlustur(yanit, `/v1/yerler/${yerId}/degerlendir`);
+  return yanit.json() as Promise<KamusalYerDetayi>;
+}
+
 export async function gunlukPlanOlustur(
   talep: GunlukPlanTalebi,
 ): Promise<GunlukPlanCevap> {
@@ -204,4 +274,29 @@ export async function konaklamaBolgesiOner(rotaId: string): Promise<RotaCevap> {
 
 export function apiTabanUrl(): string {
   return apiKoku();
+}
+
+export async function aramaGetir(
+  q: string,
+  filtreler: AramaFiltreDurumu,
+  secenekler: { limit?: number; cursor?: string; signal?: AbortSignal } = {},
+): Promise<AramaCevabi> {
+  const params = new URLSearchParams({ q, sehir: filtreler.sehir });
+  if (filtreler.ilce) params.set("ilce", filtreler.ilce);
+  if (filtreler.tur) params.set("tur", filtreler.tur);
+  for (const kod of filtreler.zorunluKosullar) params.append("zorunlu_kosul", kod);
+  for (const kod of filtreler.tercihler) params.append("tercih", kod);
+  params.set("limit", String(secenekler.limit ?? 20));
+  if (secenekler.cursor) params.set("cursor", secenekler.cursor);
+  return apiGet<AramaCevabi>(`/v1/arama?${params}`, secenekler.signal);
+}
+
+export async function aramaFiltreleriniGetir(
+  sehir = "samsun",
+  signal?: AbortSignal,
+): Promise<AramaFiltreKatalogu> {
+  return apiGet<AramaFiltreKatalogu>(
+    `/v1/arama/filtreler?${new URLSearchParams({ sehir })}`,
+    signal,
+  );
 }

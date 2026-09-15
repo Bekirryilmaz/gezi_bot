@@ -25,6 +25,9 @@ from sunucu.api.yerler_router import yonlendirici as yerler_yonlendirici
 from sunucu.karar_motoru.router import yonlendirici as karar_yonlendirici
 from sunucu.veritabani.baglanti import motor
 from sunucu.admin.router import yonlendirici as admin_yonlendirici
+from sunucu.arama.router import yonlendirici as arama_yonlendirici
+from sunucu.kesfet.router import yonlendirici as kesfet_yonlendirici
+from sunucu.kapsam.router import yonlendirici as kapsam_yonlendirici
 
 
 def _izinli_originleri_al() -> list[str]:
@@ -91,6 +94,9 @@ hata_yakalayicilari_kur(uygulama)
 uygulama.include_router(yerler_yonlendirici)
 uygulama.include_router(rotalar_yonlendirici)
 uygulama.include_router(karar_yonlendirici)
+uygulama.include_router(arama_yonlendirici)
+uygulama.include_router(kesfet_yonlendirici)
+uygulama.include_router(kapsam_yonlendirici)
 
 admin_uygulama = FastAPI(
     title="Şamandıra İç Admin API",

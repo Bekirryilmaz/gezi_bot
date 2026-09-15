@@ -19,7 +19,12 @@ from sunucu.yayin.domain import KullanimTuru, YayinUygunlukDurumu
 from sunucu.yayin.servis import yayin_kaydi_kamusal_mi
 
 
-def adaylari_toplu_getir(oturum: Session, yer_idleri: list[str]) -> list[KararAdayi]:
+def adaylari_toplu_getir(
+    oturum: Session,
+    yer_idleri: list[str],
+    *,
+    kullanim_turu: KullanimTuru = KullanimTuru.KARAR,
+) -> list[KararAdayi]:
     """Yer/publication ve aktif claim projection'larini iki toplu sorguda getirir."""
     benzersiz = list(dict.fromkeys(yer_idleri))
     yer_yayini = aliased(YayinKaydi, name="yer_yayini")
@@ -77,7 +82,7 @@ def adaylari_toplu_getir(oturum: Session, yer_idleri: list[str]) -> list[KararAd
         )
         durum = (
             YayinUygunlukDurumu(yayin.durum)
-            if yayin is not None
+            if yayin_kaydi_kamusal_mi(yayin, kullanim_turu)
             else YayinUygunlukDurumu.YAYINLANAMAZ
         )
         adaylar.append(

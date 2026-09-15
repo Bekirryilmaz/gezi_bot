@@ -67,3 +67,21 @@ def test_public_mapper_ic_veriyi_projectiona_tasimiyor():
 
     assert set(_anahtarlari_yur(payload)).isdisjoint(YASAK_ALANLAR)
     assert payload["ticari_bildirim"] == "sponsorlu"
+
+
+def test_versioned_arama_public_contract_internal_skor_tasimiyor():
+    sema = uygulama.openapi()
+    assert "/v1/arama" in sema["paths"]
+    arama_semalari = {
+        ad: deger for ad, deger in sema["components"]["schemas"].items() if ad.startswith("Arama")
+    }
+    anahtarlar = set(_anahtarlari_yur(arama_semalari))
+    assert anahtarlar.isdisjoint({"internal_score", "fuzzy_score", "benzerlik", "sponsor"})
+
+
+def test_kesfet_ve_public_detail_versioned_contract_yasak_alan_tasimiyor():
+    sema = uygulama.openapi()
+    assert "/v1/kesfet/degerlendir" in sema["paths"]
+    assert "/v1/yerler/{yer_id}" in sema["paths"]
+    ilgili = {ad: deger for ad, deger in sema["components"]["schemas"].items() if ad.startswith(("Kesfet", "KamusalYer", "YayimlanmisBilgi"))}
+    assert set(_anahtarlari_yur(ilgili)).isdisjoint(YASAK_ALANLAR | {"guven_sinifi", "sponsor"})

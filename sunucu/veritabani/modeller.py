@@ -25,6 +25,7 @@ from datetime import datetime
 
 from geoalchemy2 import Geography
 from sqlalchemy import (
+    Computed,
     JSON,
     DateTime,
     Float,
@@ -55,6 +56,9 @@ class Sehir(Taban):
 
     id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=_uuid_uret)
     isim: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    arama_isim: Mapped[str] = mapped_column(
+        String(100), Computed("samandira_arama_normalize(isim)", persisted=True)
+    )
     plaka_kodu: Mapped[str | None] = mapped_column(String(2))
     bolge: Mapped[str | None] = mapped_column(String(50))
     merkez_enlem: Mapped[float | None] = mapped_column(Float)
@@ -83,10 +87,14 @@ class Yer(Taban):
     sehir_id: Mapped[str] = mapped_column(ForeignKey("sehirler.id", ondelete="CASCADE"), nullable=False)
 
     isim: Mapped[str] = mapped_column(String(255), nullable=False)
+    arama_isim: Mapped[str] = mapped_column(
+        String(255), Computed("samandira_arama_normalize(isim)", persisted=True)
+    )
     ana_kategori: Mapped[str] = mapped_column(String(30), nullable=False)
     alt_kategori: Mapped[str] = mapped_column(String(50), nullable=False)
 
     ilce: Mapped[str | None] = mapped_column(String(100))
+    ilce_id: Mapped[str | None] = mapped_column(ForeignKey("ilceler.id", ondelete="RESTRICT"))
     adres: Mapped[str | None] = mapped_column(Text)
     aciklama: Mapped[str | None] = mapped_column(Text)
     tanitim_metni: Mapped[str | None] = mapped_column(Text)
@@ -135,6 +143,18 @@ class Yer(Taban):
     __table_args__ = (
         Index("ix_yerler_konum", "konum", postgresql_using="gist"),
         Index("ix_yerler_sehir_kategori", "sehir_id", "ana_kategori", "alt_kategori"),
+        Index("ix_yerler_ilce_id", "ilce_id"),
+        Index(
+            "ix_yerler_arama_isim_prefix",
+            "arama_isim",
+            postgresql_ops={"arama_isim": "text_pattern_ops"},
+        ),
+        Index(
+            "ix_yerler_arama_isim_trgm",
+            "arama_isim",
+            postgresql_using="gin",
+            postgresql_ops={"arama_isim": "gin_trgm_ops"},
+        ),
     )
 
     def __repr__(self) -> str:
@@ -319,3 +339,4 @@ from sunucu.veritabani.admin_modelleri import (  # noqa: E402,F401
 from sunucu.veritabani.karar_modelleri import (  # noqa: E402,F401
     KararIzi,
 )
+from sunucu.veritabani.arama_modelleri import Ilce  # noqa: E402,F401
