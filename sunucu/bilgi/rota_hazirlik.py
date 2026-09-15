@@ -7,6 +7,7 @@ from typing import Any
 
 from ortak.sabitler import (
     ONERIYE_UYGUN_KIMLIK_SINIFLARI,
+    CalismaSaatiDurumu,
     KimlikKaliteSinifi,
     RotaHazirlikDurumu,
     RotaHazirlikNedeni,
@@ -23,6 +24,7 @@ class RotaHazirlikGirdisi:
     amaclar: tuple[str, ...]
     yayin_uygun: bool
     calisma_saati: TamamlikHucresi
+    calisma_saati_durumu: CalismaSaatiDurumu | None = None
 
 
 @dataclass(frozen=True)
@@ -74,7 +76,14 @@ def rota_hazirligini_hesapla(girdi: RotaHazirlikGirdisi) -> RotaHazirlikOzeti:
     else:
         nedenler.append(RotaHazirlikNedeni.YAYIN_UYGUN_DEGIL.value)
 
-    if girdi.calisma_saati is TamamlikHucresi.BILINIYOR:
+    saat_durumu = girdi.calisma_saati_durumu
+    if saat_durumu is CalismaSaatiDurumu.PARTIALLY_KNOWN:
+        nedenler.append(RotaHazirlikNedeni.CALISMA_SAATI_PARCALI.value)
+    elif saat_durumu is CalismaSaatiDurumu.STALE:
+        nedenler.append(RotaHazirlikNedeni.CALISMA_SAATI_ESKIMIS.value)
+    elif saat_durumu is CalismaSaatiDurumu.INVALID:
+        nedenler.append(RotaHazirlikNedeni.CALISMA_SAATI_GECERSIZ.value)
+    elif girdi.calisma_saati is TamamlikHucresi.BILINIYOR:
         nedenler.append(RotaHazirlikNedeni.CALISMA_SAATI_BILINIYOR.value)
     elif girdi.calisma_saati is TamamlikHucresi.YALNIZ_DAHILI:
         nedenler.append(RotaHazirlikNedeni.CALISMA_SAATI_YALNIZ_DAHILI.value)
@@ -98,7 +107,11 @@ def rota_hazirligini_hesapla(girdi: RotaHazirlikGirdisi) -> RotaHazirlikOzeti:
             kirilim=_kirilim(girdi, RotaHazirlikDurumu.KESIF_ADAYI),
         )
 
-    if girdi.calisma_saati is TamamlikHucresi.BILINIYOR:
+    saat_hazir = girdi.calisma_saati is TamamlikHucresi.BILINIYOR and saat_durumu in {
+        None,
+        CalismaSaatiDurumu.KNOWN,
+    }
+    if saat_hazir:
         return RotaHazirlikOzeti(
             durum=RotaHazirlikDurumu.ROTA_HAZIR,
             neden_kodlari=tuple(nedenler),
@@ -129,5 +142,8 @@ def _kirilim(girdi: RotaHazirlikGirdisi, durum: RotaHazirlikDurumu) -> dict[str,
         "amaclar": list(girdi.amaclar),
         "yayin_uygun": girdi.yayin_uygun,
         "calisma_saati": girdi.calisma_saati.value,
+        "calisma_saati_durumu": (
+            girdi.calisma_saati_durumu.value if girdi.calisma_saati_durumu else None
+        ),
         "kamusal_skor": False,
     }

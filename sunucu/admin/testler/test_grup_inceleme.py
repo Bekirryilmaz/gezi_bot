@@ -257,3 +257,48 @@ def test_grup_inceleme_gecerli_saati_normalize_yazar_kor_yayin_yoktur():
         oturum.close()
         islem.rollback()
         baglanti.close()
+
+
+def test_grup_inceleme_birinci_el_saati_site_ici_kaynakla_yazar():
+    from sunucu.admin.gozlem_servisi import birinci_el_gozlem_yaz, site_ici_politikasini_uygula
+
+    baglanti, islem, oturum = _oturum()
+    try:
+        site_ici_politikasini_uygula(oturum)
+        _yer, sube, _kaynak_id = _kaynak_bagi(oturum)
+        baglam = _baglam(oturum, roller={"yonetici"})
+        yazilan = birinci_el_gozlem_yaz(
+            oturum,
+            baglam=baglam,
+            sube_id=sube.id,
+            aile="calisma_saatleri",
+            deger="Mo-Su 08:30-16:30",
+            ozet="Resmi kurum saati birinci el kayit.",
+            gerekce="KTB sayfasindan birinci el saat kaydi.",
+            istek_id="grup-8",
+            kaynak_url="https://samsun.ktb.gov.tr/TR-216752/gazi-muzesi.html",
+        )
+        assert yazilan["otomatik_yayin"] is False
+        sonuc = grup_incelemeyi_uygula(
+            oturum,
+            baglam=baglam,
+            dosya_idleri=[yazilan["inceleme_dosyasi_id"]],
+            gerekce="Birinci el resmi saat sozdizimi kontrol edildi",
+            istek_id="grup-9",
+        )
+        assert yazilan["inceleme_dosyasi_id"] in sonuc.onaylanan
+        assert sonuc.otomatik_yayin is False
+        iddia = oturum.get(Iddia, yazilan["iddia_id"])
+        surum = (
+            oturum.query(IddiaSurumu)
+            .filter_by(iddia_id=iddia.id, surum_no=iddia.aktif_surum_no)
+            .one()
+        )
+        assert surum.yayin_durumu == "yayinlandi"
+        assert surum.deger.get("kaynak") == "site_ici"
+        assert surum.deger.get("durum") == "known"
+        assert (surum.deger.get("ham_referans") or "").endswith("gazi-muzesi.html")
+    finally:
+        oturum.close()
+        islem.rollback()
+        baglanti.close()

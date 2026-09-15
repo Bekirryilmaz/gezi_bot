@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from datetime import datetime
 from typing import Any
 
 from ortak.sabitler import (
@@ -12,15 +13,22 @@ from ortak.sabitler import (
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from sunucu.bilgi.calisma_saati import calisma_saati_degerini_al, calisma_saatini_ayristir
+from sunucu.bilgi.calisma_saati import (
+    calisma_saati_degerini_al,
+    calisma_saati_kaydini_kur,
+    calisma_saatini_ayristir,
+)
 from sunucu.bilgi.pilot_havuzu import PilotAday, kategori_amaci
+from sunucu.bilgi.rota_bilinmeyen import akilli_rota_go_degerlendirmesi
 from sunucu.bilgi.rota_hazirlik import RotaHazirlikGirdisi, rota_hazirligini_hesapla
+from sunucu.bilgi.rota_senaryo import senaryo_setini_olc
 from sunucu.bilgi.tamamlik_matrisi import (
     MATRIS_KOLONLARI,
     AlanKaniti,
     eksik_onemli_aileler,
     matris_satirini_kur,
 )
+from sunucu.bilgi.tarihi_neden import tarihi_mekan_nedenleri
 from sunucu.bilgi.ziyaret_suresi import ziyaret_suresini_coz
 from sunucu.kimlik.kalite import isim_gecerli_mi, oneriye_uygun_mu
 from sunucu.veritabani.bilgi_modelleri import DahiliSinyalOzeti, Iddia, IddiaSurumu
@@ -78,6 +86,46 @@ def _claim_kaniti(
     )
 
 
+def _zaman_al(deger: Any, anahtar: str) -> datetime | None:
+    ham = (deger or {}).get(anahtar) if isinstance(deger, dict) else None
+    if not ham or not isinstance(ham, str):
+        return None
+    try:
+        return datetime.fromisoformat(ham.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _saat_kaydini_claimden(surum: IddiaSurumu):
+    deger = surum.deger
+    ham = calisma_saati_degerini_al(deger)
+    kaynak = "openstreetmap"
+    if isinstance(deger, dict) and deger.get("kaynak"):
+        kaynak = str(deger.get("kaynak"))
+    return calisma_saati_kaydini_kur(
+        ham=ham,
+        kaynak=kaynak,
+        gozlemlenme_zamani=_zaman_al(deger, "gozlemlenme_zamani"),
+        cekilme_zamani=_zaman_al(deger, "cekilme_zamani"),
+        ham_referans=(deger.get("ham_referans") if isinstance(deger, dict) else None),
+        zaman_dilimi=(deger.get("zaman_dilimi") if isinstance(deger, dict) else None),
+    )
+
+
+def _yayimli_sure_dakika(surum: IddiaSurumu | None) -> int | None:
+    if surum is None or surum.yayin_durumu not in {"yayinlandi", "sinirli"}:
+        return None
+    deger = surum.deger
+    ham: Any = deger
+    if isinstance(deger, dict):
+        ham = deger.get("dakika") or deger.get("deger") or deger.get("tipik_dk")
+    try:
+        dakika = int(ham)
+    except (TypeError, ValueError):
+        return None
+    return dakika if dakika > 0 else None
+
+
 def _amaclar(alt: str | None, kahvalti: bool, calisma: bool) -> tuple[str, ...]:
     degerler: list[str] = []
     temel = kategori_amaci(alt)
@@ -121,6 +169,9 @@ def mekan_kapsamini_kur(
         osm=osm_bool,
     )
     saat_hucre = TamamlikHucresi(satir["calisma_saatleri"])
+    saat_kaydi = None
+    if "calisma_saatleri" in claimler:
+        saat_kaydi = _saat_kaydini_claimden(claimler["calisma_saatleri"])
     hazirlik = rota_hazirligini_hesapla(
         RotaHazirlikGirdisi(
             kimlik_sinifi=aday.kimlik_sinifi,
@@ -130,9 +181,13 @@ def mekan_kapsamini_kur(
             amaclar=amaclar,
             yayin_uygun=oneriye_uygun_mu(aday.kimlik_sinifi),
             calisma_saati=saat_hucre,
+            calisma_saati_durumu=saat_kaydi.durum if saat_kaydi else None,
         )
     )
-    sure = ziyaret_suresini_coz(alt_kategori=aday.alt_kategori)
+    sure = ziyaret_suresini_coz(
+        dogrulanmis_dakika=_yayimli_sure_dakika(claimler.get("ziyaret_suresi")),
+        alt_kategori=aday.alt_kategori,
+    )
     nlp_ozet = {
         aile: {
             "guven_sinifi": nlp[aile].guven_sinifi,
@@ -153,6 +208,7 @@ def mekan_kapsamini_kur(
         "matris": satir,
         "eksik_onemli_aileler": eksik_onemli_aileler(satir),
         "rota_hazirlik": hazirlik.sozluk(),
+        "calisma_saati_durumu": saat_kaydi.durum.value if saat_kaydi else None,
         "ziyaret_suresi": sure.sozluk(),
         "nlp": nlp_ozet,
         "gold_aday": False,
@@ -271,6 +327,7 @@ def rota_simulasyonu(satirlar: list[dict[str, Any]]) -> dict[str, Any]:
     for ilce in sorted({s.get("ilce_adi") or "ilcesiz" for s in satirlar}):
         kova = _filtre(lambda s, i=ilce: (s.get("ilce_adi") or "ilcesiz") == i)
         ilce_sim[ilce] = {"aday": len(kova), **_durum(kova)}
+    senaryo_af = senaryo_setini_olc(satirlar)
     return {
         "pilot_toplam": len(satirlar),
         "durum": _durum(satirlar),
@@ -307,6 +364,65 @@ def rota_simulasyonu(satirlar: list[dict[str, Any]]) -> dict[str, Any]:
                 )
             ),
         },
+        "senaryo_af": senaryo_af,
+        "go": akilli_rota_go_degerlendirmesi(
+            {
+                **senaryo_af,
+                "desteklenen_amaclar": (
+                    "kahve_icmek",
+                    "yemek_yemek",
+                    "tarihi_kulturel_ziyaret",
+                    "acik_hava",
+                    "tatli_yemek",
+                ),
+                "desteklenmeyen_amaclar": ("kahvalti", "calisma"),
+            }
+        ),
+    }
+
+
+def saat_durum_ozeti(satirlar: list[dict[str, Any]]) -> dict[str, int]:
+    sayac: Counter[str] = Counter()
+    for satir in satirlar:
+        sayac[satir.get("calisma_saati_durumu") or "yok"] += 1
+    return dict(sayac)
+
+
+def sure_kaynak_ozeti(satirlar: list[dict[str, Any]]) -> dict[str, int]:
+    sayac: Counter[str] = Counter()
+    fact = 0
+    for satir in satirlar:
+        sure = satir.get("ziyaret_suresi") or {}
+        sayac[sure.get("kaynak") or "yok"] += 1
+        if sure.get("fact_mi"):
+            fact += 1
+    sayac["fact_olan"] = fact
+    return dict(sayac)
+
+
+def tarihi_neden_ozeti(satirlar: list[dict[str, Any]]) -> dict[str, Any]:
+    kova = [
+        s for s in satirlar if "tarihi_kulturel_ziyaret" in (s.get("amaclar") or [])
+    ]
+    neden_say: Counter[str] = Counter()
+    kayitlar = []
+    for satir in kova:
+        nedenler = tarihi_mekan_nedenleri(satir)
+        for neden in nedenler:
+            neden_say[neden] += 1
+        kayitlar.append(
+            {
+                "isim": satir.get("isim"),
+                "ilce_adi": satir.get("ilce_adi"),
+                "rota_hazirlik": (satir.get("rota_hazirlik") or {}).get("durum"),
+                "nedenler": list(nedenler),
+            }
+        )
+    return {
+        "adet": len(kova),
+        "neden": dict(neden_say),
+        "rota": rota_durum_ozeti(kova),
+        "kayitlar": kayitlar,
     }
 
 

@@ -166,3 +166,14 @@ Samsun 88 mekanlık veriye dayalı pilot, OSM grup inceleme (kör yayın yok),
 tamamlık matrisi ve iç rota hazırlık durumu kayıtlıdır. Bugün Ne Yapalım
 kahve/yemek/tarih sınırlı GO; Akıllı Rota NO-GO (`rota_hazir` 11/88, tarih 0).
 Production DB, commit, push ve yeni migration yoktur.
+
+## FAZ 25.5 rota kritik veri tamamlama — 16 Eylül 2026
+
+- [faz25-5-sonuc.md](./01-research/faz25-5-sonuc.md)
+
+Pilot 88 korundu. Resmi KTB çalışma saati 5 tarihi/kültürel mekanda
+gözlem→inceleme→yayın ile eklendi (`rota_hazir` 11→16, tarih 0→5).
+Parser durumları, ziyaret süresi estimate semantiği ve FAZ 26 unknown
+sözleşmesi kayıtlıdır. Bugün Ne Yapalım GO; Akıllı Rota GO (limited/unknown).
+Production DB, commit, push ve yeni migration yoktur.
+

@@ -28,7 +28,11 @@ from sunucu.bilgi.pilot_kapsam import (
     nlp_kapsam_ozeti,
     rota_durum_ozeti,
     rota_simulasyonu,
+    saat_durum_ozeti,
+    sure_kaynak_ozeti,
+    tarihi_neden_ozeti,
 )
+from sunucu.bilgi.resmi_saat import resmi_saatleri_isle
 from sunucu.veritabani.admin_modelleri import AdminKullanici
 from sunucu.veritabani.baglanti import OturumUretici
 
@@ -87,6 +91,9 @@ def _rapor(oturum: Session, sehir_adi: str) -> dict[str, Any]:
         "rota_durum": rota_durum_ozeti(kayitlar),
         "matris_ozet": matris_kolon_ozeti(kayitlar),
         "nlp": nlp_kapsam_ozeti(kayitlar),
+        "saat_durum": saat_durum_ozeti(kayitlar),
+        "sure_kaynak": sure_kaynak_ozeti(kayitlar),
+        "tarihi": tarihi_neden_ozeti(kayitlar),
         "simulasyon": rota_simulasyonu(kayitlar),
         "kuyruk": kuyruk_sayimi(oturum),
         "kayitlar": kayitlar,
@@ -150,11 +157,12 @@ def _grup_incele(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="FAZ 25.4 pilot kapsam operasyonu")
+    parser = argparse.ArgumentParser(description="FAZ 25.5 rota kritik veri operasyonu")
     parser.add_argument("--sehir", default="Samsun")
     parser.add_argument("--rapor", action="store_true")
     parser.add_argument("--triyaj", action="store_true")
     parser.add_argument("--grup-inceleme", action="store_true")
+    parser.add_argument("--resmi-saat", action="store_true")
     parser.add_argument("--pilot", action="store_true")
     parser.add_argument("--gold", action="store_true")
     parser.add_argument("--aile", default=None)
@@ -162,15 +170,31 @@ def main() -> None:
     parser.add_argument(
         "--gerekce",
         default=(
-            "Pilot dusuk risk OSM yapisal adaylari aile bazinda incelendi; kor otomatik yayin yok."
+            "Pilot rota-kritik calisma saati resmi kaynak ve dusuk risk OSM "
+            "adaylari incelendi; kor otomatik yayin yok."
         ),
     )
     parser.add_argument("--cikti", type=Path)
     args = parser.parse_args()
     with OturumUretici() as oturum:
         cikti: dict[str, Any] = {}
+        sehir_id = sehir_idsini_bul(oturum, args.sehir)
+        havuz = havuzu_sec(veritabanindan_adaylar(oturum, sehir_id))
         if args.triyaj:
-            cikti["triyaj"] = inceleme_kuyrugunu_triyaj_et(oturum, dry_run=not args.yaz)
+            cikti["triyaj"] = inceleme_kuyrugunu_triyaj_et(
+                oturum,
+                dry_run=not args.yaz,
+                pilot_sube_idleri={a.sube_id for a in havuz},
+            )
+        if args.resmi_saat:
+            baglam = _yayinci_baglam(oturum) if args.yaz else None
+            cikti["resmi_saat"] = resmi_saatleri_isle(
+                oturum,
+                baglam=baglam,
+                havuz=havuz,
+                yaz=args.yaz,
+                gerekce=args.gerekce,
+            )
         if args.grup_inceleme:
             cikti["grup_inceleme"] = _grup_incele(
                 oturum,
@@ -181,7 +205,7 @@ def main() -> None:
                 yaz=args.yaz,
                 gerekce=args.gerekce,
             )
-        if args.rapor or not (args.triyaj or args.grup_inceleme):
+        if args.rapor or not (args.triyaj or args.grup_inceleme or args.resmi_saat):
             cikti["rapor"] = _rapor(oturum, args.sehir)
             if "kayitlar" in cikti["rapor"] and args.cikti is None:
                 ozet = dict(cikti["rapor"])

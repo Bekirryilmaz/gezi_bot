@@ -415,7 +415,7 @@ Akıllı Rota motoru bu bölümle uygulanmaz. Yalnız hangi bilginin rota için
 kritik, hangisinin karar için önemli, hangisinin isteğe bağlı olduğunu
 sınıflandırır. Kod: `ortak/sabitler.py::RotaKapsamSinifi`,
 `ROTA_KAPSAM_AILELERI`, `RotaHazirlikDurumu`, `TamamlikHucresi`,
-`ZiyaretSuresiKaynagi`.
+`ZiyaretSuresiKaynagi`, `CalismaSaatiDurumu`, `RotaBilinmeyenDavranis`.
 
 ### 11.1. Kapsam sınıfları
 
@@ -445,24 +445,55 @@ aggregate olabilir. Kamusal skor üretilmez.
 
 ### 11.3. Ziyaret süresi kaynağı
 
-| Kaynak | Fact mi? |
+| Kaynak | Fact mi? | Anlam |
+|---|---|---|
+| `dogrulanmis_sure` | Evet | Yayımlanmış süre iddiası (`verified_duration`) |
+| `kullanici_secimi` | Hayır | O oturumun tercihi (`user_selected_duration`) |
+| `planlama_tahmini` | Hayır | Kategori aralığı; yalnız rota planlama yedeği (`planning_estimate`) |
+| `bilinmiyor` | Hayır | Süre yok (`unknown`) |
+
+`planlama_tahmini` tek kesin sayı değildir: `minimum_dk` / `tipik_dk` /
+`maksimum_dk` taşır. Kullanıcıya gerekiyorsa «Planlama için yaklaşık
+45–75 dakika ayırdık» denir. «60 dakika sürer» denmez. Public fact
+değildir.
+
+### 11.4. Çalışma saati ayrıştırma durumu
+
+OSM `opening_hours` ve birinci el/resmî kaynak aynı durum kümesini kullanır.
+Tahmin yok. Google yorumundan saat türetilmez.
+
+| Durum | Anlam |
 |---|---|
-| `bilinen_dogrulanmis` | Evet; yayımlanmış süre iddiası |
-| `kategori_sezgisel` | Hayır; yalnız planner yedegi |
-| `kullanici_secimi` | Hayır; o oturumun tercihi |
-| `bilinmiyor` | Süre yok |
+| `known` | Desteklenen sözdizimi tam çözüldü |
+| `partially_known` | Bazı kurallar çözüldü; PH/mevsim/yorum atlandı |
+| `unknown` | Ham değer yok |
+| `invalid` | Desteklenmeyen veya gece taşan sözdizimi |
+| `stale` | Çözüldü ama gözlem tazeliği doldu |
 
-Kategori sezgiseli `kafe=60` gibi gercekmiş fact olarak sunulmaz.
+`acik_iddiasi_kurulabilir` yalnız `known` ve taze kayıtta True olur.
+`unknown` / `invalid` / `stale` yer «şimdi açık» sayılmaz.
 
-### 11.4. Rota hazırlık durumu
+### 11.5. Rota hazırlık durumu
 
 Kamusal skor değildir. İç durum:
 
 | Durum | Anlam |
 |---|---|
-| `rota_hazir` | Kimlik, koordinat, ilçe, amaç ve yayın uygun; rota-kritik unknown sınırı içinde; çalışma saati yayımlanmış ve sözdizimi geçerli |
-| `rota_sinirli` | Durak adayı olabilir ama çalışma saati unknown/yalnız dahili veya rota-kritik eksik sınırda |
+| `rota_hazir` | Kimlik, koordinat, ilçe, amaç ve yayın uygun; çalışma saati yayımlanmış **ve** `known` |
+| `rota_sinirli` | Temel uygun; saat unknown/partial/stale/yalnız dahili. Akıllı Rota limited aday olabilir; «Gitmeden önce saatini doğrula» |
 | `kesif_adayi` | Keşfet/Bugün için bakılabilir; günlük dizi kurulmaz |
 | `rota_kapali` | Karantina, geçersiz koordinat veya aktif olmayan şube |
 
-Çalışma saati bilinmiyorsa `rota_hazir` olunmaz; `rota_sinirli` olabilir.
+`rota_hazir` sayısı tek GO kriteri değildir. `rota_sinirli` unknown
+sözleşmesiyle kullanılabilir.
+
+### 11.6. Rota unknown sözleşmesi (FAZ 26)
+
+| Konu | Davranış |
+|---|---|
+| çalışma saati unknown | `limited_route` uyarı; hard blok değil; açık iddiası yok |
+| ziyaret süresi estimate | `limited_route` uyarı; public fact değil |
+| geçiş/transition unknown | `limited_route` uyarı |
+| rezervasyon unknown | `limited_route` uyarı; kullanıcı zorunlu kıldıysa hard blok |
+| geçici kapanış unknown | `limited_route` uyarı; açık varsayılmaz |
+| kimlik karantina, geçersiz koordinat, şube pasif | `hard_block` |

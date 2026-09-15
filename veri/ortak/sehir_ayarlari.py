@@ -32,6 +32,10 @@ class SehirAyari(BaseModel):
     isim: str = Field(..., description="Goruntulenen tam isim, orn. 'Samsun'")
     plaka_kodu: str
     bolge: str = Field(..., description="Bolgesel gruplama, orn. 'Karadeniz'")
+    zaman_dilimi: str = Field(
+        default="Europe/Istanbul",
+        description="IANA zaman dilimi; calisma saati kaydinin timezone alani",
+    )
 
     # OpenStreetMap Overpass API sorgusunda il sinirini bulmak icin kullanilir.
     # Turkiye illeri OSM'de admin_level=4 iliski (relation) olarak bu kodla etiketlidir.

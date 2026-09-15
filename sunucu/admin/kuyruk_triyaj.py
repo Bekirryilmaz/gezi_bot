@@ -51,6 +51,8 @@ def kuyruk_onceligini_hesapla(
     guclu_kanit: bool = False,
     dusuk_celiski: bool = True,
     dogrulanmis_sube: bool = False,
+    pilot_mekan: bool = False,
+    rota_kritik: bool = False,
 ) -> KuyrukOnceligi:
     if aile in DUSUK_RISK_AILELERI:
         triyaj = "dusuk_risk"
@@ -68,12 +70,23 @@ def kuyruk_onceligini_hesapla(
         puan += 8
     if dogrulanmis_sube:
         puan += 10
+    if rota_kritik or aile == "calisma_saatleri":
+        puan += 25
+    if pilot_mekan:
+        puan += 40
     if triyaj == "yuksek_risk":
         puan -= 25
     return KuyrukOnceligi(triyaj_sinifi=triyaj, oncelik_puani=max(0, puan), risk_sinifi=risk)
 
 
-def inceleme_kuyrugunu_triyaj_et(oturum: Session, *, dry_run: bool = False) -> dict[str, int]:
+def inceleme_kuyrugunu_triyaj_et(
+    oturum: Session,
+    *,
+    dry_run: bool = False,
+    pilot_sube_idleri: set[str] | None = None,
+) -> dict[str, int]:
+    from ortak.sabitler import ROTA_KAPSAM_AILELERI, RotaKapsamSinifi
+
     dosyalar = (
         oturum.query(IncelemeDosyasi)
         .filter(
@@ -95,6 +108,12 @@ def inceleme_kuyrugunu_triyaj_et(oturum: Session, *, dry_run: bool = False) -> d
             guclu_kanit=True,
             dusuk_celiski=True,
             dogrulanmis_sube=dogrulanmis,
+            pilot_mekan=bool(
+                pilot_sube_idleri is not None
+                and iddia is not None
+                and iddia.sube_id in pilot_sube_idleri
+            ),
+            rota_kritik=ROTA_KAPSAM_AILELERI.get(aile) == RotaKapsamSinifi.ROTA_KRITIK.value,
         )
         sayac[oncelik.triyaj_sinifi] += 1
         if dry_run:

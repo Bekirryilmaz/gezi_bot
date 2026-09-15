@@ -14,7 +14,11 @@ from sunucu.admin.kuyruk_triyaj import DUSUK_RISK_AILELERI
 from sunucu.admin.workflow import _komutu_uygula, nesne_yetkisini_dogrula
 from sunucu.auth.rbac import Yetki
 from sunucu.auth.servis import AdminBaglami
-from sunucu.bilgi.calisma_saati import calisma_saati_degerini_al, calisma_saatini_ayristir
+from sunucu.bilgi.calisma_saati import (
+    calisma_saati_degerini_al,
+    calisma_saati_kaydini_kur,
+    calisma_saatini_ayristir,
+)
 from sunucu.veritabani.admin_modelleri import IncelemeDosyasi
 from sunucu.veritabani.bilgi_modelleri import Iddia, IddiaSurumu
 
@@ -150,10 +154,37 @@ def grup_incelemeyi_uygula(
                 continue
             if surum is not None:
                 govde = dict(surum.deger or {})
-                govde["normalize"] = ayristirma.normalize
-                govde["sozdizimi_gecerli"] = True
-                govde["zaman_kapsami"] = "haftalik"
-                govde["her_zaman_acik"] = ayristirma.her_zaman_acik
+                kaynak = "openstreetmap"
+                if (iddia.kapsam or {}).get("kaynak") == "site_ici":
+                    kaynak = "site_ici"
+                kayit = calisma_saati_kaydini_kur(
+                    ham=ham,
+                    kaynak=kaynak,
+                    ham_referans=str(
+                        govde.get("ham_referans") or govde.get("kaynak_url") or ""
+                    )
+                    or None,
+                    gozlemlenme_zamani=surum.gecerlilik_baslangici,
+                    cekilme_zamani=surum.gecerlilik_baslangici,
+                )
+                govde.update(
+                    {
+                        "normalize": ayristirma.normalize,
+                        "sozdizimi_gecerli": True,
+                        "zaman_kapsami": (
+                            "kismi_haftalik"
+                            if ayristirma.durum.value == "partially_known"
+                            else "haftalik"
+                        ),
+                        "her_zaman_acik": ayristirma.her_zaman_acik,
+                        "durum": ayristirma.durum.value,
+                        "parser_surumu": kayit.parser_surumu,
+                        "zaman_dilimi": kayit.zaman_dilimi,
+                        "kaynak": kaynak,
+                        "ham_referans": kayit.ham_referans,
+                        "deger": ham,
+                    }
+                )
                 surum.deger = govde
         dosya.onerilen_eylem = "claim_approve"
         try:

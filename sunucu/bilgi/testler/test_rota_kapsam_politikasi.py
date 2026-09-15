@@ -23,7 +23,6 @@ def test_calisma_saati_gecerli_normalize_ve_24_7():
 def test_calisma_saati_karmasik_ve_gecersiz_tahmin_edilmez():
     for ham in (
         "Mo-Su 08:00-02:00",
-        "PH off; Mo-Fr 09:00-18:00",
         "Mo-Su",
         "Jan-Mar 09:00-17:00",
         'Mo-Fr 09:00-18:00 "by appointment"',
@@ -45,12 +44,12 @@ def test_calisma_saati_parcali_ve_off():
 
 def test_ziyaret_suresi_sezgisel_fact_degildir():
     sezgisel = ziyaret_suresini_coz(alt_kategori="kafe")
-    assert sezgisel.kaynak is ZiyaretSuresiKaynagi.KATEGORI_SEZGISEL
+    assert sezgisel.kaynak is ZiyaretSuresiKaynagi.PLANLAMA_TAHMINI
     assert sezgisel.fact_mi is False
     assert sezgisel.dakika == 45
     dogrulanan = ziyaret_suresini_coz(dogrulanmis_dakika=80, alt_kategori="kafe")
     assert dogrulanan.fact_mi is True
-    assert dogrulanan.kaynak is ZiyaretSuresiKaynagi.BILINEN_DOGRULANMIS
+    assert dogrulanan.kaynak is ZiyaretSuresiKaynagi.DOGRULANMIS_SURE
     kullanici = ziyaret_suresini_coz(
         kullanici_dakika=30, dogrulanmis_dakika=80, alt_kategori="muze"
     )

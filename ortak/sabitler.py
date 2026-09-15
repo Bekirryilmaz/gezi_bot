@@ -563,13 +563,32 @@ class TamamlikHucresi(StrEnum):
     YALNIZ_DAHILI = "yalniz_dahili"
 
 
+class CalismaSaatiDurumu(StrEnum):
+    """opening_hours ayrıştırma durumu. Tahmin yoktur."""
+
+    KNOWN = "known"
+    PARTIALLY_KNOWN = "partially_known"
+    UNKNOWN = "unknown"
+    INVALID = "invalid"
+    STALE = "stale"
+
+
 class ZiyaretSuresiKaynagi(StrEnum):
     """Ziyaret suresinin nereden geldigi. Sezgisel fact degildir."""
 
-    BILINEN_DOGRULANMIS = "bilinen_dogrulanmis"
-    KATEGORI_SEZGISEL = "kategori_sezgisel"
+    DOGRULANMIS_SURE = "dogrulanmis_sure"
+    BILINEN_DOGRULANMIS = "dogrulanmis_sure"
+    PLANLAMA_TAHMINI = "planlama_tahmini"
+    KATEGORI_SEZGISEL = "planlama_tahmini"
     KULLANICI_SECIMI = "kullanici_secimi"
     BILINMIYOR = "bilinmiyor"
+
+
+class RotaBilinmeyenDavranis(StrEnum):
+    """FAZ 26 unknown sozlesmesi. Motor bu fazda yazilmaz."""
+
+    HARD_BLOK = "hard_block"
+    SINIRLI_UYARI = "limited_route"
 
 
 class RotaHazirlikNedeni(StrEnum):
@@ -591,6 +610,8 @@ class RotaHazirlikNedeni(StrEnum):
     CALISMA_SAATI_BILINMIYOR = "calisma_saati_bilinmiyor"
     CALISMA_SAATI_YALNIZ_DAHILI = "calisma_saati_yalniz_dahili"
     CALISMA_SAATI_GECERSIZ = "calisma_saati_gecersiz"
+    CALISMA_SAATI_PARCALI = "calisma_saati_parcali"
+    CALISMA_SAATI_ESKIMIS = "calisma_saati_eskimis"
     ROTA_KRITIK_EKSIK = "rota_kritik_eksik"
 
 
