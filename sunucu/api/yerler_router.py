@@ -12,6 +12,7 @@ from sunucu.api.semalar import (
     BolgeProfiliCevap,
     SehirCevap,
     SehirIstatistikleri,
+    PratikBilgi,
     YerDetay,
     YerListeCevabi,
     YerOzet,
@@ -146,7 +147,7 @@ def yer_detayi(yer_id: str, yanit: Response, oturum: Session = Depends(oturum_al
     yanit.headers["ETag"] = f'"yer-{yer_id}-v{yayin.surum if yayin else 0}"'
     yanit.headers["Cache-Control"] = "public, max-age=60, must-revalidate"
     detay = YerDetay.yerden_olustur(yer, enlem, boylam)
-    detay.pratik_bilgiler = yer_pratik_bilgileri(oturum, yer_id)
+    detay.pratik_bilgiler = [PratikBilgi.model_validate(bilgi) for bilgi in yer_pratik_bilgileri(oturum, yer_id)]
     return detay
 
 

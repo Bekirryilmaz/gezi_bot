@@ -4,10 +4,11 @@ import os
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from sqlalchemy import String, cast
 from sqlalchemy.orm import Session
 
-from sunucu.admin.semalar import AdminKimlikCevabi, AdminLoginTalebi, AuditCevabi, BirlestirmeCevabi, ClaimIncelemeCevabi, ClaimOzetCevabi, EslemeAdayiCevabi, IkinciIncelemeTalebi, IncelemeDosyasiCevabi, IncelemeKomutu
+from sunucu.admin.semalar import AdminKimlikCevabi, AdminLoginTalebi, AuditCevabi, BirlestirmeCevabi, ClaimIncelemeCevabi, ClaimOzetCevabi, ClaimSayfasiCevabi, EslemeAdayiCevabi, IkinciIncelemeTalebi, IncelemeDosyasiCevabi, IncelemeKomutu
 from sunucu.admin.workflow import claim_yayin_onizle, inceleme_komutu_gonder, ikinci_incelemeyi_onayla, nesne_sehir_id, nesne_yetkisini_dogrula
 from sunucu.auth.rbac import Yetki
 from sunucu.auth.servis import CSRF_COOKIE, OTURUM_COOKIE, AdminBaglami, admin_baglami_al, oturum_ac, parola_dogrula, yetki_gerekli
@@ -15,6 +16,8 @@ from sunucu.veritabani.admin_modelleri import AdminAuditOlayi, AdminKullanici, I
 from sunucu.veritabani.baglanti import oturum_al
 from sunucu.veritabani.bilgi_modelleri import Gozlem, Iddia, IddiaSurumu, KanitBaglantisi
 from sunucu.veritabani.kimlik_modelleri import EslemeAdayi, YerBirlestirmesi
+from sunucu.veritabani.kimlik_modelleri import Sube
+from sunucu.veritabani.modeller import Yer
 
 yonlendirici = APIRouter()
 
@@ -70,10 +73,66 @@ def birlestirmeler(oturum: Session = Depends(oturum_al), baglam: AdminBaglami = 
     return [BirlestirmeCevabi(id=k.id, kaynak_sube_id=k.kaynak_sube_id, hedef_sube_id=k.hedef_sube_id, birlestirme_zamani=k.birlestirme_zamani) for k in kayitlar if baglam.kapsam_izinli_mi(nesne_sehir_id(oturum, "sube", k.kaynak_sube_id))]
 
 
-@yonlendirici.get("/claimler", response_model=list[ClaimOzetCevabi])
-def claimler(oturum: Session = Depends(oturum_al), baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.INCELEME_GOR))) -> list[ClaimOzetCevabi]:
-    kayitlar = oturum.query(Iddia).order_by(Iddia.olusturulma_zamani.desc()).limit(200).all()
-    return [ClaimOzetCevabi(id=k.id, sube_id=k.sube_id, aile=k.aile, aktif_surum_no=k.aktif_surum_no) for k in kayitlar if baglam.kapsam_izinli_mi(nesne_sehir_id(oturum, "claim", k.id))]
+@yonlendirici.get("/claimler", response_model=ClaimSayfasiCevabi)
+def claimler(
+    aile: str | None = Query(default=None, max_length=40),
+    durum: str | None = Query(default=None, max_length=30),
+    mekan: str | None = Query(default=None, max_length=120),
+    sayfa: int = Query(default=1, ge=1),
+    sayfa_boyutu: int = Query(default=25, ge=1, le=100),
+    oturum: Session = Depends(oturum_al),
+    baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.INCELEME_GOR)),
+) -> ClaimSayfasiCevabi:
+    sorgu = (
+        oturum.query(Iddia, IddiaSurumu, Sube, Yer, IncelemeDosyasi, KanitBaglantisi, Gozlem)
+        .join(IddiaSurumu, (IddiaSurumu.iddia_id == Iddia.id) & (IddiaSurumu.surum_no == Iddia.aktif_surum_no))
+        .join(Sube, Sube.id == Iddia.sube_id)
+        .join(Yer, Yer.id == Sube.legacy_yer_id)
+        .join(
+            IncelemeDosyasi,
+            (IncelemeDosyasi.nesne_turu == "claim")
+            & (IncelemeDosyasi.nesne_id == cast(Iddia.id, String))
+            & (IncelemeDosyasi.dosya_turu == "claim_candidate"),
+        )
+        .join(KanitBaglantisi, (KanitBaglantisi.iddia_surumu_id == IddiaSurumu.id) & (KanitBaglantisi.rol == "supporting"))
+        .join(Gozlem, Gozlem.id == KanitBaglantisi.gozlem_id)
+    )
+    if aile:
+        sorgu = sorgu.filter(Iddia.aile == aile)
+    if durum:
+        sorgu = sorgu.filter(IncelemeDosyasi.durum == durum)
+    if mekan:
+        sorgu = sorgu.filter(Sube.guncel_isim.ilike(f"%{mekan.strip()}%"))
+    satirlar = [
+        satir
+        for satir in sorgu.order_by(Sube.guncel_isim, Iddia.aile, Iddia.id).all()
+        if baglam.kapsam_izinli_mi(nesne_sehir_id(oturum, "claim", satir.Iddia.id))
+    ]
+    toplam = len(satirlar)
+    baslangic = (sayfa - 1) * sayfa_boyutu
+    kayitlar = []
+    for satir in satirlar[baslangic : baslangic + sayfa_boyutu]:
+        iddia, surum, sube, yer, dosya, _, gozlem = satir
+        kayitlar.append(ClaimOzetCevabi(
+            id=iddia.id,
+            sube_id=iddia.sube_id,
+            yer_id=yer.id,
+            mekan_adi=sube.guncel_isim,
+            aile=iddia.aile,
+            aktif_surum_no=iddia.aktif_surum_no,
+            durum=dosya.durum,
+            risk_sinifi=dosya.risk_sinifi,
+            kaynak=gozlem.kaynak,
+            kaynak_kayit_id=gozlem.kaynak_kayit_id,
+            kaynak_alani=iddia.kapsam.get("kaynak_alani"),
+            candidate_deger=surum.deger.get("deger") if isinstance(surum.deger, dict) else None,
+        ))
+    return ClaimSayfasiCevabi(
+        kayitlar=kayitlar,
+        toplam=toplam,
+        sayfa=sayfa,
+        sayfa_boyutu=sayfa_boyutu,
+    )
 
 
 @yonlendirici.get("/claimler/{claim_id}", response_model=ClaimIncelemeCevabi)
@@ -82,13 +141,16 @@ def claim_detay(claim_id: str, oturum: Session = Depends(oturum_al), baglam: Adm
     if not iddia:
         raise HTTPException(status_code=404, detail="Claim bulunamadi.")
     nesne_yetkisini_dogrula(oturum, baglam, "claim", claim_id)
+    sube = oturum.get(Sube, iddia.sube_id)
+    yer = oturum.get(Yer, sube.legacy_yer_id) if sube and sube.legacy_yer_id else None
     surum = oturum.query(IddiaSurumu).filter_by(iddia_id=claim_id, surum_no=iddia.aktif_surum_no).first()
     baglar = oturum.query(KanitBaglantisi).filter_by(iddia_surumu_id=surum.id).all() if surum else []
     kanitlar = []
     for bag in baglar:
         gozlem = oturum.get(Gozlem, bag.gozlem_id)
-        kanitlar.append({"id": bag.id, "rol": bag.rol, "gerekce": bag.gerekce, "gozlem_id": bag.gozlem_id, "kaynak": gozlem.kaynak if gozlem else None, "icerik_ozeti": gozlem.icerik_ozeti if gozlem else {}})
-    return ClaimIncelemeCevabi(id=iddia.id, sube_id=iddia.sube_id, aile=iddia.aile, kapsam=iddia.kapsam, aktif_surum_no=iddia.aktif_surum_no, surum={"id": surum.id, "surum_no": surum.surum_no, "deger": surum.deger, "bilgi_durumu": surum.bilgi_durumu, "yayin_durumu": surum.yayin_durumu} if surum else None, supporting_evidence=[k for k in kanitlar if k["rol"] == "supporting"], counter_evidence=[k for k in kanitlar if k["rol"] == "counter"], yayin_onizleme=claim_yayin_onizle(oturum, iddia))
+        kanitlar.append({"id": bag.id, "rol": bag.rol, "gerekce": bag.gerekce, "gozlem_id": bag.gozlem_id, "kaynak": gozlem.kaynak if gozlem else None, "kaynak_kayit_id": gozlem.kaynak_kayit_id if gozlem else None, "kaynak_url": gozlem.kaynak_url if gozlem else None, "cekilme_zamani": gozlem.cekilme_zamani if gozlem else None, "icerik_ozeti": gozlem.icerik_ozeti if gozlem else {}})
+    public_deger = surum.deger.get("deger") if surum and isinstance(surum.deger, dict) else None
+    return ClaimIncelemeCevabi(id=iddia.id, sube_id=iddia.sube_id, yer_id=yer.id if yer else None, mekan_adi=sube.guncel_isim if sube else "Bilinmeyen sube", aile=iddia.aile, kapsam=iddia.kapsam, aktif_surum_no=iddia.aktif_surum_no, surum={"id": surum.id, "surum_no": surum.surum_no, "deger": surum.deger, "bilgi_durumu": surum.bilgi_durumu, "yayin_durumu": surum.yayin_durumu} if surum else None, supporting_evidence=[k for k in kanitlar if k["rol"] == "supporting"], counter_evidence=[k for k in kanitlar if k["rol"] == "counter"], yayin_onizleme=claim_yayin_onizle(oturum, iddia), public_preview={"mekan": sube.guncel_isim if sube else None, "aile": iddia.aile, "deger": public_deger, "bilgi_durumu": surum.bilgi_durumu if surum else "bilinmiyor", "kapsam": iddia.kapsam})
 
 
 @yonlendirici.post("/incelemeler", response_model=IncelemeDosyasiCevabi, status_code=status.HTTP_201_CREATED)

@@ -60,6 +60,8 @@ class EslemeAdayiCevabi(BaseModel):
 class ClaimIncelemeCevabi(BaseModel):
     id: str
     sube_id: str
+    yer_id: str | None
+    mekan_adi: str
     aile: str
     kapsam: dict[str, Any]
     aktif_surum_no: int | None
@@ -67,13 +69,29 @@ class ClaimIncelemeCevabi(BaseModel):
     supporting_evidence: list[dict[str, Any]]
     counter_evidence: list[dict[str, Any]]
     yayin_onizleme: dict[str, Any]
+    public_preview: dict[str, Any]
 
 
 class ClaimOzetCevabi(BaseModel):
     id: str
     sube_id: str
+    yer_id: str | None
+    mekan_adi: str
     aile: str
     aktif_surum_no: int | None
+    durum: str
+    risk_sinifi: str
+    kaynak: str | None
+    kaynak_kayit_id: str | None
+    kaynak_alani: str | None
+    candidate_deger: Any
+
+
+class ClaimSayfasiCevabi(BaseModel):
+    kayitlar: list[ClaimOzetCevabi]
+    toplam: int
+    sayfa: int
+    sayfa_boyutu: int
 
 
 class BirlestirmeCevabi(BaseModel):

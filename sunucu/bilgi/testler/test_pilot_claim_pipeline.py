@@ -10,6 +10,7 @@ from sunucu.admin.workflow import _komutu_uygula
 from sunucu.auth.servis import admin_olustur
 from sunucu.bilgi.pilot_claimleri import (
     adaylari_yaz,
+    kaynak_boolean_normalize,
     kaynak_haklari_uygun_mu,
     osm_politikasini_uygula,
     satirdan_adaylar,
@@ -63,6 +64,27 @@ def test_yapilandirilmis_kayit_dogru_candidate_uretir_ve_nlp_degil():
     assert {"yer_turu", "amac_destegi", "adres", "wifi"} <= aileler
     assert all(aday.icerik_ozeti["kaynak_alani"] for aday in adaylar)
     assert all("yorum" not in aday.kaynak_alani for aday in adaylar)
+
+
+def test_boolean_kaynak_degerleri_explicit_normalize_edilir():
+    assert kaynak_boolean_normalize("no", aile="wifi") is False
+    assert kaynak_boolean_normalize("false", aile="wifi") is False
+    assert kaynak_boolean_normalize("yes", aile="wifi") is True
+    assert kaynak_boolean_normalize("true", aile="wifi") is True
+    assert kaynak_boolean_normalize("wlan", aile="wifi") is True
+    assert kaynak_boolean_normalize("customers", aile="wifi") is None
+    assert kaynak_boolean_normalize("limited", aile="tekerlekli_sandalye_erisimi") is None
+
+
+def test_unknown_boolean_ve_gecersiz_iletisim_candidate_uretmez():
+    satir = _satir("node/invalid")
+    satir["ozellikler"]["wifi"] = "customers"
+    satir["telefon"] = "telefon yok"
+    satir["web_sitesi"] = "www.ornek.com"
+    aileler = {aday.aile for aday in satirdan_adaylar(satir)}
+    assert "wifi" not in aileler
+    assert "telefon" not in aileler
+    assert "web_sitesi" not in aileler
 
 
 def test_unknown_ve_geri_cekilmis_hak_candidate_yazmaz():

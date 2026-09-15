@@ -15,6 +15,7 @@ import {
   type Birlestirme,
   type ClaimInceleme,
   type ClaimOzet,
+  type ClaimSayfasi,
   type EslemeAdayi,
   type IncelemeDosyasi,
 } from "@/lib/admin-api";
@@ -114,6 +115,11 @@ export function AdminPaneli() {
   const [adaylar, setAdaylar] = useState<EslemeAdayi[]>([]);
   const [birlestirmeler, setBirlestirmeler] = useState<Birlestirme[]>([]);
   const [claimler, setClaimler] = useState<ClaimOzet[]>([]);
+  const [claimToplam, setClaimToplam] = useState(0);
+  const [claimSayfa, setClaimSayfa] = useState(1);
+  const [claimAile, setClaimAile] = useState("");
+  const [claimDurum, setClaimDurum] = useState("bekliyor");
+  const [claimMekan, setClaimMekan] = useState("");
   const [audit, setAudit] = useState<AuditOlayi[]>([]);
   const [claim, setClaim] = useState<ClaimInceleme | null>(null);
   const [hata, setHata] = useState("");
@@ -123,17 +129,25 @@ export function AdminPaneli() {
     try {
       const ben = await adminIstek<AdminKimlik>("/me");
       setKimlik(ben);
+      const claimParametreleri = new URLSearchParams({
+        sayfa: String(claimSayfa),
+        sayfa_boyutu: "25",
+      });
+      if (claimAile) claimParametreleri.set("aile", claimAile);
+      if (claimDurum) claimParametreleri.set("durum", claimDurum);
+      if (claimMekan) claimParametreleri.set("mekan", claimMekan);
       const [yeniKuyruk, yeniAdaylar, yeniBirlestirmeler, yeniClaimler] =
         await Promise.all([
           adminIstek<IncelemeDosyasi[]>("/kuyruk"),
           adminIstek<EslemeAdayi[]>("/kimlik/esleme-adaylari"),
           adminIstek<Birlestirme[]>("/kimlik/birlestirmeler"),
-          adminIstek<ClaimOzet[]>("/claimler"),
+          adminIstek<ClaimSayfasi>(`/claimler?${claimParametreleri}`),
         ]);
       setKuyruk(yeniKuyruk);
       setAdaylar(yeniAdaylar);
       setBirlestirmeler(yeniBirlestirmeler);
-      setClaimler(yeniClaimler);
+      setClaimler(yeniClaimler.kayitlar);
+      setClaimToplam(yeniClaimler.toplam);
       if (ben.yetkiler.includes("audit_gor"))
         setAudit(await adminIstek<AuditOlayi[]>("/audit"));
       setDurum("hazir");
@@ -146,7 +160,7 @@ export function AdminPaneli() {
         setHata(error instanceof Error ? error.message : "Admin verisi yüklenemedi.");
       }
     }
-  }, [router]);
+  }, [claimAile, claimDurum, claimMekan, claimSayfa, router]);
 
   useEffect(() => {
     const zamanlayici = window.setTimeout(() => void yenile(), 0);
@@ -314,19 +328,113 @@ export function AdminPaneli() {
         {sekme === "claim" && (
           <section>
             <h2 className="yazi-alt">Claim inceleme</h2>
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+            <div className="mt-4 grid gap-3 rounded-lg bg-white p-4 sm:grid-cols-3">
+              <label className="grid gap-1 text-xs font-medium">
+                Claim ailesi
+                <select
+                  value={claimAile}
+                  onChange={(event) => {
+                    setClaimSayfa(1);
+                    setClaimAile(event.target.value);
+                  }}
+                  className="border-bordo/20 rounded border p-2 text-sm"
+                >
+                  <option value="">Tümü</option>
+                  {[
+                    "yer_turu",
+                    "amac_destegi",
+                    "adres",
+                    "web_sitesi",
+                    "telefon",
+                    "wifi",
+                    "tekerlekli_sandalye_erisimi",
+                  ].map((aile) => (
+                    <option key={aile} value={aile}>
+                      {aile}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="grid gap-1 text-xs font-medium">
+                Durum
+                <select
+                  value={claimDurum}
+                  onChange={(event) => {
+                    setClaimSayfa(1);
+                    setClaimDurum(event.target.value);
+                  }}
+                  className="border-bordo/20 rounded border p-2 text-sm"
+                >
+                  <option value="bekliyor">Bekliyor</option>
+                  <option value="tamamlandi">Tamamlandı</option>
+                  <option value="">Tümü</option>
+                </select>
+              </label>
+              <form
+                className="grid gap-1 text-xs font-medium"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  setClaimSayfa(1);
+                  setClaimMekan(
+                    String(new FormData(event.currentTarget).get("mekan") || "").trim(),
+                  );
+                }}
+              >
+                <label htmlFor="mekan-filtresi">Mekân adı</label>
+                <div className="flex gap-2">
+                  <input
+                    id="mekan-filtresi"
+                    name="mekan"
+                    defaultValue={claimMekan}
+                    className="border-bordo/20 min-w-0 flex-1 rounded border p-2 text-sm"
+                  />
+                  <button className="bg-bordo rounded px-3 text-white">Ara</button>
+                </div>
+              </form>
+            </div>
+            <p className="mt-3 text-sm">
+              {claimToplam} kayıt · sayfa {claimSayfa}
+            </p>
+            <div className="mt-3 grid gap-2 md:grid-cols-2">
               {claimler.map((c) => (
                 <button
                   key={c.id}
                   onClick={async () => {
                     setClaim(await adminIstek<ClaimInceleme>(`/claimler/${c.id}`));
                   }}
-                  className="border-bordo/15 min-w-48 rounded border bg-white p-3 text-left text-xs"
+                  className="border-bordo/15 rounded border bg-white p-3 text-left text-xs"
                 >
-                  <strong className="block">{c.aile}</strong>
-                  <span className="mt-1 block break-all">{c.id}</span>
+                  <span className="flex justify-between gap-2">
+                    <strong>{c.mekan_adi}</strong>
+                    <span>{c.risk_sinifi}</span>
+                  </span>
+                  <span className="mt-1 block">
+                    {c.aile} · {c.kaynak_alani}
+                  </span>
+                  <span className="mt-1 block break-words">
+                    {JSON.stringify(c.candidate_deger)}
+                  </span>
+                  <span className="mt-1 block text-[10px] break-all">
+                    {c.kaynak}: {c.kaynak_kayit_id}
+                  </span>
                 </button>
               ))}
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button
+                disabled={claimSayfa <= 1}
+                onClick={() => setClaimSayfa((sayfa) => Math.max(1, sayfa - 1))}
+                className="border-bordo/20 rounded border px-3 py-2 text-sm disabled:opacity-40"
+              >
+                Önceki
+              </button>
+              <button
+                disabled={claimSayfa * 25 >= claimToplam}
+                onClick={() => setClaimSayfa((sayfa) => sayfa + 1)}
+                className="border-bordo/20 rounded border px-3 py-2 text-sm disabled:opacity-40"
+              >
+                Sonraki
+              </button>
             </div>
             <form onSubmit={claimAra} className="mt-4 flex max-w-xl gap-2">
               <label className="sr-only" htmlFor="claim_id">
@@ -344,7 +452,9 @@ export function AdminPaneli() {
             {claim && (
               <article className="border-bordo/15 mt-5 rounded-lg border bg-white p-5">
                 <div className="flex flex-wrap justify-between gap-2">
-                  <h3 className="font-semibold">{claim.aile}</h3>
+                  <h3 className="font-semibold">
+                    {claim.mekan_adi} · {claim.aile}
+                  </h3>
                   <span className="bg-kopuk rounded px-2 py-1 text-xs">
                     {claim.yayin_onizleme.durum}
                   </span>
@@ -357,6 +467,12 @@ export function AdminPaneli() {
                   {claim.yayin_onizleme.etkilenen_public_alanlar.join(", ")}
                 </p>
                 <div className="bg-sis mt-3 grid gap-2 rounded p-3 text-xs">
+                  <div>
+                    <strong>Public önizleme</strong>
+                    <pre className="mt-1 overflow-auto whitespace-pre-wrap">
+                      {JSON.stringify(claim.public_preview, null, 2)}
+                    </pre>
+                  </div>
                   <div>
                     <strong>Kapsam</strong>
                     <pre className="mt-1 overflow-auto whitespace-pre-wrap">
@@ -379,7 +495,11 @@ export function AdminPaneli() {
                 </div>
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   <EylemFormu
-                    eylem="claim_approve"
+                    eylem={
+                      claim.aile === "tekerlekli_sandalye_erisimi"
+                        ? "kritik_claim_yayini"
+                        : "claim_approve"
+                    }
                     nesneTuru="claim"
                     nesneId={claim.id}
                     tamamlandi={() => void yenile()}

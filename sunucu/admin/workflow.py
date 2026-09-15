@@ -29,7 +29,13 @@ EYLEM_YETKISI = {
     "withdraw": Yetki.GERI_CEK,
     "hak_degisikligi": Yetki.HAK_DEGISTIR,
 }
-KRITIK_CLAIM_AILELERI = frozenset({"giris_basamak", "fiziksel_erisim", "calisma_saati", "ziyaret_kosulu"})
+KRITIK_CLAIM_AILELERI = frozenset({
+    "giris_basamak",
+    "fiziksel_erisim",
+    "tekerlekli_sandalye_erisimi",
+    "calisma_saati",
+    "ziyaret_kosulu",
+})
 
 
 def nesne_sehir_id(oturum: Session, nesne_turu: str, nesne_id: str) -> str | None:

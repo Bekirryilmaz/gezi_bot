@@ -1,16 +1,26 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import String, cast
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from sunucu.api.uygulama import admin_uygulama, uygulama
-from sunucu.auth.servis import admin_olustur
-from sunucu.veritabani.admin_modelleri import AdminAuditOlayi, AdminRol
+from sunucu.admin.workflow import inceleme_komutu_gonder
+from sunucu.auth.rbac import yetkileri_birlestir
+from sunucu.auth.servis import AdminBaglami, admin_olustur
+from sunucu.veritabani.admin_modelleri import (
+    AdminAuditOlayi,
+    AdminOturum,
+    AdminRol,
+    IncelemeDosyasi,
+)
 from sunucu.veritabani.baglanti import motor, oturum_al
+from sunucu.veritabani.bilgi_modelleri import Iddia
 from sunucu.veritabani.kimlik_modelleri import EslemeAdayi, Sube
 from sunucu.veritabani.modeller import Yer
 
@@ -88,3 +98,59 @@ def test_audit_db_trigger_ile_update_delete_edilemez(admin_ortami):
     with pytest.raises(DBAPIError):
         olay.gerekce = "degistirilemez"; oturum.flush()
     savepoint.rollback()
+
+
+def test_tekerlekli_sandalye_claimi_ikinci_inceleme_ister(admin_ortami):
+    _, oturum, yonetici, _, _ = admin_ortami
+    iddia = oturum.query(Iddia).filter_by(aile="tekerlekli_sandalye_erisimi").first()
+    if iddia is None:
+        pytest.skip("Development fixture kritik claim icermiyor.")
+    sahte_oturum = AdminOturum(
+        kullanici_id=yonetici.id,
+        token_hash=uuid.uuid4().hex,
+        csrf_hash=uuid.uuid4().hex,
+        sona_erme_zamani=datetime.now(timezone.utc) + timedelta(hours=1),
+    )
+    baglam = AdminBaglami(
+        yonetici,
+        sahte_oturum,
+        frozenset({"yonetici"}),
+        yetkileri_birlestir({"yonetici"}),
+    )
+    dosya = inceleme_komutu_gonder(
+        oturum,
+        baglam=baglam,
+        eylem="claim_approve",
+        nesne_turu="claim",
+        nesne_id=str(iddia.id),
+        gerekce="Kritik erisim claimi bagimsiz inceleme beklemeli",
+        payload={},
+        istek_id=f"test-{uuid.uuid4()}",
+    )
+    assert dosya.onerilen_eylem == "kritik_claim_yayini"
+    assert dosya.durum == "ikinci_inceleme_bekliyor"
+
+
+def test_claim_kuyrugu_aile_durum_mekan_ve_sayfalama_sunar(admin_ortami):
+    client, oturum, yonetici, _, _ = admin_ortami
+    ornek = (
+        oturum.query(Iddia)
+        .filter_by(aile="wifi")
+        .join(IncelemeDosyasi, IncelemeDosyasi.nesne_id == cast(Iddia.id, String))
+        .filter(IncelemeDosyasi.durum == "bekliyor")
+        .first()
+    )
+    if ornek is None:
+        pytest.skip("Development fixture bekleyen wifi claim'i icermiyor.")
+    csrf = _login(client, yonetici.eposta)
+    cevap = client.get("/v1/admin/claimler?aile=wifi&durum=bekliyor&sayfa=1&sayfa_boyutu=2")
+    assert cevap.status_code == 200, cevap.text
+    govde = cevap.json()
+    assert govde["sayfa"] == 1 and govde["sayfa_boyutu"] == 2
+    assert govde["toplam"] >= len(govde["kayitlar"]) >= 1
+    assert all(kayit["aile"] == "wifi" and kayit["durum"] == "bekliyor" for kayit in govde["kayitlar"])
+    assert all(kayit["mekan_adi"] and kayit["kaynak_alani"] == "ozellikler.wifi" for kayit in govde["kayitlar"])
+    detay = client.get(f"/v1/admin/claimler/{govde['kayitlar'][0]['id']}")
+    assert detay.status_code == 200
+    assert detay.json()["mekan_adi"] and detay.json()["public_preview"]["aile"] == "wifi"
+    client.post("/v1/admin/logout", headers={"X-CSRF-Token": csrf})

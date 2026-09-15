@@ -4,12 +4,14 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import uuid
 from collections import Counter
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+from urllib.parse import urlparse
 
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
@@ -109,6 +111,64 @@ def _zaman(deger: str | None) -> datetime:
     return sonuc if sonuc.tzinfo else sonuc.replace(tzinfo=timezone.utc)
 
 
+_BOS_YER_TUTUCULAR = {"-", "n/a", "na", "none", "null", "unknown", "bilinmiyor", "yok"}
+_TELEFON_KARAKTERLERI = re.compile(r"^\+?[0-9 ()\-./]+$")
+
+
+def kaynak_boolean_normalize(deger: Any, *, aile: str) -> bool | None:
+    """Yalniz acik ve ailece anlamli degerleri boolean'a cevirir.
+
+    Candidate katmani bazen normalized JSON yerine ham kaynak degeriyle de
+    cagrilabilir. Python'in ``bool('no') is True`` davranisi burada kullanilmaz.
+    ``customers`` ve ``limited`` olumlu iddia icin yeterince kesin degildir.
+    """
+    if isinstance(deger, bool):
+        return deger
+    if isinstance(deger, int) and deger in {0, 1}:
+        return bool(deger)
+    if not isinstance(deger, str):
+        return None
+    temiz = deger.casefold().strip()
+    if temiz in {"yes", "true", "1", "evet"}:
+        return True
+    if temiz in {"no", "false", "0", "hayir", "hayır"}:
+        return False
+    if aile == "wifi" and temiz == "wlan":
+        return True
+    return None
+
+
+def telefon_candidate_degeri(deger: Any) -> str | None:
+    if not isinstance(deger, str):
+        return None
+    temiz = deger.strip()
+    if temiz.casefold() in _BOS_YER_TUTUCULAR or not _TELEFON_KARAKTERLERI.fullmatch(temiz):
+        return None
+    rakamlar = re.sub(r"\D", "", temiz)
+    if not 7 <= len(rakamlar) <= 15 or len(set(rakamlar)) == 1:
+        return None
+    return temiz
+
+
+def web_sitesi_candidate_degeri(deger: Any) -> str | None:
+    if not isinstance(deger, str):
+        return None
+    temiz = deger.strip()
+    if temiz.casefold() in _BOS_YER_TUTUCULAR:
+        return None
+    ayrik = urlparse(temiz)
+    if ayrik.scheme not in {"http", "https"} or not ayrik.hostname or "." not in ayrik.hostname:
+        return None
+    return temiz
+
+
+def metin_candidate_degeri(deger: Any) -> str | None:
+    if not isinstance(deger, str):
+        return None
+    temiz = deger.strip()
+    return temiz if temiz and temiz.casefold() not in _BOS_YER_TUTUCULAR else None
+
+
 def kaynak_haklari_uygun_mu(politika: KaynakPolitikasi | None, *, simdi: datetime | None = None) -> tuple[bool, str | None]:
     simdi = simdi or datetime.now(timezone.utc)
     if politika is None:
@@ -154,11 +214,7 @@ def osm_satirlarini_oku(dosya: Path) -> list[dict[str, Any]]:
 
 
 def _aday_sayisi(satir: dict[str, Any]) -> int:
-    sayi = 2  # yer_turu + dar amac_destegi
-    sayi += sum(bool(satir.get(alan)) for alan in ("adres", "telefon", "web_sitesi"))
-    ozellikler = satir.get("ozellikler") or {}
-    sayi += sum(ozellikler.get(alan) is not None for alan in ("wifi", "engelli_erisimi", "ucretsiz"))
-    return sayi
+    return len(satirdan_adaylar(satir))
 
 
 def pilot_satirlarini_sec(
@@ -207,24 +263,34 @@ def satirdan_adaylar(satir: dict[str, Any]) -> list[AdayKaydi]:
             kaynak_alani=alan,
             deger=deger,
             kapsam={**ortak_kapsam, "kaynak_alani": alan, **(kapsam or {})},
-            icerik_ozeti={"kaynak_alani": alan, "deger": deger, "kaynak_kayit_id": satir["kaynak_id"]},
+            icerik_ozeti={
+                "kaynak_alani": alan,
+                "deger": deger,
+                "kaynak_kayit_id": satir["kaynak_id"],
+                "kaynak_ismi": satir.get("isim"),
+                "konum": {"enlem": satir.get("enlem"), "boylam": satir.get("boylam")},
+            },
         ))
 
     ekle("yer_turu", "ana_kategori+alt_kategori", {"ana_kategori": satir["ana_kategori"], "alt_kategori": kategori})
     amaclar = AMAC_ESLEMESI.get(kategori)
     if amaclar:
         ekle("amac_destegi", "alt_kategori", list(amaclar), kapsam={"cikarim_turu": "deterministik_dar_tur_eslemesi"})
-    for alan in ("adres", "telefon", "web_sitesi"):
-        if satir.get(alan):
-            ekle(alan, alan, satir[alan])
+    adres = metin_candidate_degeri(satir.get("adres"))
+    telefon = telefon_candidate_degeri(satir.get("telefon"))
+    web_sitesi = web_sitesi_candidate_degeri(satir.get("web_sitesi"))
+    for alan, deger in (("adres", adres), ("telefon", telefon), ("web_sitesi", web_sitesi)):
+        if deger is not None:
+            ekle(alan, alan, deger)
     ozellikler = satir.get("ozellikler") or {}
     for kaynak_alani, aile in (
         ("wifi", "wifi"),
         ("engelli_erisimi", "tekerlekli_sandalye_erisimi"),
         ("ucretsiz", "ucretsiz"),
     ):
-        if ozellikler.get(kaynak_alani) is not None:
-            ekle(aile, f"ozellikler.{kaynak_alani}", bool(ozellikler[kaynak_alani]))
+        deger = kaynak_boolean_normalize(ozellikler.get(kaynak_alani), aile=aile)
+        if deger is not None:
+            ekle(aile, f"ozellikler.{kaynak_alani}", deger)
     return adaylar
 
 
@@ -402,6 +468,17 @@ def coverage_raporu(oturum: Session, *, kategoriler: set[str]) -> dict[str, Any]
         .filter(IncelemeDosyasi.dosya_turu == "claim_candidate", IncelemeDosyasi.durum != "tamamlandi")
         .count()
     )
+    aktif_durumlar = Counter(
+        durum
+        for (durum,) in (
+            oturum.query(IddiaSurumu.bilgi_durumu)
+            .join(Iddia, Iddia.id == IddiaSurumu.iddia_id)
+            .join(Sube, Sube.id == Iddia.sube_id)
+            .join(pilot_yer, pilot_yer.c.id == Sube.legacy_yer_id)
+            .filter(IddiaSurumu.surum_no == Iddia.aktif_surum_no)
+            .all()
+        )
+    )
     hak_engelli = (
         oturum.query(KaynakPolitikasi)
         .filter(KaynakPolitikasi.kaynak == OSM_KAYNAK)
@@ -414,8 +491,8 @@ def coverage_raporu(oturum: Session, *, kategoriler: set[str]) -> dict[str, Any]
         "claimi_olan_yer": len(claimli_yerler),
         "claim_ailesi_coverage": {aile: {"yer": len(ids), "oran": round(len(ids) / toplam, 4) if toplam else 0} for aile, ids in sorted(aile_yerleri.items())},
         "unknown_orani": round((toplam - len(claimli_yerler)) / toplam, 4) if toplam else 0,
-        "stale": durumlar["eskimis"],
-        "conflicting": durumlar["celiskili"],
+        "stale": aktif_durumlar["eskimis"],
+        "conflicting": aktif_durumlar["celiskili"],
         "hak_nedeniyle_kullanilamayan_oran": 0 if hak_uygun else 1,
         "admin_review_bekleyen": bekleyen,
         "yayinlanmis_claim": len(yayinli_claimler),

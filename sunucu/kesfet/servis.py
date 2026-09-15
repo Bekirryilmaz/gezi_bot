@@ -84,7 +84,11 @@ def kesfet_degerlendir(
         tur=talep.arama.tur,
         zorunlu_kosullar=zorunlu_kodlari,
         tercihler=tercih_kodlari,
-        limit=50,
+        # Arama sirasi amac claim'ini bilmez. Ilk 50'yi kesmek, alfabetik olarak
+        # daha sonra gelen ama yayimlanmis amac claim'i olan yerleri Karar
+        # Motoruna hic ulastirmiyordu. Bu ic cagri, kamusal API sayfa boyutu
+        # degil; sehir/kategori kapsamindaki aday havuzudur.
+        limit=2_000,
         cursor=None,
     )
     haric = set(talep.haric_yerler) | set(baglam.reddedilen_yerler)
@@ -177,4 +181,3 @@ def kesfet_degerlendir(
         daha_fazla_var_mi=len(degerlendirilen) > len(secilen),
         trace_reference=trace,
     )
-

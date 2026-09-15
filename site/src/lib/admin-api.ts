@@ -39,13 +39,30 @@ export type Birlestirme = {
 export type ClaimOzet = {
   id: string;
   sube_id: string;
+  yer_id: string | null;
+  mekan_adi: string;
   aile: string;
   aktif_surum_no: number | null;
+  durum: string;
+  risk_sinifi: string;
+  kaynak: string | null;
+  kaynak_kayit_id: string | null;
+  kaynak_alani: string | null;
+  candidate_deger: unknown;
+};
+
+export type ClaimSayfasi = {
+  kayitlar: ClaimOzet[];
+  toplam: number;
+  sayfa: number;
+  sayfa_boyutu: number;
 };
 
 export type ClaimInceleme = {
   id: string;
   sube_id: string;
+  yer_id: string | null;
+  mekan_adi: string;
   aile: string;
   kapsam: Record<string, unknown>;
   aktif_surum_no: number | null;
@@ -57,6 +74,7 @@ export type ClaimInceleme = {
     neden_kodlari: string[];
     etkilenen_public_alanlar: string[];
   };
+  public_preview: Record<string, unknown>;
 };
 
 export type AuditOlayi = {

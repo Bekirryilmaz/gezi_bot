@@ -88,3 +88,14 @@ def test_ret_withdraw_ve_sponsor_sonucu_degistirmez(oturum: Session):
     cekilmis = kesfet_degerlendir(oturum, _talep(ad, sehir), request_id="withdraw")
     assert str(yer1.id) not in {x.yer.place_id for x in cekilmis.secenekler}
     assert str(yer2.id) in {x.yer.place_id for x in cekilmis.secenekler}
+
+
+def test_ilk_elli_unknown_amac_claimi_olan_gec_adayi_gizlemez(oturum: Session):
+    sehir = oturum.query(Sehir).filter(Sehir.arama_isim == "samsun").one()
+    ilce = oturum.query(Ilce).filter_by(sehir_id=sehir.id, arama_isim="atakum").one()
+    ek = uuid.uuid4().hex[:8]
+    for sira in range(51):
+        _yer_ekle(oturum, sehir, ilce, f"A Aday {ek} {sira:02d}", amac_var=False)
+    destekli, _ = _yer_ekle(oturum, sehir, ilce, f"Z Destekli {ek}", amac_var=True)
+    cevap = kesfet_degerlendir(oturum, _talep(ek, sehir), request_id="ilk-elli")
+    assert str(destekli.id) in {x.yer.place_id for x in cevap.secenekler}
