@@ -157,3 +157,12 @@ Kirli kimlik karantina, quality-first sıralama, `internet_kafe` amaç yasağı,
 0015 veri korumalı downgrade ve 126+30 yeniden ölçüm kayıtlıdır.
 Bugün Ne Yapalım kahve/yemek/tarih için sınırlı GO; Akıllı Rota NO-GO.
 Production DB, commit ve push yoktur.
+
+## FAZ 25.4 karar coverage ve pilot — 16 Eylül 2026
+
+- [faz25-4-sonuc.md](./01-research/faz25-4-sonuc.md)
+
+Samsun 88 mekanlık veriye dayalı pilot, OSM grup inceleme (kör yayın yok),
+tamamlık matrisi ve iç rota hazırlık durumu kayıtlıdır. Bugün Ne Yapalım
+kahve/yemek/tarih sınırlı GO; Akıllı Rota NO-GO (`rota_hazir` 11/88, tarih 0).
+Production DB, commit, push ve yeni migration yoktur.

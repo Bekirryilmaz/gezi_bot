@@ -534,3 +534,132 @@ def uygun_zaman_dilimleri(alt_kategori: str) -> list[str]:
 def bekleme_payi_dk(ana_kategori: str) -> int:
     """Ziyaret suresine eklenecek lojistik tampon (dk). Bilinmiyorsa 15."""
     return MEKAN_BEKLEME_SURELERI_DK.get(ana_kategori, _VARSAYILAN_BEKLEME_PAYI_DK)
+
+
+class RotaKapsamSinifi(StrEnum):
+    """Rota/karar bilgi ailesinin kritikligi. Kamusal skor degildir."""
+
+    ROTA_KRITIK = "rota_kritik"
+    KARAR_ONEMLI = "karar_onemli"
+    ISTEGE_BAGLI = "istege_bagli"
+
+
+class RotaHazirlikDurumu(StrEnum):
+    """Ic rota hazirlik durumu; kamusal skor veya sira bonusu degildir."""
+
+    ROTA_HAZIR = "rota_hazir"
+    ROTA_SINIRLI = "rota_sinirli"
+    KESIF_ADAYI = "kesif_adayi"
+    ROTA_KAPALI = "rota_kapali"
+
+
+class TamamlikHucresi(StrEnum):
+    """Pilot tamamlik matrisi hucresi."""
+
+    BILINIYOR = "biliniyor"
+    BILINMIYOR = "bilinmiyor"
+    ESKIMIS = "eskimis"
+    CELISKILI = "celiskili"
+    YALNIZ_DAHILI = "yalniz_dahili"
+
+
+class ZiyaretSuresiKaynagi(StrEnum):
+    """Ziyaret suresinin nereden geldigi. Sezgisel fact degildir."""
+
+    BILINEN_DOGRULANMIS = "bilinen_dogrulanmis"
+    KATEGORI_SEZGISEL = "kategori_sezgisel"
+    KULLANICI_SECIMI = "kullanici_secimi"
+    BILINMIYOR = "bilinmiyor"
+
+
+class RotaHazirlikNedeni(StrEnum):
+    """Rota hazirlik kirilimi; aciklanabilir reason code."""
+
+    KIMLIK_KARANTINA = "kimlik_karantina"
+    KIMLIK_SUPHELI = "kimlik_supheli"
+    KIMLIK_UYGUN = "kimlik_uygun"
+    SUBE_AKTIF_DEGIL = "sube_aktif_degil"
+    KOORDINAT_GECERSIZ = "koordinat_gecersiz"
+    KOORDINAT_UYGUN = "koordinat_uygun"
+    ILCE_EKSIK = "ilce_eksik"
+    ILCE_UYGUN = "ilce_uygun"
+    AMAC_BILINMIYOR = "amac_bilinmiyor"
+    AMAC_BILINIYOR = "amac_biliniyor"
+    YAYIN_UYGUN_DEGIL = "yayin_uygun_degil"
+    YAYIN_UYGUN = "yayin_uygun"
+    CALISMA_SAATI_BILINIYOR = "calisma_saati_biliniyor"
+    CALISMA_SAATI_BILINMIYOR = "calisma_saati_bilinmiyor"
+    CALISMA_SAATI_YALNIZ_DAHILI = "calisma_saati_yalniz_dahili"
+    CALISMA_SAATI_GECERSIZ = "calisma_saati_gecersiz"
+    ROTA_KRITIK_EKSIK = "rota_kritik_eksik"
+
+
+# dokumanlar/kategori_taksonomisi.md #11.1
+ROTA_KAPSAM_AILELERI: dict[str, str] = {
+    "kimlik": RotaKapsamSinifi.ROTA_KRITIK.value,
+    "ilce": RotaKapsamSinifi.ROTA_KRITIK.value,
+    "koordinat": RotaKapsamSinifi.ROTA_KRITIK.value,
+    "amac": RotaKapsamSinifi.ROTA_KRITIK.value,
+    "calisma_saatleri": RotaKapsamSinifi.ROTA_KRITIK.value,
+    "ziyaret_suresi": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "rezervasyon": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "wifi": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "otopark": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "acik_alan": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "tekerlekli_sandalye_erisimi": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "aile": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "cocuk": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "calisma": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "sessizlik": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "manzara": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "fiyat": RotaKapsamSinifi.KARAR_ONEMLI.value,
+    "web_sitesi": RotaKapsamSinifi.ISTEGE_BAGLI.value,
+    "telefon": RotaKapsamSinifi.ISTEGE_BAGLI.value,
+}
+
+ROTA_AMAC_HAVUZLARI: dict[str, tuple[str, ...]] = {
+    "kahve_icmek": (
+        YemeIcmeAltKategori.KAFE.value,
+        YemeIcmeAltKategori.KAHVE_UZMANLIK.value,
+    ),
+    "yemek_yemek": (
+        YemeIcmeAltKategori.RESTORAN_LOKANTA.value,
+        YemeIcmeAltKategori.KEBAP_IZGARA.value,
+        YemeIcmeAltKategori.DENIZ_MAHSULLERI.value,
+        YemeIcmeAltKategori.EV_YEMEKLERI_ESNAF.value,
+        YemeIcmeAltKategori.SOKAK_LEZZETI.value,
+        YemeIcmeAltKategori.FINE_DINING_ROMANTIK.value,
+        YemeIcmeAltKategori.MEYHANE_BAR.value,
+    ),
+    "tatli_yemek": (YemeIcmeAltKategori.TATLI_PASTANE.value,),
+    "tarihi_kulturel_ziyaret": (GezilecekYerAltKategori.TARIHI_KULTUREL.value,),
+    "acik_hava": (
+        GezilecekYerAltKategori.DOGA_MANZARA.value,
+        GezilecekYerAltKategori.PLAJ_SU.value,
+    ),
+    "eglence": (GezilecekYerAltKategori.EGLENCE_AKTIVITE.value,),
+}
+
+GRUP_INCELEME_DUSUK_RISK_AILELERI: frozenset[str] = frozenset(
+    {
+        "web_sitesi",
+        "telefon",
+        "adres",
+        "yer_turu",
+        "calisma_saatleri",
+        "otopark",
+        "acik_alan",
+        "wifi",
+        "rezervasyon",
+    }
+)
+GRUP_INCELEME_KRITIK_AILELER: frozenset[str] = frozenset(
+    {
+        "giris_basamak",
+        "fiziksel_erisim",
+        "tekerlekli_sandalye_erisimi",
+        "calisma_saati",
+        "ziyaret_kosulu",
+        "amac_destegi",
+    }
+)

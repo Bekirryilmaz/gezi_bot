@@ -406,3 +406,63 @@ Rota zaman bütçesi ≈ ziyaret süresi + tampon + duraklar arası ulaşım.
 
 Bu dakikalar ilk tahmindir; gerçek kullanım geri bildirimiyle
 `zaman_butcesi.py` sabitleri gibi ayarlanması beklenir.
+
+---
+
+## 11. Rota coverage aileleri ve hazırlık durumu
+
+Akıllı Rota motoru bu bölümle uygulanmaz. Yalnız hangi bilginin rota için
+kritik, hangisinin karar için önemli, hangisinin isteğe bağlı olduğunu
+sınıflandırır. Kod: `ortak/sabitler.py::RotaKapsamSinifi`,
+`ROTA_KAPSAM_AILELERI`, `RotaHazirlikDurumu`, `TamamlikHucresi`,
+`ZiyaretSuresiKaynagi`.
+
+### 11.1. Kapsam sınıfları
+
+| Sınıf | Anlam |
+|---|---|
+| `rota_kritik` | Yoksa durak yapılamaz veya gün planı savunulamaz |
+| `karar_onemli` | Seçimi değiştirir; eksikse dürüstçe unknown kalır |
+| `istege_bagli` | Anlatılabilir; rota adaylığını tek başına düşürmez |
+
+| Aile / alan | Sınıf |
+|---|---|
+| canonical yer, şube, temiz isim, kategori | `rota_kritik` |
+| canonical ilçe, koordinat | `rota_kritik` |
+| amaç (`kahve_icmek`, `yemek_yemek`, `kahvalti`, `tatli_yemek`, `tarihi_kulturel_ziyaret`, `acik_hava`, `eglence`, `calisma`) | `rota_kritik` |
+| `calisma_saatleri` | `rota_kritik` |
+| ziyaret süresi | `karar_onemli` (bilinmiyorsa sezgisel yalnız planner yedegi) |
+| `rezervasyon` | `karar_onemli` |
+| `wifi`, `otopark`, `acik_alan`, `tekerlekli_sandalye_erisimi` | `karar_onemli` |
+| aile/çocuk, çalışma/laptop, sakinlik, manzara, fiyat | `karar_onemli` |
+| web sitesi, telefon | `istege_bagli` |
+
+### 11.2. Tamamlık hücresi
+
+`biliniyor`, `bilinmiyor`, `eskimis`, `celiskili`, `yalniz_dahili`.
+`yalniz_dahili` yayımlanmış iddia değildir; OSM ham etiket veya NLP
+aggregate olabilir. Kamusal skor üretilmez.
+
+### 11.3. Ziyaret süresi kaynağı
+
+| Kaynak | Fact mi? |
+|---|---|
+| `bilinen_dogrulanmis` | Evet; yayımlanmış süre iddiası |
+| `kategori_sezgisel` | Hayır; yalnız planner yedegi |
+| `kullanici_secimi` | Hayır; o oturumun tercihi |
+| `bilinmiyor` | Süre yok |
+
+Kategori sezgiseli `kafe=60` gibi gercekmiş fact olarak sunulmaz.
+
+### 11.4. Rota hazırlık durumu
+
+Kamusal skor değildir. İç durum:
+
+| Durum | Anlam |
+|---|---|
+| `rota_hazir` | Kimlik, koordinat, ilçe, amaç ve yayın uygun; rota-kritik unknown sınırı içinde; çalışma saati yayımlanmış ve sözdizimi geçerli |
+| `rota_sinirli` | Durak adayı olabilir ama çalışma saati unknown/yalnız dahili veya rota-kritik eksik sınırda |
+| `kesif_adayi` | Keşfet/Bugün için bakılabilir; günlük dizi kurulmaz |
+| `rota_kapali` | Karantina, geçersiz koordinat veya aktif olmayan şube |
+
+Çalışma saati bilinmiyorsa `rota_hazir` olunmaz; `rota_sinirli` olabilir.

@@ -4,6 +4,7 @@ import {
   adminGorunumu,
   adminIstek,
   eylemHazirMi,
+  grupIncelemeHazirMi,
   kritikEylemMi,
   type IncelemeDosyasi,
 } from "./admin-api";
@@ -29,13 +30,11 @@ describe("admin akislari", () => {
   it("401 durumunu unauthorized redirect kararina cevirir", async () => {
     vi.stubGlobal(
       "fetch",
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(JSON.stringify({ detail: "Admin oturumu gerekli." }), {
-            status: 401,
-          }),
-        ),
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ detail: "Admin oturumu gerekli." }), {
+          status: 401,
+        }),
+      ),
     );
     await expect(adminIstek("/me")).rejects.toMatchObject({ durum: 401 });
     expect(adminGorunumu("yetkisiz", [])).toBe("login_redirect");
@@ -58,15 +57,25 @@ describe("admin akislari", () => {
   it("typed error state mesajini korur", async () => {
     vi.stubGlobal(
       "fetch",
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(JSON.stringify({ detail: "Yayin kapisi reddetti." }), {
-            status: 409,
-          }),
-        ),
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ detail: "Yayin kapisi reddetti." }), {
+          status: 409,
+        }),
+      ),
     );
     await expect(adminIstek("/incelemeler")).rejects.toThrow("Yayin kapisi reddetti.");
     expect(adminGorunumu("hata", [])).toBe("error");
+  });
+
+  it("grup inceleme kor otomatik yayin icin gerekce ve azami 80 ister", () => {
+    expect(grupIncelemeHazirMi([], "Yeterli gerekce")).toBe(false);
+    expect(grupIncelemeHazirMi(["a"], "kisa")).toBe(false);
+    expect(grupIncelemeHazirMi(["a"], "Yeterli gerekce")).toBe(true);
+    expect(
+      grupIncelemeHazirMi(
+        Array.from({ length: 81 }, (_, i) => String(i)),
+        "Yeterli gerekce",
+      ),
+    ).toBe(false);
   });
 });

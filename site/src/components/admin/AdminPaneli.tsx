@@ -8,6 +8,7 @@ import {
   adminGorunumu,
   adminIstek,
   eylemHazirMi,
+  grupIncelemeHazirMi,
   kritikEylemMi,
   type AdminGorunumDurumu,
   type AdminKimlik,
@@ -18,10 +19,14 @@ import {
   type ClaimSayfasi,
   type DahiliSinyalOzet,
   type EslemeAdayi,
+  type GrupKuyruk,
+  type GrupIncelemeSonucu,
   type IncelemeDosyasi,
+  type PilotKayit,
+  type PilotOzet,
 } from "@/lib/admin-api";
 
-type Sekme = "kuyruk" | "kimlik" | "claim" | "sinyal" | "audit";
+type Sekme = "kuyruk" | "pilot" | "kimlik" | "claim" | "sinyal" | "audit";
 
 function EylemFormu({
   eylem,
@@ -126,6 +131,12 @@ export function AdminPaneli() {
   const [sinyaller, setSinyaller] = useState<DahiliSinyalOzet[]>([]);
   const [hata, setHata] = useState("");
   const [sekme, setSekme] = useState<Sekme>("kuyruk");
+  const [grup, setGrup] = useState<GrupKuyruk | null>(null);
+  const [grupAile, setGrupAile] = useState("calisma_saatleri");
+  const [grupSecim, setGrupSecim] = useState<string[]>([]);
+  const [grupGerekce, setGrupGerekce] = useState("");
+  const [pilot, setPilot] = useState<PilotOzet | null>(null);
+  const [seciliPilot, setSeciliPilot] = useState<PilotKayit | null>(null);
 
   const yenile = useCallback(async () => {
     try {
@@ -152,6 +163,21 @@ export function AdminPaneli() {
       setClaimler(yeniClaimler.kayitlar);
       setClaimToplam(yeniClaimler.toplam);
       setSinyaller(yeniSinyaller.kayitlar);
+      if (sekme === "kuyruk") {
+        const yeniGrup = await adminIstek<GrupKuyruk>(
+          `/kuyruk/gruplar?pilot=true&aile=${encodeURIComponent(grupAile)}`,
+        );
+        setGrup(yeniGrup);
+        setGrupSecim(
+          yeniGrup.kayitlar
+            .filter((k) => k.grup_uygun)
+            .slice(0, 80)
+            .map((k) => k.dosya_id),
+        );
+      }
+      if (sekme === "pilot" || sekme === "sinyal") {
+        setPilot(await adminIstek<PilotOzet>("/pilot"));
+      }
       if (ben.yetkiler.includes("audit_gor"))
         setAudit(await adminIstek<AuditOlayi[]>("/audit"));
       setDurum("hazir");
@@ -164,7 +190,7 @@ export function AdminPaneli() {
         setHata(error instanceof Error ? error.message : "Admin verisi yüklenemedi.");
       }
     }
-  }, [claimAile, claimDurum, claimMekan, claimSayfa, router]);
+  }, [claimAile, claimDurum, claimMekan, claimSayfa, grupAile, router, sekme]);
 
   useEffect(() => {
     const zamanlayici = window.setTimeout(() => void yenile(), 0);
@@ -222,7 +248,7 @@ export function AdminPaneli() {
       </header>
       <main className="kabuk py-6 sm:py-10">
         <nav aria-label="Admin bölümleri" className="mb-6 flex gap-2 overflow-x-auto">
-          {(["kuyruk", "kimlik", "claim", "sinyal", "audit"] as Sekme[])
+          {(["kuyruk", "pilot", "kimlik", "claim", "sinyal", "audit"] as Sekme[])
             .filter((s) => s !== "audit" || kimlik?.yetkiler.includes("audit_gor"))
             .map((s) => (
               <button
@@ -243,6 +269,110 @@ export function AdminPaneli() {
         {sekme === "kuyruk" && (
           <section>
             <h2 className="yazi-alt">İnceleme kuyruğu</h2>
+            {kimlik?.yetkiler.includes("yayinla") && (
+              <div className="border-bordo/15 mt-4 rounded-lg border bg-white p-4">
+                <h3 className="text-sm font-semibold">Pilot grup inceleme</h3>
+                <p className="mt-1 text-xs">
+                  Düşük risk yapısal OSM adayları aile bazında incelenir. Kör otomatik
+                  yayın yoktur. Tekerlekli sandalye ve amaç çıkarımı bu yolla yayınlanmaz.
+                </p>
+                <label className="mt-3 grid gap-1 text-xs font-medium">
+                  Aile
+                  <select
+                    value={grupAile}
+                    onChange={(e) => setGrupAile(e.target.value)}
+                    className="border-bordo/20 rounded border p-2"
+                  >
+                    {[
+                      "calisma_saatleri",
+                      "wifi",
+                      "otopark",
+                      "acik_alan",
+                      "rezervasyon",
+                      "yer_turu",
+                      "telefon",
+                      "web_sitesi",
+                      "adres",
+                    ].map((aile) => (
+                      <option key={aile} value={aile}>
+                        {aile}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <p className="mt-2 text-xs">
+                  Uygun {grup?.uygun ?? 0} / {grup?.toplam ?? 0}. Seçili{" "}
+                  {grupSecim.length}
+                  (en fazla 80).
+                </p>
+                <label className="mt-3 grid gap-1 text-xs font-medium">
+                  Gerekçe
+                  <textarea
+                    value={grupGerekce}
+                    onChange={(e) => setGrupGerekce(e.target.value)}
+                    minLength={8}
+                    rows={2}
+                    className="border-bordo/20 rounded border p-2"
+                  />
+                </label>
+                <button
+                  className="bg-bordo mt-3 rounded px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
+                  disabled={!grupIncelemeHazirMi(grupSecim, grupGerekce)}
+                  onClick={async () => {
+                    setHata("");
+                    try {
+                      const sonuc = await adminIstek<GrupIncelemeSonucu>(
+                        "/grup-inceleme",
+                        {
+                          method: "POST",
+                          body: JSON.stringify({
+                            dosya_idleri: grupSecim,
+                            gerekce: grupGerekce,
+                            eylem: "claim_approve",
+                          }),
+                        },
+                      );
+                      if (sonuc.otomatik_yayin) {
+                        setHata("Grup inceleme otomatik yayın üretmemeli.");
+                        return;
+                      }
+                      setGrupGerekce("");
+                      await yenile();
+                    } catch (error) {
+                      setHata(
+                        error instanceof Error
+                          ? error.message
+                          : "Grup inceleme tamamlanamadı.",
+                      );
+                    }
+                  }}
+                >
+                  Seçilenleri incele ve yayınla
+                </button>
+                <ul className="mt-3 grid max-h-64 gap-1 overflow-auto text-xs">
+                  {(grup?.kayitlar ?? []).map((kayit) => (
+                    <li key={kayit.dosya_id} className="flex items-start gap-2">
+                      <input
+                        type="checkbox"
+                        checked={grupSecim.includes(kayit.dosya_id)}
+                        disabled={!kayit.grup_uygun}
+                        onChange={(e) => {
+                          setGrupSecim((onceki) =>
+                            e.target.checked
+                              ? [...onceki, kayit.dosya_id].slice(0, 80)
+                              : onceki.filter((id) => id !== kayit.dosya_id),
+                          );
+                        }}
+                      />
+                      <span>
+                        {kayit.mekan_adi} · {String(kayit.candidate_deger)}{" "}
+                        {kayit.grup_uygun ? "" : `(atlanır: ${kayit.grup_neden})`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="mt-4 grid gap-4">
               {kuyruk.length === 0 && <p>Bekleyen dosya yok.</p>}
               {kuyruk.map((dosya) => (
@@ -253,7 +383,7 @@ export function AdminPaneli() {
                   <div className="flex flex-wrap justify-between gap-2">
                     <strong>{dosya.onerilen_eylem}</strong>
                     <span className="text-xs uppercase">
-                      {dosya.risk_sinifi} · {dosya.durum}
+                      {dosya.triyaj_sinifi || dosya.risk_sinifi} · {dosya.durum}
                     </span>
                   </div>
                   <p className="mt-2 text-sm break-all">
@@ -263,6 +393,57 @@ export function AdminPaneli() {
                     kimlik?.yetkiler.includes("ikinci_incele") && (
                       <IkinciOnayFormu onayla={(g) => ikinciOnay(dosya, g)} />
                     )}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+        {sekme === "pilot" && (
+          <section>
+            <h2 className="yazi-alt">Pilot kapsam</h2>
+            <p className="mt-2 text-sm">
+              {pilot
+                ? `${pilot.havuz.sayi} mekan, ${pilot.gold_sayisi} gold aday. Rota hazır ${pilot.rota_durum.rota_hazir ?? 0}, sınırlı ${pilot.rota_durum.rota_sinirli ?? 0}. Kamusal skor yok.`
+                : "Pilot özeti yükleniyor…"}
+            </p>
+            {pilot && (
+              <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
+                {Object.entries(pilot.havuz.amac || {}).map(([amac, sayi]) => (
+                  <div key={amac} className="border-bordo/10 rounded border bg-white p-2">
+                    <dt>{amac}</dt>
+                    <dd className="font-semibold">{sayi}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            <div className="mt-4 grid gap-3">
+              {(pilot?.kayitlar ?? []).map((kayit) => (
+                <article
+                  key={kayit.sube_id}
+                  className="border-bordo/15 rounded-lg border bg-white p-4"
+                >
+                  <div className="flex flex-wrap justify-between gap-2">
+                    <strong>{kayit.isim}</strong>
+                    <span className="text-xs uppercase">
+                      {kayit.rota_hazirlik.durum}
+                      {kayit.gold_aday ? " · gold" : ""}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs">
+                    {kayit.ilce_adi} · {kayit.alt_kategori} · {kayit.amaclar.join(", ")}
+                  </p>
+                  <p className="mt-1 text-xs">
+                    Eksik: {kayit.eksik_onemli_aileler.join(", ") || "önemli boşluk yok"}
+                  </p>
+                  <button
+                    className="border-bordo/20 mt-2 rounded border px-2 py-1 text-xs"
+                    onClick={() => {
+                      setSeciliPilot(kayit);
+                      setSekme("sinyal");
+                    }}
+                  >
+                    Eksikleri birinci el gözleme taşı
+                  </button>
                 </article>
               ))}
             </div>
@@ -567,19 +748,29 @@ export function AdminPaneli() {
         {sekme === "sinyal" && (
           <section className="grid gap-6">
             <h2 className="text-lg font-semibold">Dahili sinyal ve birinci el gözlem</h2>
+            {seciliPilot && (
+              <p className="text-sm">
+                Seçilen pilot: {seciliPilot.isim}. Eksik aileler:{" "}
+                {seciliPilot.eksik_onemli_aileler.join(", ") || "önemli boşluk yok"}.
+              </p>
+            )}
             <form
+              key={seciliPilot?.sube_id || "gozlem"}
               className="border-bordo/15 grid max-w-xl gap-3 rounded-lg border bg-white p-4"
               onSubmit={async (event) => {
                 event.preventDefault();
                 const veri = new FormData(event.currentTarget);
                 setHata("");
+                const aile = String(veri.get("aile") || "");
+                const metin = String(veri.get("deger_metin") || "").trim();
+                const deger = metin || veri.get("deger") === "true";
                 try {
                   await adminIstek("/gozlemler", {
                     method: "POST",
                     body: JSON.stringify({
                       sube_id: String(veri.get("sube_id") || ""),
-                      aile: String(veri.get("aile") || ""),
-                      deger: veri.get("deger") === "true",
+                      aile,
+                      deger,
                       ozet: String(veri.get("ozet") || ""),
                       gerekce: String(veri.get("gerekce") || ""),
                     }),
@@ -600,6 +791,7 @@ export function AdminPaneli() {
                 <input
                   name="sube_id"
                   required
+                  defaultValue={seciliPilot?.sube_id || ""}
                   className="border-bordo/20 rounded border p-2"
                 />
               </label>
@@ -608,7 +800,7 @@ export function AdminPaneli() {
                 <input
                   name="aile"
                   required
-                  defaultValue="wifi"
+                  defaultValue={seciliPilot?.eksik_onemli_aileler[0] || "wifi"}
                   className="border-bordo/20 rounded border p-2"
                 />
               </label>
@@ -618,6 +810,14 @@ export function AdminPaneli() {
                   <option value="true">var</option>
                   <option value="false">yok</option>
                 </select>
+              </label>
+              <label className="grid gap-1 text-xs font-medium">
+                Metin değer (çalışma saati vb.)
+                <input
+                  name="deger_metin"
+                  placeholder="Mo-Su 09:00-18:00"
+                  className="border-bordo/20 rounded border p-2"
+                />
               </label>
               <label className="grid gap-1 text-xs font-medium">
                 Gözlem özeti

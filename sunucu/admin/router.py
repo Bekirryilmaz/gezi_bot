@@ -12,18 +12,22 @@ from sunucu.admin.semalar import (
     AdminKimlikCevabi,
     AdminLoginTalebi,
     AuditCevabi,
-    BirlestirmeCevabi,
     BirinciElGozlemCevabi,
     BirinciElGozlemTalebi,
+    BirlestirmeCevabi,
     ClaimIncelemeCevabi,
     ClaimOzetCevabi,
     ClaimSayfasiCevabi,
     DahiliSinyalOzetCevabi,
     DahiliSinyalSayfasiCevabi,
     EslemeAdayiCevabi,
+    GrupIncelemeCevabi,
+    GrupIncelemeTalebi,
+    GrupKuyrukCevabi,
     IkinciIncelemeTalebi,
     IncelemeDosyasiCevabi,
     IncelemeKomutu,
+    PilotOzetCevabi,
 )
 from sunucu.admin.workflow import (
     claim_yayin_onizle,
@@ -566,3 +570,92 @@ def birinci_el_gozlem(
     )
     oturum.commit()
     return BirinciElGozlemCevabi(**sonuc)
+
+
+@yonlendirici.get("/kuyruk/gruplar", response_model=GrupKuyrukCevabi)
+def kuyruk_gruplari(
+    aile: str | None = Query(default=None, max_length=50),
+    pilot: bool = Query(default=False),
+    sehir: str = Query(default="Samsun", max_length=80),
+    oturum: Session = Depends(oturum_al),
+    baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.INCELEME_GOR)),
+) -> GrupKuyrukCevabi:
+    from sunucu.admin.grup_kuyruk import grup_adaylarini_listele, grup_ozetini_kur
+    from sunucu.bilgi.pilot_havuzu import havuzu_sec, sehir_idsini_bul, veritabanindan_adaylar
+
+    sube_idleri = None
+    if pilot:
+        sehir_id = sehir_idsini_bul(oturum, sehir)
+        havuz = havuzu_sec(veritabanindan_adaylar(oturum, sehir_id))
+        sube_idleri = {a.sube_id for a in havuz}
+    kayitlar = grup_adaylarini_listele(oturum, aile=aile, sube_idleri=sube_idleri)
+    kayitlar = [
+        k
+        for k in kayitlar
+        if baglam.kapsam_izinli_mi(nesne_sehir_id(oturum, "claim", k["iddia_id"]))
+    ]
+    return GrupKuyrukCevabi(**grup_ozetini_kur(kayitlar))
+
+
+@yonlendirici.post("/grup-inceleme", response_model=GrupIncelemeCevabi)
+def grup_inceleme(
+    talep: GrupIncelemeTalebi,
+    request: Request,
+    oturum: Session = Depends(oturum_al),
+    baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.YAYINLA)),
+) -> GrupIncelemeCevabi:
+    from sunucu.admin.grup_inceleme import grup_incelemeyi_uygula
+
+    sonuc = grup_incelemeyi_uygula(
+        oturum,
+        baglam=baglam,
+        dosya_idleri=talep.dosya_idleri,
+        gerekce=talep.gerekce,
+        istek_id=_istek_id(request),
+        eylem=talep.eylem,
+    )
+    oturum.commit()
+    return GrupIncelemeCevabi(**sonuc.sozluk())
+
+
+@yonlendirici.get("/pilot", response_model=PilotOzetCevabi)
+def pilot_ozet(
+    sehir: str = Query(default="Samsun", max_length=80),
+    oturum: Session = Depends(oturum_al),
+    baglam: AdminBaglami = Depends(yetki_gerekli(Yetki.INCELEME_GOR)),
+) -> PilotOzetCevabi:
+    from sunucu.bilgi.pilot_havuzu import (
+        gold_sec,
+        havuz_ozeti,
+        havuzu_sec,
+        sehir_idsini_bul,
+        veritabanindan_adaylar,
+    )
+    from sunucu.bilgi.pilot_kapsam import (
+        havuz_kapsamini_kur,
+        kuyruk_sayimi,
+        matris_kolon_ozeti,
+        nlp_kapsam_ozeti,
+        rota_durum_ozeti,
+        rota_simulasyonu,
+    )
+
+    sehir_id = sehir_idsini_bul(oturum, sehir)
+    if not baglam.kapsam_izinli_mi(sehir_id):
+        raise HTTPException(status_code=403, detail="Sehir kapsami disinda.")
+    adaylar = veritabanindan_adaylar(oturum, sehir_id)
+    havuz = havuzu_sec(adaylar)
+    gold = gold_sec(havuz)
+    gold_idleri = {a.sube_id for a in gold}
+    kayitlar = havuz_kapsamini_kur(oturum, havuz, gold_idleri=gold_idleri)
+    return PilotOzetCevabi(
+        sehir=sehir,
+        havuz=havuz_ozeti(havuz),
+        gold_sayisi=len(gold),
+        rota_durum=rota_durum_ozeti(kayitlar),
+        matris_ozet=matris_kolon_ozeti(kayitlar),
+        nlp=nlp_kapsam_ozeti(kayitlar),
+        simulasyon=rota_simulasyonu(kayitlar),
+        kuyruk=kuyruk_sayimi(oturum),
+        kayitlar=kayitlar,
+    )

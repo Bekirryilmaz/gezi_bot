@@ -137,6 +137,39 @@ class BirinciElGozlemCevabi(BaseModel):
     otomatik_yayin: bool
 
 
+class GrupIncelemeTalebi(BaseModel):
+    dosya_idleri: list[str] = Field(min_length=1, max_length=80)
+    gerekce: str = Field(min_length=8, max_length=2000)
+    eylem: str = Field(default="claim_approve", min_length=2, max_length=80)
+
+
+class GrupIncelemeCevabi(BaseModel):
+    onaylanan: list[str]
+    atlanan: list[dict[str, str]]
+    hatalar: list[dict[str, str]]
+    otomatik_yayin: bool = False
+
+
+class GrupKuyrukCevabi(BaseModel):
+    kayitlar: list[dict[str, Any]]
+    aile_ozeti: dict[str, dict[str, int]]
+    toplam: int
+    uygun: int
+    otomatik_yayin: bool = False
+
+
+class PilotOzetCevabi(BaseModel):
+    sehir: str
+    havuz: dict[str, Any]
+    gold_sayisi: int
+    rota_durum: dict[str, int]
+    matris_ozet: dict[str, dict[str, int]]
+    nlp: dict[str, Any]
+    simulasyon: dict[str, Any]
+    kuyruk: dict[str, int]
+    kayitlar: list[dict[str, Any]]
+
+
 class DahiliSinyalOzetCevabi(BaseModel):
     id: str
     sube_id: str

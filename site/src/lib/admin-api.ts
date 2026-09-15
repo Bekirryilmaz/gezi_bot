@@ -14,6 +14,8 @@ export type IncelemeDosyasi = {
   nesne_id: string;
   durum: string;
   risk_sinifi: string;
+  oncelik_puani?: number;
+  triyaj_sinifi?: string | null;
   onerilen_eylem?: string | null;
   karar_gerekcesi?: string | null;
   surum: number;
@@ -113,6 +115,65 @@ export type DahiliSinyalSayfasi = {
   kayitlar: DahiliSinyalOzet[];
   toplam: number;
 };
+
+export type GrupKuyrukKayit = {
+  dosya_id: string;
+  iddia_id: string;
+  sube_id: string;
+  mekan_adi: string;
+  aile: string;
+  durum: string;
+  triyaj_sinifi: string | null;
+  candidate_deger: unknown;
+  grup_uygun: boolean;
+  grup_neden: string;
+  saat_sozdizimi_gecerli: boolean | null;
+};
+
+export type GrupKuyruk = {
+  kayitlar: GrupKuyrukKayit[];
+  aile_ozeti: Record<string, { toplam: number; uygun: number; atlanan: number }>;
+  toplam: number;
+  uygun: number;
+  otomatik_yayin: boolean;
+};
+
+export type GrupIncelemeSonucu = {
+  onaylanan: string[];
+  atlanan: Array<{ dosya_id: string; neden: string }>;
+  hatalar: Array<{ dosya_id: string; neden: string }>;
+  otomatik_yayin: boolean;
+};
+
+export type PilotKayit = {
+  sube_id: string;
+  yer_id: string;
+  isim: string;
+  alt_kategori: string;
+  ilce_adi: string | null;
+  kimlik_sinifi: string;
+  amaclar: string[];
+  matris: Record<string, string>;
+  eksik_onemli_aileler: string[];
+  rota_hazirlik: { durum: string; neden_kodlari: string[] };
+  gold_aday: boolean;
+};
+
+export type PilotOzet = {
+  sehir: string;
+  havuz: { sayi: number; amac: Record<string, number>; ilce: Record<string, number> };
+  gold_sayisi: number;
+  rota_durum: Record<string, number>;
+  matris_ozet: Record<string, Record<string, number>>;
+  nlp: { mekan_en_az_bir: number; preference_eligible: Record<string, number> };
+  simulasyon: Record<string, unknown>;
+  kuyruk: Record<string, number>;
+  kayitlar: PilotKayit[];
+};
+
+export function grupIncelemeHazirMi(ids: string[], gerekce: string): boolean {
+  return ids.length > 0 && ids.length <= 80 && gerekce.trim().length >= 8;
+}
 
 export class AdminApiHatasi extends Error {
   constructor(

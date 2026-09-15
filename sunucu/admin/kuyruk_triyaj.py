@@ -19,15 +19,17 @@ DUSUK_RISK_AILELERI = frozenset(
         "acik_alan",
         "tekerlekli_sandalye_erisimi",
         "wifi",
+        "rezervasyon",
     }
 )
 YUKSEK_RISK_AILELERI = frozenset({"amac_destegi"})
 KAPSAM_ONCELIGI = {
+    "calisma_saatleri": 110,
     "wifi": 100,
     "otopark": 90,
     "acik_alan": 80,
     "tekerlekli_sandalye_erisimi": 70,
-    "calisma_saatleri": 40,
+    "rezervasyon": 60,
     "yer_turu": 25,
     "telefon": 20,
     "web_sitesi": 15,
@@ -74,7 +76,9 @@ def kuyruk_onceligini_hesapla(
 def inceleme_kuyrugunu_triyaj_et(oturum: Session, *, dry_run: bool = False) -> dict[str, int]:
     dosyalar = (
         oturum.query(IncelemeDosyasi)
-        .filter(IncelemeDosyasi.durum != "tamamlandi", IncelemeDosyasi.dosya_turu == "claim_candidate")
+        .filter(
+            IncelemeDosyasi.durum != "tamamlandi", IncelemeDosyasi.dosya_turu == "claim_candidate"
+        )
         .all()
     )
     sayac = {"dusuk_risk": 0, "yuksek_risk": 0, "orta_risk": 0, "guncellenen": 0}
@@ -83,7 +87,8 @@ def inceleme_kuyrugunu_triyaj_et(oturum: Session, *, dry_run: bool = False) -> d
         aile = iddia.aile if iddia is not None else ""
         sube = oturum.get(Sube, iddia.sube_id) if iddia is not None else None
         dogrulanmis = bool(
-            sube is not None and getattr(sube, "kimlik_kalite_sinifi", "") in {"dogrulanmis", "guclu"}
+            sube is not None
+            and getattr(sube, "kimlik_kalite_sinifi", "") in {"dogrulanmis", "guclu"}
         )
         oncelik = kuyruk_onceligini_hesapla(
             aile=aile,
