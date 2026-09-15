@@ -13,7 +13,12 @@ type Props = {
 };
 
 function guvenliDonus(deger: string | undefined, varsayilan: string): string {
-  if (!deger || !deger.startsWith("/sehir/") || deger.startsWith("//")) return varsayilan;
+  if (
+    !deger ||
+    deger.startsWith("//") ||
+    (!deger.startsWith("/sehir/") && !deger.startsWith("/?bugun="))
+  )
+    return varsayilan;
   return deger;
 }
 
@@ -181,7 +186,9 @@ export default async function YerDetaySayfasi({ params, searchParams }: Props) {
             href={donusYolu}
             className="text-bordo block min-h-11 py-2 underline underline-offset-4"
           >
-            Keşfet bağlamına dön
+            {donusYolu.startsWith("/?bugun=")
+              ? "Bugün Ne Yapalım bağlamına dön"
+              : "Keşfet bağlamına dön"}
           </Link>
         </aside>
       </div>

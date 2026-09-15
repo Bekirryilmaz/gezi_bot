@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass, field
-from datetime import date, time
+from datetime import date, datetime, time
 from enum import StrEnum
 from typing import Any
 
@@ -86,6 +86,7 @@ class ZamanBaglami:
     ziyaret_tarihi: date | None = None
     baslangic: time | None = None
     bitis: time | None = None
+    degerlendirme_zamani: datetime | None = None
 
     def dogrula(self) -> None:
         if self.baslangic and self.bitis and self.bitis <= self.baslangic:
@@ -158,6 +159,7 @@ class KararBaglami:
                 "tarih": self.zaman.ziyaret_tarihi.isoformat() if self.zaman.ziyaret_tarihi else None,
                 "baslangic": self.zaman.baslangic.isoformat() if self.zaman.baslangic else None,
                 "bitis": self.zaman.bitis.isoformat() if self.zaman.bitis else None,
+                "degerlendirme_zamani": self.zaman.degerlendirme_zamani.isoformat() if self.zaman.degerlendirme_zamani else None,
             },
             "baslangic_noktasi": self.baslangic_noktasi,
             "ulasim_bicimi": self.ulasim_bicimi,
@@ -277,6 +279,7 @@ class KararMotoru:
                     "ziyaret_tarihi": baglam.zaman.ziyaret_tarihi.isoformat() if baglam.zaman.ziyaret_tarihi else None,
                     "saat_baslangic": baglam.zaman.baslangic.isoformat() if baglam.zaman.baslangic else None,
                     "saat_bitis": baglam.zaman.bitis.isoformat() if baglam.zaman.bitis else None,
+                    "degerlendirme_zamani": baglam.zaman.degerlendirme_zamani.isoformat() if baglam.zaman.degerlendirme_zamani else None,
                     "sehir": baglam.cografi_baglam.sehir, "ilce": baglam.cografi_baglam.ilce,
                 },
                 bilgi_surumu=baglam.bilgi_surumu, politika_surumu=baglam.politika_surumu,

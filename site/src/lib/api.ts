@@ -20,6 +20,8 @@ import type {
   KararBaglami,
   KesfetCevabi,
   SehirKapsami,
+  BugunNeYapalimCevabi,
+  BugunNeYapalimTalebi,
 } from "./types";
 
 export class ApiHatasi extends Error {
@@ -214,6 +216,27 @@ export async function kesfetDegerlendir(
   }
   if (!yanit.ok) throw await apiHatasiOlustur(yanit, "/v1/kesfet/degerlendir");
   return yanit.json() as Promise<KesfetCevabi>;
+}
+
+export async function bugunNeYapalimDegerlendir(
+  talep: BugunNeYapalimTalebi,
+  signal?: AbortSignal,
+): Promise<BugunNeYapalimCevabi> {
+  let yanit: Response;
+  try {
+    yanit = await fetch(`${apiKoku()}/v1/bugun-ne-yapalim`, {
+      method: "POST",
+      signal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(talep),
+      cache: "no-store",
+    });
+  } catch (hata) {
+    if (hata instanceof DOMException && hata.name === "AbortError") throw hata;
+    throw new ApiHatasi(agHatasiMesaji(hata), null, "unavailable");
+  }
+  if (!yanit.ok) throw await apiHatasiOlustur(yanit, "/v1/bugun-ne-yapalim");
+  return yanit.json() as Promise<BugunNeYapalimCevabi>;
 }
 
 export async function sehirKapsaminiGetir(sehir: string): Promise<SehirKapsami> {

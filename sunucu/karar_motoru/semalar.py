@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, time
+from datetime import date, datetime, time
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -16,6 +16,7 @@ class ZamanBaglamiSemasi(BaseModel):
     ziyaret_tarihi: date | None = None
     baslangic: time | None = None
     bitis: time | None = None
+    degerlendirme_zamani: datetime | None = None
 
 
 class CografiBaglamSemasi(BaseModel):

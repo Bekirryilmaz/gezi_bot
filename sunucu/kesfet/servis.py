@@ -72,8 +72,9 @@ def kesfet_degerlendir(
     talep: KesfetDegerlendirmeTalebi,
     *,
     request_id: str,
+    giris_kanali: str = "kesfet",
 ) -> KesfetDegerlendirmeCevabi:
-    baglam = talep.baglam.domaine("kesfet")
+    baglam = talep.baglam.domaine(giris_kanali)
     zorunlu_kodlari = [k.kod for k in baglam.zorunlu_kosullar if k.kod in SOMUT_KOSULLAR]
     tercih_kodlari = [t.kod for t in baglam.tercihler if t.kod in SOMUT_KOSULLAR]
     arama_cevabi = ara(

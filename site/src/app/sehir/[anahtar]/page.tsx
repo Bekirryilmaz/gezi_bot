@@ -58,6 +58,7 @@ export default async function SehirKesfetSayfasi({ params, searchParams }: Props
           filtreKatalogu={katalogSonucu.value}
           ilkSorgu={ilk.q}
           ilkFiltreler={ilk.filtreler}
+          ilkAmac={typeof ham.amac === "string" ? ham.amac : ""}
         />
       </div>
     </main>

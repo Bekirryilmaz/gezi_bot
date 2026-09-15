@@ -33,6 +33,7 @@ type Props = {
   filtreKatalogu: AramaFiltreKatalogu;
   ilkSorgu: string;
   ilkFiltreler: AramaFiltreDurumu;
+  ilkAmac?: string;
 };
 
 function baglamAnahtari(sorgu: string, filtreler: AramaFiltreDurumu): string {
@@ -101,9 +102,10 @@ export function KesfetKararAlani({
   filtreKatalogu,
   ilkSorgu,
   ilkFiltreler,
+  ilkAmac = "",
 }: Props) {
   const [sorgu, setSorgu] = useState(ilkSorgu);
-  const [amac, setAmac] = useState("");
+  const [amac, setAmac] = useState(ilkAmac);
   const [filtreState, filtreEylemi] = useReducer(aramaFiltreReducer, {
     uygulanan: ilkFiltreler,
     taslak: ilkFiltreler,

@@ -22,6 +22,8 @@ import {
 } from "@/lib/api";
 import { DENEYIM_EKSENLERI } from "@/lib/sabitler";
 import type { BolgeProfili } from "@/lib/types";
+import { BugunNeYapalimAlani } from "@/components/bugun/BugunNeYapalimAlani";
+import { aramaFiltreleriniGetir } from "@/lib/api";
 
 /** yon.md 4.2 (3) — "ne yapar?" uc karti; plakalar atmosfer, yer fotografi degil. */
 const YOLLAR = [
@@ -42,10 +44,10 @@ const YOLLAR = [
   },
   {
     anahtar: "rota",
-    baslik: "Bugün ne yapmak istersin?",
-    metin: "İlgi alanlarını seç; tek günlük Akıllı Rota planını oluştur.",
-    href: (s: string) => `/sehir/${s}/rota`,
-    cta: CTA_BIRINCIL,
+    baslik: "Bugün Ne Yapalım?",
+    metin: "Bugünkü niyetini yaz; doğrulanmış bilgiden az sayıda hedefli seçenek bul.",
+    href: () => "/#bugun-ne-yapalim",
+    cta: "Bugün için bak",
   },
 ] as const;
 
@@ -107,9 +109,15 @@ async function AnaSayfaGovde() {
   const teaser = teaserBolgesi(bolgeler);
   const isaretler = haritaIsaretleriniKur(sehirAnahtar, bolgeler);
   const haritaMerkez = haritaMerkeziniBul(sehir, bolgeler, isaretler);
+  const filtreKatalogu = await aramaFiltreleriniGetir(sehirAnahtar).catch(() => null);
 
   return (
     <>
+      <BugunNeYapalimAlani
+        sehir={sehirIsim}
+        sehirAnahtari={sehirAnahtar}
+        filtreKatalogu={filtreKatalogu}
+      />
       <HaritaBolum
         sehirAnahtari={sehirAnahtar}
         sehirIsim={sehirIsim}

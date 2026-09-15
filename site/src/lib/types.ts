@@ -253,7 +253,11 @@ export type KararBaglami = {
     ziyaret_tarihi?: string | null;
     baslangic?: string | null;
     bitis?: string | null;
+    degerlendirme_zamani?: string | null;
   };
+  ulasim_bicimi?: string | null;
+  butce_ust_siniri?: number | null;
+  sure_ust_siniri_dakika?: number | null;
   zorunlu_kosullar?: Array<Record<string, unknown>>;
   tercihler?: Array<Record<string, unknown>>;
   reddedilen_yerler?: string[];
@@ -282,6 +286,45 @@ export type KesfetCevabi = {
   degerlendirilemeyen_aday_sayisi: number;
   daha_fazla_var_mi: boolean;
   trace_reference: string | null;
+};
+
+export type BugunAmaci = "kahve_icmek" | "yemek_yemek" | "tarihi_kulturel_ziyaret";
+
+export type BugunNeYapalimTalebi = {
+  serbest_metin?: string | null;
+  niyet: {
+    sehir: string;
+    ilce?: string | null;
+    amac?: BugunAmaci | null;
+    kisi_baglami?: string | null;
+    istenen_zaman?: string | null;
+    sure_dakika?: number | null;
+    ulasim_bicimi?: string | null;
+    butce_ust_siniri?: number | null;
+    zorunlu_kosullar?: string[];
+    tercihler?: string[];
+  };
+  haric_yerler?: string[];
+};
+
+export type BugunNeYapalimCevabi = {
+  durum: "clarification" | "success" | "empty" | "insufficient";
+  anlasilan_ihtiyac_ozeti: string;
+  netlestirme: {
+    soru: string;
+    alan: "amac";
+    secenekler: Array<{ deger: BugunAmaci; etiket: string }>;
+  } | null;
+  baglam: KararBaglami;
+  bugun_baglami: {
+    degerlendirme_zamani: string;
+    saat_dilimi: string;
+    ziyaret_tarihi: string;
+    aciklik_bilgisi: "dogrulanmiyor";
+    aciklik_aciklamasi: string;
+  };
+  kesfet: KesfetCevabi | null;
+  kesfet_sorgusu: string | null;
 };
 
 export type IlceKapsami = {
