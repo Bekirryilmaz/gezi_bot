@@ -9,7 +9,8 @@ degistirmek digerini kirmasin diye ayrilir.
 
 from __future__ import annotations
 
-from typing import Literal
+from datetime import datetime
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -107,6 +108,19 @@ class YerListeCevabi(BaseModel):
     toplam_sayi: int
 
 
+class PratikBilgi(BaseModel):
+    """Yayina uygun claim projection'i; ham evidence veya ic puan tasimaz."""
+
+    aile: str
+    deger: Any | None = None
+    bilgi_durumu: Literal["biliniyor", "bilinmiyor", "eskimis", "celiskili"]
+    kapsam: dict[str, Any] = Field(default_factory=dict)
+    gecerlilik_baslangici: datetime | None = None
+    gecerlilik_bitisi: datetime | None = None
+    dogrulanma_zamani: datetime | None = None
+    yeniden_dogrulama: str | None = None
+
+
 class IcOrnekYorum(BaseModel):
     """Yalniz ic/admin kullanim icin ham yorum DTO'su; public router'a baglanmaz."""
 
@@ -137,6 +151,7 @@ class YerDetay(YerOzet):
     web_sitesi: str | None = None
     aktiviteler: list[str] = Field(default_factory=list)
     fotograf_urlleri: list[str] = Field(default_factory=list)
+    pratik_bilgiler: list[PratikBilgi] = Field(default_factory=list)
 
     @classmethod
     def yerden_olustur(cls, yer: Yer, enlem: float, boylam: float) -> "YerDetay":

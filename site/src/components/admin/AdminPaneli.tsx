@@ -356,6 +356,20 @@ export function AdminPaneli() {
                   Etkilenen alanlar:{" "}
                   {claim.yayin_onizleme.etkilenen_public_alanlar.join(", ")}
                 </p>
+                <div className="bg-sis mt-3 grid gap-2 rounded p-3 text-xs">
+                  <div>
+                    <strong>Kapsam</strong>
+                    <pre className="mt-1 overflow-auto whitespace-pre-wrap">
+                      {JSON.stringify(claim.kapsam, null, 2)}
+                    </pre>
+                  </div>
+                  <div>
+                    <strong>Aktif sürüm</strong>
+                    <pre className="mt-1 overflow-auto whitespace-pre-wrap">
+                      {JSON.stringify(claim.surum, null, 2)}
+                    </pre>
+                  </div>
+                </div>
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   <KanitListesi
                     baslik="Destekleyen kanıt"
@@ -378,6 +392,12 @@ export function AdminPaneli() {
                   />
                   <EylemFormu
                     eylem="claim_stale"
+                    nesneTuru="claim"
+                    nesneId={claim.id}
+                    tamamlandi={() => void yenile()}
+                  />
+                  <EylemFormu
+                    eylem="claim_reject"
                     nesneTuru="claim"
                     nesneId={claim.id}
                     tamamlandi={() => void yenile()}

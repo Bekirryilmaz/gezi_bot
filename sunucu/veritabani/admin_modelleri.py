@@ -86,7 +86,9 @@ class IncelemeDosyasi(Taban):
     risk_sinifi: Mapped[str] = mapped_column(String(20), nullable=False, default="dusuk")
     onerilen_eylem: Mapped[str | None] = mapped_column(String(80))
     komut_payload: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
-    acan_aktor_id: Mapped[str] = mapped_column(ForeignKey("admin_kullanicilari.id", ondelete="RESTRICT"), nullable=False)
+    # Deterministik veri isi insan onayi bekleyen bir dosya acabilir. Null,
+    # islemin onaysiz yayinlandigi degil, acan tarafin sistem oldugu anlamindadir.
+    acan_aktor_id: Mapped[str | None] = mapped_column(ForeignKey("admin_kullanicilari.id", ondelete="RESTRICT"), nullable=True)
     atanan_aktor_id: Mapped[str | None] = mapped_column(ForeignKey("admin_kullanicilari.id", ondelete="SET NULL"))
     ikinci_inceleyen_id: Mapped[str | None] = mapped_column(ForeignKey("admin_kullanicilari.id", ondelete="RESTRICT"))
     karar_gerekcesi: Mapped[str | None] = mapped_column(Text)

@@ -16,6 +16,7 @@ from sunucu.api.semalar import (
     YerListeCevabi,
     YerOzet,
 )
+from sunucu.bilgi.public import yer_pratik_bilgileri
 from sunucu.veritabani.baglanti import oturum_al
 from sunucu.veritabani.modeller import BolgeProfili, Sehir
 from sunucu.veritabani.sorgular import (
@@ -144,7 +145,9 @@ def yer_detayi(yer_id: str, yanit: Response, oturum: Session = Depends(oturum_al
     yayin = yer_yayin_kaydi_getir(oturum, yer_id)
     yanit.headers["ETag"] = f'"yer-{yer_id}-v{yayin.surum if yayin else 0}"'
     yanit.headers["Cache-Control"] = "public, max-age=60, must-revalidate"
-    return YerDetay.yerden_olustur(yer, enlem, boylam)
+    detay = YerDetay.yerden_olustur(yer, enlem, boylam)
+    detay.pratik_bilgiler = yer_pratik_bilgileri(oturum, yer_id)
+    return detay
 
 
 @yonlendirici.get("/sehirler-tanimli", response_model=list[str], include_in_schema=False)

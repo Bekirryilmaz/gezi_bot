@@ -25,6 +25,7 @@ EYLEM_YETKISI = {
     "kritik_claim_yayini": Yetki.YAYINLA,
     "claim_limit": Yetki.CLAIM_INCELE,
     "claim_stale": Yetki.CLAIM_INCELE,
+    "claim_reject": Yetki.CLAIM_INCELE,
     "withdraw": Yetki.GERI_CEK,
     "hak_degisikligi": Yetki.HAK_DEGISTIR,
 }
@@ -93,6 +94,19 @@ def _yayin_kaydi_guncelle(oturum: Session, *, nesne_turu: str, nesne_id: str, du
     return kayit
 
 
+def _claim_candidate_dosyalarini_kapat(oturum: Session, claim_id: str, gerekce: str) -> None:
+    dosyalar = (
+        oturum.query(IncelemeDosyasi)
+        .filter_by(dosya_turu="claim_candidate", nesne_turu="claim", nesne_id=claim_id)
+        .filter(IncelemeDosyasi.durum != "tamamlandi")
+        .all()
+    )
+    for aday_dosyasi in dosyalar:
+        aday_dosyasi.durum = "tamamlandi"
+        aday_dosyasi.karar_gerekcesi = gerekce
+        aday_dosyasi.surum += 1
+
+
 def _komutu_uygula(oturum: Session, dosya: IncelemeDosyasi, aktor_id: str, gerekce: str, istek_id: str) -> dict:
     eylem, payload = dosya.onerilen_eylem or "", dosya.komut_payload or {}
     onceki: dict = {"durum": dosya.durum, "surum": dosya.surum}
@@ -117,7 +131,7 @@ def _komutu_uygula(oturum: Session, dosya: IncelemeDosyasi, aktor_id: str, gerek
         bol(oturum, birlesme, gerekce)
         olay = gecersizlestirme_olayi_uret(oturum, olay_anahtari=f"split:{birlesme.id}:{dosya.id}", kaynak_turu="yer", kaynak_id=birlesme.kaynak_sube_id, olay_turu="split")
         olayi_isle(oturum, olay)
-    elif eylem in {"claim_approve", "kritik_claim_yayini", "claim_limit", "claim_stale"}:
+    elif eylem in {"claim_approve", "kritik_claim_yayini", "claim_limit", "claim_stale", "claim_reject"}:
         iddia = oturum.get(Iddia, dosya.nesne_id)
         if not iddia:
             raise HTTPException(status_code=404, detail="Claim bulunamadi.")
@@ -133,11 +147,16 @@ def _komutu_uygula(oturum: Session, dosya: IncelemeDosyasi, aktor_id: str, gerek
         elif eylem == "claim_limit":
             surum.yayin_durumu = "sinirli"
             durum, nedenler = YayinUygunlukDurumu.SINIRLI_YAYINLANABILIR.value, [payload.get("sinir_kodu", "admin_sinirli")]
-        else:
+        elif eylem == "claim_stale":
             surum.bilgi_durumu = BilgiDurumu.ESKIMIS.value
             surum.yayin_durumu = "yeniden_dogrulama"
             durum, nedenler = YayinUygunlukDurumu.YENIDEN_DOGRULAMA_GEREKLI.value, ["eskimis"]
+        else:
+            surum.yayin_durumu = "reddedildi"
+            surum.yayin_engeli = payload.get("gerekce_kodu", "admin_reddi")
+            durum, nedenler = YayinUygunlukDurumu.YAYINLANAMAZ.value, [surum.yayin_engeli]
         _yayin_kaydi_guncelle(oturum, nesne_turu="claim", nesne_id=iddia.id, durum=durum, nedenler=nedenler)
+        _claim_candidate_dosyalarini_kapat(oturum, str(iddia.id), gerekce)
         sube = oturum.get(Sube, iddia.sube_id)
         if sube and sube.legacy_yer_id:
             etki_bagi_ekle(oturum, "claim", iddia.id, "yer", sube.legacy_yer_id, "place_projection")

@@ -63,6 +63,8 @@ SOMUT_KOSULLAR: dict[str, SomutKosulTanimi] = {
         "engelli_tuvaleti", "Erişilebilir tuvalet", "engelli_tuvaleti", True
     ),
     "otopark": SomutKosulTanimi("otopark", "Otopark", "otopark", True),
+    "wifi": SomutKosulTanimi("wifi", "Wi-Fi", "wifi", True),
+    "ucretsiz": SomutKosulTanimi("ucretsiz", "Ücretsiz", "ucretsiz", True),
     "sessiz_ortam": SomutKosulTanimi("sessiz_ortam", "Sessiz ortam", "sessiz_ortam", True),
 }
 
