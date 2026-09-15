@@ -27,7 +27,7 @@ def test_serbest_metin_basit_parser_uydurmadan_yapilandirir():
     )
     assert cozum.amac == "kahve_icmek"
     assert cozum.ilce == "Atakum"
-    assert cozum.kisi_baglami == "arkadaşlarla"
+    assert cozum.kisi_baglami == "arkadaslar"
     assert cozum.sure_dakika == 120
     assert cozum.zorunlu_kosullar == ("wifi",)
     assert cozum.tercihler == ("sessiz_ortam",)

@@ -1,0 +1,5364 @@
+{
+  "counts": {
+    "observation_count": 212,
+    "claim_candidate_count": 212,
+    "pending_count": 167,
+    "review_ready_branches": 68,
+    "public_claim_count": 24
+  },
+  "family_coverage": [
+    {
+      "family": "amac_destegi",
+      "known_true_or_value": 6,
+      "known_false": 0,
+      "unknown": 1713,
+      "stale": 1,
+      "conflicting": 0,
+      "review_pending": 68
+    },
+    {
+      "family": "wifi",
+      "known_true_or_value": 2,
+      "known_false": 0,
+      "unknown": 1717,
+      "stale": 1,
+      "conflicting": 0,
+      "review_pending": 7
+    },
+    {
+      "family": "otopark",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "sessiz_ortam",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "sohbet_uygunlugu",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "aile_uygunlugu",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "cocuk_uygunlugu",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "calisma_uygunlugu",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "manzara",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "uygun_fiyat",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "fiyat",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "calisma_saati",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "acik_alan",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "acik_hava",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "canli_muzik",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "tekerlekli_sandalye_erisimi",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 1
+    },
+    {
+      "family": "ziyaret_suresi",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    },
+    {
+      "family": "ulasim",
+      "known_true_or_value": 0,
+      "known_false": 0,
+      "unknown": 1719,
+      "stale": 0,
+      "conflicting": 0,
+      "review_pending": 0
+    }
+  ],
+  "purpose_coverage": [
+    {
+      "purpose": "kahve_icmek",
+      "known_support": 3,
+      "unknown": 1716,
+      "known_false": 0
+    },
+    {
+      "purpose": "yemek_yemek",
+      "known_support": 1,
+      "unknown": 1718,
+      "known_false": 0
+    },
+    {
+      "purpose": "tarihi_kulturel_ziyaret",
+      "known_support": 2,
+      "unknown": 1717,
+      "known_false": 0
+    },
+    {
+      "purpose": "tatli_yemek",
+      "known_support": 0,
+      "unknown": 1719,
+      "known_false": 0
+    },
+    {
+      "purpose": "kahvalti_yapmak",
+      "known_support": 0,
+      "unknown": 1719,
+      "known_false": 0
+    },
+    {
+      "purpose": "eglence",
+      "known_support": 0,
+      "unknown": 1719,
+      "known_false": 0
+    },
+    {
+      "purpose": "calisma",
+      "known_support": 0,
+      "unknown": 1719,
+      "known_false": 0
+    },
+    {
+      "purpose": "birlikte_vakit",
+      "known_support": 0,
+      "unknown": 1719,
+      "known_false": 0
+    },
+    {
+      "purpose": "cocukla_aktivite",
+      "known_support": 0,
+      "unknown": 1719,
+      "known_false": 0
+    }
+  ],
+  "coverage_denominator": 1719,
+  "coverage_note": "unknown includes pending/stale/conflicting; these are diagnostic overlays, not extra partition categories. Purpose lists are not closed-world false evidence.",
+  "aggregate_signals": [
+    {
+      "branch_id": "02871205-7cd2-4558-8195-8bc8846723a7",
+      "family": "adres",
+      "supporting_observation_count": 2,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 2,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "02871205-7cd2-4558-8195-8bc8846723a7",
+      "family": "amac_destegi",
+      "supporting_observation_count": 2,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 2,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "02871205-7cd2-4558-8195-8bc8846723a7",
+      "family": "yer_turu",
+      "supporting_observation_count": 2,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 2,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "092b90d0-3479-4399-8e06-8ebeb2876359",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "092b90d0-3479-4399-8e06-8ebeb2876359",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0ce78a55-9900-4ea3-8e8b-13aa2360d50c",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0ce78a55-9900-4ea3-8e8b-13aa2360d50c",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0ce78a55-9900-4ea3-8e8b-13aa2360d50c",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0d9d3d84-8023-4520-b181-48ca441a0348",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0d9d3d84-8023-4520-b181-48ca441a0348",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0d9d3d84-8023-4520-b181-48ca441a0348",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0ed37321-3138-4d75-b080-d58bc21db2f9",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0ed37321-3138-4d75-b080-d58bc21db2f9",
+      "family": "ucretsiz",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "0ed37321-3138-4d75-b080-d58bc21db2f9",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "11b525bc-480a-4224-a903-a31f978ba7e8",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "11b525bc-480a-4224-a903-a31f978ba7e8",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13953a48-d2a0-4a4a-9a4c-0eb15c5d2f61",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13953a48-d2a0-4a4a-9a4c-0eb15c5d2f61",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13953a48-d2a0-4a4a-9a4c-0eb15c5d2f61",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13b3a5dc-264e-4887-8919-34848fd1313e",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13b3a5dc-264e-4887-8919-34848fd1313e",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13b3a5dc-264e-4887-8919-34848fd1313e",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13b3a5dc-264e-4887-8919-34848fd1313e",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "13b3a5dc-264e-4887-8919-34848fd1313e",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14f219e2-20c1-49b1-be73-4c53b8d91602",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14f219e2-20c1-49b1-be73-4c53b8d91602",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14f219e2-20c1-49b1-be73-4c53b8d91602",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14f219e2-20c1-49b1-be73-4c53b8d91602",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14f219e2-20c1-49b1-be73-4c53b8d91602",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14feb8e0-481d-42d4-bd6c-46fb86293a48",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14feb8e0-481d-42d4-bd6c-46fb86293a48",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14feb8e0-481d-42d4-bd6c-46fb86293a48",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14feb8e0-481d-42d4-bd6c-46fb86293a48",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "14feb8e0-481d-42d4-bd6c-46fb86293a48",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "15abcb52-f7e1-478c-a542-0d05a52deb02",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "15abcb52-f7e1-478c-a542-0d05a52deb02",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "15abcb52-f7e1-478c-a542-0d05a52deb02",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "15bcb18b-9497-463b-8f6c-af3299a62b8f",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "15bcb18b-9497-463b-8f6c-af3299a62b8f",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "17901e56-0116-4461-ab97-00bff110a4e0",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "17901e56-0116-4461-ab97-00bff110a4e0",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "17901e56-0116-4461-ab97-00bff110a4e0",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "187f8dfb-dee3-4ab0-aa7f-c3a17c6a4d90",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "187f8dfb-dee3-4ab0-aa7f-c3a17c6a4d90",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "1aae7810-086f-4459-b942-7809f138a093",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "1aae7810-086f-4459-b942-7809f138a093",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "1c6a777a-92e6-4a86-8111-3c85cb378904",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "1c6a777a-92e6-4a86-8111-3c85cb378904",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "31465082-071c-4918-bf4c-04600d5ec56d",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "31465082-071c-4918-bf4c-04600d5ec56d",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "31465082-071c-4918-bf4c-04600d5ec56d",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "3ff95bf8-7a69-49fa-a14b-37ade28512aa",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "3ff95bf8-7a69-49fa-a14b-37ade28512aa",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "40a9919b-b4f3-4ae4-9329-65ee28f5bef4",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "40a9919b-b4f3-4ae4-9329-65ee28f5bef4",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "41762d00-0dff-4251-ab86-783c1588e527",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "41762d00-0dff-4251-ab86-783c1588e527",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "45298bf7-65e7-4cc1-a007-aa8d841893ac",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "45298bf7-65e7-4cc1-a007-aa8d841893ac",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "45298bf7-65e7-4cc1-a007-aa8d841893ac",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "45298bf7-65e7-4cc1-a007-aa8d841893ac",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "45514c74-d36e-4598-83ef-1695d7ed054d",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "45514c74-d36e-4598-83ef-1695d7ed054d",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "566f8816-9a23-41c8-9c75-91d97fa722ee",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "566f8816-9a23-41c8-9c75-91d97fa722ee",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "572c3c2d-ad36-40da-b888-2be8c22ea1d3",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "572c3c2d-ad36-40da-b888-2be8c22ea1d3",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "57754c89-19b2-46dc-9b89-f8f94eb62570",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "57754c89-19b2-46dc-9b89-f8f94eb62570",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "5d635ff5-5b9b-4719-b4b5-c43ccf83eb65",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "5d635ff5-5b9b-4719-b4b5-c43ccf83eb65",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "5e3d3baa-49a9-46c5-b68a-01e55d27142e",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "5e3d3baa-49a9-46c5-b68a-01e55d27142e",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "5f43f923-1051-4fe1-8855-d51a4ce6a6b1",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "5f43f923-1051-4fe1-8855-d51a4ce6a6b1",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6083e075-0537-4b19-a91f-577e7f8e7a9c",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6083e075-0537-4b19-a91f-577e7f8e7a9c",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6083e075-0537-4b19-a91f-577e7f8e7a9c",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6083e075-0537-4b19-a91f-577e7f8e7a9c",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6083e075-0537-4b19-a91f-577e7f8e7a9c",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6083e075-0537-4b19-a91f-577e7f8e7a9c",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "62b00efd-1a21-4169-8fbc-98edbc7f816c",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "62b00efd-1a21-4169-8fbc-98edbc7f816c",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6bd611e0-740c-4b7e-a5eb-7f738e7e1378",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6bd611e0-740c-4b7e-a5eb-7f738e7e1378",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6bd611e0-740c-4b7e-a5eb-7f738e7e1378",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6bd611e0-740c-4b7e-a5eb-7f738e7e1378",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6ee0bb99-539a-448d-ab88-006442bfc605",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6ee0bb99-539a-448d-ab88-006442bfc605",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "6ee0bb99-539a-448d-ab88-006442bfc605",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "722a6edb-a831-4657-8c50-369c5187b77b",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "722a6edb-a831-4657-8c50-369c5187b77b",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "73924de6-015e-4e98-936d-00d913fdb003",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "73924de6-015e-4e98-936d-00d913fdb003",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "7b1e0e83-0b86-4f4e-b895-b1ea38d12a23",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "7b1e0e83-0b86-4f4e-b895-b1ea38d12a23",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "7b1e0e83-0b86-4f4e-b895-b1ea38d12a23",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "7f8d1830-719f-4550-99df-d68e354a0c99",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "7f8d1830-719f-4550-99df-d68e354a0c99",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "7f8d1830-719f-4550-99df-d68e354a0c99",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "80ef491e-f152-4fc2-8d03-844d66941da6",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "80ef491e-f152-4fc2-8d03-844d66941da6",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "83284da4-7a30-4bec-9e64-e3b574b63216",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "83284da4-7a30-4bec-9e64-e3b574b63216",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8ca5f107-8c69-464b-8c5b-0d414dbced6e",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8ca5f107-8c69-464b-8c5b-0d414dbced6e",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8ca5f107-8c69-464b-8c5b-0d414dbced6e",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8d2279dc-d259-4bb7-b88d-38cee05c6ace",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8d2279dc-d259-4bb7-b88d-38cee05c6ace",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8d640888-b991-422c-b481-b8961f5fdd55",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8d640888-b991-422c-b481-b8961f5fdd55",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8e2bcd88-b10e-4f87-8da6-93168941b894",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8e2bcd88-b10e-4f87-8da6-93168941b894",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8e2bcd88-b10e-4f87-8da6-93168941b894",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "8e2bcd88-b10e-4f87-8da6-93168941b894",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9b7c5f6e-92b2-4512-a0bc-d2888c661f61",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9b7c5f6e-92b2-4512-a0bc-d2888c661f61",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9b7c5f6e-92b2-4512-a0bc-d2888c661f61",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9b7c5f6e-92b2-4512-a0bc-d2888c661f61",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9e2303a5-36ac-44bf-9254-4dbbc18560e4",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9e2303a5-36ac-44bf-9254-4dbbc18560e4",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9f7393d5-cfa8-487f-80d6-bcf2daf35c0e",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "9f7393d5-cfa8-487f-80d6-bcf2daf35c0e",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a2513e22-e425-4205-ab7b-33b4e72605e5",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a2513e22-e425-4205-ab7b-33b4e72605e5",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a2513e22-e425-4205-ab7b-33b4e72605e5",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a484465d-76e0-4dc7-b1f8-b0665d441c13",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a484465d-76e0-4dc7-b1f8-b0665d441c13",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a52f5f18-4923-4d83-8819-e664abfb0bb2",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a52f5f18-4923-4d83-8819-e664abfb0bb2",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a6208e22-220d-42aa-b3c8-8b89f690f739",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a6208e22-220d-42aa-b3c8-8b89f690f739",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a700878f-0b38-4c4b-b556-a5f8822525fa",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a700878f-0b38-4c4b-b556-a5f8822525fa",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a700878f-0b38-4c4b-b556-a5f8822525fa",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a7dbc113-3051-4541-865a-ab6d4eb3be3e",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a7dbc113-3051-4541-865a-ab6d4eb3be3e",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a961479b-aa6f-4caa-9aa1-c428771276fd",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "a961479b-aa6f-4caa-9aa1-c428771276fd",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b07a8db1-d09a-402b-b073-a32e9b94a9a9",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b07a8db1-d09a-402b-b073-a32e9b94a9a9",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b07a8db1-d09a-402b-b073-a32e9b94a9a9",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b07a8db1-d09a-402b-b073-a32e9b94a9a9",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b5620180-83f6-4a3f-89dd-67647e489e7c",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b5620180-83f6-4a3f-89dd-67647e489e7c",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b684904c-4a2c-4a0d-a32e-12d6a6f6be36",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b684904c-4a2c-4a0d-a32e-12d6a6f6be36",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b6e53a65-1f54-469b-80ff-22227db5baf9",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b6e53a65-1f54-469b-80ff-22227db5baf9",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "b6e53a65-1f54-469b-80ff-22227db5baf9",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "ba03effb-0afd-455d-a441-bf786a449051",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "ba03effb-0afd-455d-a441-bf786a449051",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "bbcc877f-c709-464a-b279-6d1e8a9e8e00",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "bbcc877f-c709-464a-b279-6d1e8a9e8e00",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "bbcc877f-c709-464a-b279-6d1e8a9e8e00",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "c1c9eec5-f24f-4cdd-9b33-a7ef1c840713",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "c1c9eec5-f24f-4cdd-9b33-a7ef1c840713",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "c9589ee2-df7d-4ebd-925d-0feb305fb5f4",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "c9589ee2-df7d-4ebd-925d-0feb305fb5f4",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "cb93f731-3bde-4467-9977-af6b4cbdc6f4",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "cb93f731-3bde-4467-9977-af6b4cbdc6f4",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d0655239-1236-4587-a20b-cc7de8a0accb",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d0655239-1236-4587-a20b-cc7de8a0accb",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d1d1fbb9-bb12-4426-a506-49ca316609fe",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d1d1fbb9-bb12-4426-a506-49ca316609fe",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d2fa6486-c212-45c1-8e17-7b12abefca37",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d2fa6486-c212-45c1-8e17-7b12abefca37",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d5f5fcaf-6331-4213-a724-815637c8601d",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d5f5fcaf-6331-4213-a724-815637c8601d",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d5f5fcaf-6331-4213-a724-815637c8601d",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d5f5fcaf-6331-4213-a724-815637c8601d",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d763efc2-2fdc-4402-ac82-f32973e8a4b2",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d763efc2-2fdc-4402-ac82-f32973e8a4b2",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d880c9dc-73cf-463e-b843-dc20b5cdeddd",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d880c9dc-73cf-463e-b843-dc20b5cdeddd",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d880c9dc-73cf-463e-b843-dc20b5cdeddd",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d880c9dc-73cf-463e-b843-dc20b5cdeddd",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d880c9dc-73cf-463e-b843-dc20b5cdeddd",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "d880c9dc-73cf-463e-b843-dc20b5cdeddd",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "dcfc100a-3511-47ee-b2ee-6cd75b3b09b9",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "dcfc100a-3511-47ee-b2ee-6cd75b3b09b9",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "dcfc100a-3511-47ee-b2ee-6cd75b3b09b9",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "dd734b6b-a95e-4c52-9166-efeda8a8e6b9",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "dd734b6b-a95e-4c52-9166-efeda8a8e6b9",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e571f6a0-1a12-454d-8acc-bc5dfa3a4486",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e571f6a0-1a12-454d-8acc-bc5dfa3a4486",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e571f6a0-1a12-454d-8acc-bc5dfa3a4486",
+      "family": "telefon",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e571f6a0-1a12-454d-8acc-bc5dfa3a4486",
+      "family": "web_sitesi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e571f6a0-1a12-454d-8acc-bc5dfa3a4486",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e571f6a0-1a12-454d-8acc-bc5dfa3a4486",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e838c8a1-9723-4b61-8f46-3a9addedf7cd",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e838c8a1-9723-4b61-8f46-3a9addedf7cd",
+      "family": "wifi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "e838c8a1-9723-4b61-8f46-3a9addedf7cd",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "eb34c255-3a63-4cd3-b6be-2edb4da221dc",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "eb34c255-3a63-4cd3-b6be-2edb4da221dc",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "ecbfcd81-edcb-414e-816e-6a0d7cbc27fc",
+      "family": "adres",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "ecbfcd81-edcb-414e-816e-6a0d7cbc27fc",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "ecbfcd81-edcb-414e-816e-6a0d7cbc27fc",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "f10b95f0-df9b-4a02-86c4-e4d79ecaf031",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "f10b95f0-df9b-4a02-86c4-e4d79ecaf031",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "f23231ab-806b-4e1f-8bf8-917a77da4cea",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "f23231ab-806b-4e1f-8bf8-917a77da4cea",
+      "family": "tekerlekli_sandalye_erisimi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "f23231ab-806b-4e1f-8bf8-917a77da4cea",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "fab9050f-364f-49b8-b3c0-b1866fca0154",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "fab9050f-364f-49b8-b3c0-b1866fca0154",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "fb4f6229-3dc9-4f48-a02e-38a8086d690b",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "fb4f6229-3dc9-4f48-a02e-38a8086d690b",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "fde68226-6954-4ba3-b76e-9993b893a2e3",
+      "family": "amac_destegi",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence",
+          "subjective_gate_uncalibrated"
+        ],
+        "automatic_publication": false
+      }
+    },
+    {
+      "branch_id": "fde68226-6954-4ba3-b76e-9993b893a2e3",
+      "family": "yer_turu",
+      "supporting_observation_count": 1,
+      "counter_observation_count": 0,
+      "unique_evidence_count": 1,
+      "source_diversity": 1,
+      "date_range": null,
+      "freshness": "unknown",
+      "conflict_level": "none",
+      "counter_share": 0.0,
+      "branch_confidence": "unknown",
+      "rights_status": "allowed",
+      "verified_evidence_count": 0,
+      "promotion_gate": {
+        "admin_review_eligible": false,
+        "reasons": [
+          "branch_unverified",
+          "freshness_unverified",
+          "no_verified_evidence"
+        ],
+        "automatic_publication": false
+      }
+    }
+  ],
+  "aggregate_distribution": {
+    "groups": 209,
+    "source_diversity": {
+      "1": 209
+    },
+    "supporting_count": {
+      "2": 3,
+      "1": 206
+    },
+    "promotion_reasons": {
+      "branch_unverified": 209,
+      "freshness_unverified": 209,
+      "no_verified_evidence": 209,
+      "subjective_gate_uncalibrated": 80
+    },
+    "eligible": 0,
+    "evidence_roles": {
+      "supporting": 212
+    }
+  },
+  "review_rights": {
+    "source": "google_maps",
+    "reviews": 19609,
+    "policy_present": false,
+    "processing_run": false,
+    "blocked_before_model": true,
+    "new_aday_gozlem": 0,
+    "new_claim_candidate": 0
+  },
+  "canonical_district": {
+    "total": 1719,
+    "canonical": 26,
+    "text": 27,
+    "coordinates": 1719
+  }
+}

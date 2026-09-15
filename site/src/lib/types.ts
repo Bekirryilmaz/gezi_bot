@@ -288,7 +288,19 @@ export type KesfetCevabi = {
   trace_reference: string | null;
 };
 
-export type BugunAmaci = "kahve_icmek" | "yemek_yemek" | "tarihi_kulturel_ziyaret";
+export type BugunAmaci =
+  | "kahve_icmek"
+  | "yemek_yemek"
+  | "tatli_yemek"
+  | "kahvalti_yapmak"
+  | "eglence"
+  | "gezme"
+  | "tarihi_kulturel_ziyaret"
+  | "acik_hava"
+  | "calisma"
+  | "birlikte_vakit"
+  | "aileyle_vakit"
+  | "cocukla_aktivite";
 
 export type BugunNeYapalimTalebi = {
   serbest_metin?: string | null;
@@ -310,6 +322,23 @@ export type BugunNeYapalimTalebi = {
 export type BugunNeYapalimCevabi = {
   durum: "clarification" | "success" | "empty" | "insufficient";
   anlasilan_ihtiyac_ozeti: string;
+  anlasilan_ihtiyac: {
+    kisi_baglami: string | null;
+    ana_amac: BugunAmaci | null;
+    alt_amaclar: BugunAmaci[];
+    aktiviteler: string[];
+    ziyaret_baglamlari: string[];
+    sehir: string;
+    ilce: string | null;
+    zaman: string | null;
+    ulasim: string | null;
+    butce_ust_siniri: number | null;
+    zorunlu_kosullar: string[];
+    tercihler: string[];
+    desteklenmeyen_istekler: string[];
+  };
+  durum_aciklamasi: string;
+  dogrulanamayan_ihtiyaclar: string[];
   netlestirme: {
     soru: string;
     alan: "amac";

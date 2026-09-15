@@ -149,7 +149,7 @@ p {
 }
 
 .site-header {
-  background: color-mix(in oklab, var(--kagit) 92%, transparent);
+  background: var(--kagit);
   border-bottom: 1px solid var(--cizgi);
 }
 
@@ -165,7 +165,7 @@ p {
 
 @keyframes header-zemin {
   to {
-    background: color-mix(in oklab, var(--kagit) 92%, transparent);
+    background: var(--kagit);
     border-bottom-color: var(--cizgi);
   }
 }

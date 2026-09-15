@@ -146,7 +146,7 @@ export default function ScrollHero() {
     <section ref={sectionRef} className="relative h-[350vh] md:h-[450vh]">
       <div className="sticky top-0 h-screen overflow-hidden bg-black">
         <img
-          src="/hero/kapak-masaustu.webp"
+          src="/hero/sequence/frame_0001.webp"
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />

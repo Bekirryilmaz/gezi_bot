@@ -9,7 +9,7 @@ test("Bugün Ne Yapalım gerçek sonuçtan detaya ve korunmuş bağlama döner",
     .getByLabel("Bugün için ihtiyacın")
     .fill("Samsun'da bugün kahve içmek istiyorum.");
   await alan.getByRole("button", { name: "Bugün için seçenek bul" }).click();
-  await expect(alan.getByText("Anlaşılan ihtiyaç", { exact: true })).toBeVisible();
+  await expect(alan.getByText("Şunu anladım:", { exact: true })).toBeVisible();
   await expect(
     alan.getByRole("heading", { name: "Bugün için hedefli seçenekler" }),
   ).toBeVisible();
@@ -39,10 +39,12 @@ test("yetersiz doğal dil yalnız bir netleştirme sorar ve klavyeyle tamamlanı
   const gonder = alan.getByRole("button", { name: "Bugün için seçenek bul" });
   await gonder.focus();
   await page.keyboard.press("Enter");
-  await expect(alan.getByText("Ne yapmak istiyorsun?", { exact: true })).toBeVisible();
+  await expect(
+    alan.getByText("Nasıl bir şey düşünüyorsunuz?", { exact: true }),
+  ).toBeVisible();
   await alan.getByRole("button", { name: "Kahve içmek" }).focus();
   await page.keyboard.press("Enter");
-  await expect(alan.getByText("Anlaşılan ihtiyaç", { exact: true })).toBeVisible();
+  await expect(alan.getByText("Şunu anladım:", { exact: true })).toBeVisible();
   await expect(alan).toHaveCSS("overflow-x", "visible");
 });
 

@@ -466,7 +466,34 @@ export function AdminPaneli() {
                   Etkilenen alanlar:{" "}
                   {claim.yayin_onizleme.etkilenen_public_alanlar.join(", ")}
                 </p>
+                <dl className="bg-kopuk mt-3 grid gap-3 rounded p-3 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt className="font-semibold">Şube</dt>
+                    <dd className="break-all">{claim.sube_id}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-semibold">Gözlem</dt>
+                    <dd>
+                      {claim.kanit_ozeti.observation_sayisi} toplam ·{" "}
+                      {claim.kanit_ozeti.supporting_sayisi} destek ·{" "}
+                      {claim.kanit_ozeti.counter_sayisi} karşı
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="font-semibold">Tarih aralığı</dt>
+                    <dd>
+                      {claim.kanit_ozeti.ilk_tarih ?? "bilinmiyor"} —{" "}
+                      {claim.kanit_ozeti.son_tarih ?? "bilinmiyor"}
+                    </dd>
+                  </div>
+                </dl>
                 <div className="bg-sis mt-3 grid gap-2 rounded p-3 text-xs">
+                  <div>
+                    <strong>Kaynak hakları</strong>
+                    <pre className="mt-1 overflow-auto whitespace-pre-wrap">
+                      {JSON.stringify(claim.kaynak_haklari, null, 2)}
+                    </pre>
+                  </div>
                   <div>
                     <strong>Public önizleme</strong>
                     <pre className="mt-1 overflow-auto whitespace-pre-wrap">

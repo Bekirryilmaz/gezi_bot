@@ -35,6 +35,7 @@ from sunucu.arama.semalar import (
     TurSecenegiSemasi,
 )
 from sunucu.bilgi.domain import BilgiDurumu
+from sunucu.bugun_ne_yapalim.gelistirme_izi import iz_artir, iz_guncelle
 from sunucu.karar_motoru.domain import KosulDurumu
 from sunucu.karar_motoru.semalar import CografiBaglamSemasi, TercihSemasi, ZorunluKosulSemasi
 from sunucu.veritabani.arama_modelleri import Ilce
@@ -295,7 +296,7 @@ def ara(
         .join(Sube, Sube.legacy_yer_id == Yer.id)
         .join(YerKimligi, YerKimligi.id == Sube.yer_kimligi_id)
         .outerjoin(Ilce, Ilce.id == Yer.ilce_id)
-        .join(yer_yayini, and_(yer_yayini.nesne_turu == "yer", yer_yayini.nesne_id == Yer.id))
+        .outerjoin(yer_yayini, and_(yer_yayini.nesne_turu == "yer", yer_yayini.nesne_id == Yer.id))
         .where(
             Yer.sehir_id == sehir.id,
             Sube.durum == "aktif",
@@ -318,7 +319,19 @@ def ara(
             metin_kosullari.append(Yer.arama_isim.op("%") (ad_sorgusu))
         sorgu = sorgu.where(or_(*metin_kosullari))
 
+    if oturum.info.get("faz25_trace") is not None:
+        iz_guncelle(oturum, search_candidate_count=oturum.scalar(
+            sorgu.with_only_columns(func.count(func.distinct(Yer.id)))
+        ))
+    if ilce is not None:
+        sorgu = sorgu.where(Yer.ilce_id == ilce.id)
+    if oturum.info.get("faz25_trace") is not None:
+        iz_guncelle(oturum, geographic_filtered_count=oturum.scalar(
+            sorgu.with_only_columns(func.count(func.distinct(Yer.id)))
+        ))
+    sorgu = sorgu.where(*_kamusal_kosullar(yer_yayini, KullanimTuru.ARAMA))
     satirlar = oturum.execute(sorgu).all()
+    iz_guncelle(oturum, publication_eligible_count=len(satirlar))
     kosul_kodlari = list(dict.fromkeys([*zorunlu_kosullar, *tercihler]))
     durumlar = _claim_durumlari(oturum, [str(s.Sube.id) for s in satirlar], kosul_kodlari)
     adaylar: list[_Aday] = []
@@ -329,8 +342,10 @@ def ara(
         hard = [aday_durumlari[kod] for kod in zorunlu_kosullar]
         if any(durum is KosulDurumu.DEGERLENDIRILEMIYOR for durum in hard):
             degerlendirilemeyen += 1
+            iz_artir(oturum, "unknown_critical_count")
             continue
         if any(durum is KosulDurumu.UYGUN_DEGIL for durum in hard):
+            iz_artir(oturum, "hard_constraint_rejected_count")
             continue
         if not ad_sorgusu:
             sonuc_turu, neden = AramaSonucuTuru.BAGLAMSAL_ADAY, EslesmeNedeni.BAGLAM

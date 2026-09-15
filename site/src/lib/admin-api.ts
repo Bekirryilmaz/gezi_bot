@@ -69,6 +69,14 @@ export type ClaimInceleme = {
   surum: Record<string, unknown> | null;
   supporting_evidence: Array<Record<string, unknown>>;
   counter_evidence: Array<Record<string, unknown>>;
+  kanit_ozeti: {
+    observation_sayisi: number;
+    supporting_sayisi: number;
+    counter_sayisi: number;
+    ilk_tarih: string | null;
+    son_tarih: string | null;
+  };
+  kaynak_haklari: Array<Record<string, unknown>>;
   yayin_onizleme: {
     durum: string;
     neden_kodlari: string[];

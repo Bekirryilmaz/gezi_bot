@@ -77,13 +77,17 @@ def tum_ham_yerleri_yukle(sehir_anahtari: str, sessiz: bool = False) -> dict[Ver
     return sonuc
 
 
-def tum_ham_yorumlari_yukle(sehir_anahtari: str, sessiz: bool = False) -> dict[VeriKaynagi, list[HamYorum]]:
+def tum_ham_yorumlari_yukle(
+    sehir_anahtari: str, sessiz: bool = False, *, kaynaklar: set[VeriKaynagi] | None = None
+) -> dict[VeriKaynagi, list[HamYorum]]:
     """veri/cikti/ham/<kaynak>/ altindaki, bu sehre ait TUM HamYorum
     kayitlarini kaynak bazinda gruplu olarak okur."""
     ham_kok = _ham_kok()
     sonuc: dict[VeriKaynagi, list[HamYorum]] = {}
 
     for kaynak, desen_sablonu in _YORUM_DOSYA_DESENLERI.items():
+        if kaynaklar is not None and kaynak not in kaynaklar:
+            continue
         klasor = ham_kok / KAYNAK_KLASORLERI[kaynak]
         if not klasor.exists():
             continue

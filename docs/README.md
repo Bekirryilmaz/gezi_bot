@@ -127,3 +127,11 @@ docs altındaki bütün yeni ürün ve geliştirme belgeleri; klasör sahipliği
 ## Design System sonrası güncel okuma kaydı
 
 [10 Design System](./03-design/10-design-system.md) yalnız proje deposundaki docs/03-design altında oluşturulmuştur. Bütün istenen referanslar okunmuş; 00–09 değiştirilmemiştir. README bağlantıları ve bu dizin güncellenmiştir. Sonraki tasarım çalışmalarında sayısal başlangıç değerleri araştırma bulgusu sayılmadan, belgedeki kabul senaryolarıyla doğrulanmalıdır. Bu görev kod, ekran, commit veya push üretmemiştir; Documents altında dosya oluşturulmamıştır.
+
+## FAZ 25.1 development kurtarma ölçümleri — 15 Eylül 2026
+
+- [faz25-1-kurtarma-sonuc.md](./01-research/faz25-1-kurtarma-sonuc.md)
+- [faz25-1-oneri-gold.md](./01-research/faz25-1-oneri-gold.md)
+- [faz25-1-promotion-veri-stratejisi.md](./01-research/faz25-1-promotion-veri-stratejisi.md)
+
+Canlı doğrulamalar ve teknik ölçümler kayıtlıdır; kaynak hakları/coğrafi veri/saha gold bağımlılıkları nedeniyle ürün geçişi NO-GO.

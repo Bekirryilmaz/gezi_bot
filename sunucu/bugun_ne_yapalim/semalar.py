@@ -7,7 +7,20 @@ from pydantic import BaseModel, ConfigDict, Field
 from sunucu.karar_motoru.semalar import KararBaglamiSemasi
 from sunucu.kesfet.semalar import KesfetDegerlendirmeCevabi
 
-Amac = Literal["kahve_icmek", "yemek_yemek", "tarihi_kulturel_ziyaret"]
+Amac = Literal[
+    "kahve_icmek",
+    "yemek_yemek",
+    "tatli_yemek",
+    "kahvalti_yapmak",
+    "eglence",
+    "gezme",
+    "tarihi_kulturel_ziyaret",
+    "acik_hava",
+    "calisma",
+    "birlikte_vakit",
+    "aileyle_vakit",
+    "cocukla_aktivite",
+]
 
 
 class BugunNiyetiSemasi(BaseModel):
@@ -52,9 +65,28 @@ class BugunBaglamiSemasi(BaseModel):
     aciklik_aciklamasi: str
 
 
+class AnlasilanIhtiyacSemasi(BaseModel):
+    kisi_baglami: str | None = None
+    ana_amac: Amac | None = None
+    alt_amaclar: list[Amac] = Field(default_factory=list)
+    aktiviteler: list[str] = Field(default_factory=list)
+    ziyaret_baglamlari: list[str] = Field(default_factory=list)
+    sehir: str
+    ilce: str | None = None
+    zaman: str | None = None
+    ulasim: str | None = None
+    butce_ust_siniri: float | None = None
+    zorunlu_kosullar: list[str] = Field(default_factory=list)
+    tercihler: list[str] = Field(default_factory=list)
+    desteklenmeyen_istekler: list[str] = Field(default_factory=list)
+
+
 class BugunNeYapalimCevabi(BaseModel):
     durum: Literal["clarification", "success", "empty", "insufficient"]
     anlasilan_ihtiyac_ozeti: str
+    anlasilan_ihtiyac: AnlasilanIhtiyacSemasi
+    durum_aciklamasi: str
+    dogrulanamayan_ihtiyaclar: list[str] = Field(default_factory=list)
     netlestirme: NetlestirmeSemasi | None = None
     baglam: KararBaglamiSemasi
     bugun_baglami: BugunBaglamiSemasi

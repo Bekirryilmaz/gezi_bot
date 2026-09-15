@@ -10,6 +10,13 @@ from sqlalchemy.orm import Session
 
 from sunucu.arama.domain import SOMUT_KOSULLAR
 from sunucu.arama.normalizasyon import turkce_arama_normalize
+from sunucu.bugun_ne_yapalim.gelistirme_izi import gelistirme_izi, iz_guncelle
+from sunucu.bugun_ne_yapalim.intent import (
+    AMAC_ETIKETLERI,
+    AMAC_SORGULARI,
+    KARARDA_DESTEKLENEN_AMACLAR,
+    metni_coz,
+)
 from sunucu.bugun_ne_yapalim.semalar import (
     BugunBaglamiSemasi,
     BugunNeYapalimCevabi,
@@ -33,21 +40,36 @@ from sunucu.veritabani.arama_modelleri import Ilce
 from sunucu.veritabani.modeller import Sehir
 
 ISTANBUL = ZoneInfo("Europe/Istanbul")
-AMAC_ETIKETLERI = {
-    "kahve_icmek": "kahve içmek",
-    "yemek_yemek": "yemek yemek",
-    "tarihi_kulturel_ziyaret": "tarih-kültür ziyareti",
+KISI_ETIKETLERI = {
+    "partner": "partnerinle",
+    "aile": "ailenle",
+    "arkadaslar": "arkadaşlarınla",
+    "cocuklar": "çocuklarla",
+    "yalniz": "tek başına",
 }
-AMAC_SORGULARI = {
-    "kahve_icmek": "kafe",
-    "yemek_yemek": "yeme içme",
-    "tarihi_kulturel_ziyaret": "tarih ve kültür",
+ISTEK_ETIKETLERI = {
+    **AMAC_ETIKETLERI,
+    "sohbet_uygunlugu": "sohbet için uygunluk",
+    "sessiz_ortam": "sakinlik / ses düzeyi",
+    "manzara": "manzara",
+    "uygun_fiyat": "fiyat düzeyi",
+    "yakinda": "yakınlık",
+    "aile_uygunlugu": "aileyle kullanım",
+    "cocuk_uygunlugu": "çocuklarla kullanım",
+    "calisma_uygunlugu": "çalışma / laptop uygunluğu",
+    "acik_hava": "açık hava alanı",
+    "canli_muzik": "canlı müzik",
+    "rezervasyon": "rezervasyon",
+    "muze_turu": "müze olarak ziyaret edilebilmesi",
 }
 
 
 @dataclass(frozen=True)
 class CozulmusNiyet:
     amac: str | None
+    alt_amaclar: tuple[str, ...]
+    aktiviteler: tuple[str, ...]
+    ziyaret_baglamlari: tuple[str, ...]
     ilce: str | None
     kisi_baglami: str | None
     istenen_zaman: str | None
@@ -56,18 +78,9 @@ class CozulmusNiyet:
     butce_ust_siniri: float | None
     zorunlu_kosullar: tuple[str, ...]
     tercihler: tuple[str, ...]
-
-
-def _amac_bul(metin: str) -> str | None:
-    eslesmeler = (
-        ("kahve_icmek", ("kahve", "kafe", "cafe")),
-        ("yemek_yemek", ("yemek", "restoran", "lokanta", "kahvalti")),
-        ("tarihi_kulturel_ziyaret", ("tarih", "muze", "kultur", "anit")),
-    )
-    bulunan = [
-        amac for amac, kelimeler in eslesmeler if any(kelime in metin for kelime in kelimeler)
-    ]
-    return bulunan[0] if len(bulunan) == 1 else None
+    desteklenmeyen_istekler: tuple[str, ...]
+    normalize_edilmis_input: str
+    celisen_niyet: bool
 
 
 def _sure_bul(metin: str) -> int | None:
@@ -87,6 +100,7 @@ def _butce_bul(metin: str) -> float | None:
 
 def _coz(talep: BugunNeYapalimTalebi, ilceler: list[Ilce]) -> CozulmusNiyet:
     metin = turkce_arama_normalize(talep.serbest_metin or "")
+    dil = metni_coz(talep.serbest_metin or "")
     yapisal = talep.niyet
     ilce = yapisal.ilce
     if not ilce:
@@ -95,35 +109,11 @@ def _coz(talep: BugunNeYapalimTalebi, ilceler: list[Ilce]) -> CozulmusNiyet:
         )
     zorunlu = list(dict.fromkeys(yapisal.zorunlu_kosullar))
     tercihler = list(dict.fromkeys(yapisal.tercihler))
-    wifi_geciyor = "wifi" in metin or "wi fi" in metin
-    if wifi_geciyor and any(k in metin for k in ("kesin", "sart", "zorunlu", "mutlaka")):
-        zorunlu.append("wifi")
-    elif wifi_geciyor:
-        tercihler.append("wifi")
-    if "sakin" in metin or "sessiz" in metin:
-        tercihler.append("sessiz_ortam")
-    if "otopark" in metin:
-        hedef = (
-            zorunlu
-            if any(k in metin for k in ("kesin", "sart", "zorunlu", "mutlaka"))
-            else tercihler
-        )
-        hedef.append("otopark")
+    zorunlu.extend(dil["zorunlu_kosullar"])
+    tercihler.extend(dil["tercihler"])
     kisi = yapisal.kisi_baglami
     if not kisi:
-        kisi = next(
-            (
-                etiket
-                for anahtar, etiket in (
-                    ("arkadas", "arkadaşlarla"),
-                    ("esim", "eşimle"),
-                    ("cocuk", "çocuklarla"),
-                    ("tek bas", "tek başıma"),
-                )
-                if anahtar in metin
-            ),
-            None,
-        )
+        kisi = dil["kisi_baglami"]
     zaman = yapisal.istenen_zaman
     if not zaman:
         zaman = "bu akşam" if "bu aksam" in metin else "şimdi" if "simdi" in metin else "bugün"
@@ -137,13 +127,18 @@ def _coz(talep: BugunNeYapalimTalebi, ilceler: list[Ilce]) -> CozulmusNiyet:
                     ("toplu tasima", "toplu taşıma"),
                     ("bisiklet", "bisiklet"),
                     ("arabay", "otomobil"),
+                    ("arabamiz yok", "araçsız"),
+                    ("arabam yok", "araçsız"),
                 )
                 if anahtar in metin
             ),
             None,
         )
     return CozulmusNiyet(
-        amac=yapisal.amac or _amac_bul(metin),
+        amac=yapisal.amac or dil["ana_amac"],
+        alt_amaclar=tuple(dil["alt_amaclar"]),
+        aktiviteler=tuple(dil["aktiviteler"]),
+        ziyaret_baglamlari=tuple(dil["ziyaret_baglamlari"]),
         ilce=ilce,
         kisi_baglami=kisi,
         istenen_zaman=zaman,
@@ -154,15 +149,19 @@ def _coz(talep: BugunNeYapalimTalebi, ilceler: list[Ilce]) -> CozulmusNiyet:
         else _butce_bul(metin),
         zorunlu_kosullar=tuple(dict.fromkeys(zorunlu)),
         tercihler=tuple(dict.fromkeys(tercihler)),
+        desteklenmeyen_istekler=tuple(dil["desteklenmeyen_istekler"]),
+        normalize_edilmis_input=str(dil["normalize_edilmis_input"]),
+        celisen_niyet=bool(dil["celisen_niyet"]),
     )
 
 
 def _ozet(sehir: str, niyet: CozulmusNiyet) -> str:
     parcalar = [niyet.ilce or sehir]
+    if niyet.kisi_baglami:
+        parcalar.append(KISI_ETIKETLERI.get(niyet.kisi_baglami, niyet.kisi_baglami))
     if niyet.amac:
         parcalar.append(AMAC_ETIKETLERI[niyet.amac])
-    if niyet.kisi_baglami:
-        parcalar.append(niyet.kisi_baglami)
+    parcalar.extend(a.replace("_", " ") for a in niyet.aktiviteler)
     if niyet.istenen_zaman:
         parcalar.append(niyet.istenen_zaman)
     if niyet.sure_dakika:
@@ -182,6 +181,40 @@ def _ozet(sehir: str, niyet: CozulmusNiyet) -> str:
     return "Şunu anladım: " + ", ".join(parcalar) + "."
 
 
+def _anlasilan_ihtiyac(sehir: str, niyet: CozulmusNiyet) -> dict[str, object]:
+    return {
+        "kisi_baglami": niyet.kisi_baglami,
+        "ana_amac": niyet.amac,
+        "alt_amaclar": list(niyet.alt_amaclar),
+        "aktiviteler": list(niyet.aktiviteler),
+        "ziyaret_baglamlari": list(niyet.ziyaret_baglamlari),
+        "sehir": sehir,
+        "ilce": niyet.ilce,
+        "zaman": niyet.istenen_zaman,
+        "ulasim": niyet.ulasim_bicimi,
+        "butce_ust_siniri": niyet.butce_ust_siniri,
+        "zorunlu_kosullar": list(niyet.zorunlu_kosullar),
+        "tercihler": list(niyet.tercihler),
+        "desteklenmeyen_istekler": list(niyet.desteklenmeyen_istekler),
+    }
+
+
+def _dogrulanamayanlar(niyet: CozulmusNiyet) -> list[str]:
+    bilinmeyenler = [
+        ISTEK_ETIKETLERI.get(kod, kod.replace("_", " ")) for kod in niyet.desteklenmeyen_istekler
+    ]
+    if any(
+        alt not in {"gezme", "birlikte_vakit", "aileyle_vakit"}
+        and not (niyet.amac == "calisma" and alt == "kahve_icmek")
+        for alt in niyet.alt_amaclar
+    ):
+        bilinmeyenler.append("Birden fazla etkinliğin aynı planda birleştirilmesi")
+    if niyet.butce_ust_siniri is not None:
+        bilinmeyenler.append("Güncel fiyatın bütçe sınırını karşılaması")
+    return bilinmeyenler
+
+
+@gelistirme_izi
 def bugun_ne_yapalim(
     oturum: Session,
     talep: BugunNeYapalimTalebi,
@@ -228,21 +261,30 @@ def bugun_ne_yapalim(
         saat_dilimi="Europe/Istanbul",
         ziyaret_tarihi=an.date().isoformat(),
         aciklik_aciklamasi=(
-            "Bu pilot kapsamda güvenilir çalışma saati claim'i yok; "
-            "'şu an açık' sonucu üretmiyoruz."
+            "Güncel çalışma saatlerini doğrulayamadığımız için "
+            "şu an açık olduğunu söyleyemiyoruz."
         ),
     )
     ozet = _ozet(sehir.isim, niyet)
-    if niyet.amac is None:
+    anlasilan = _anlasilan_ihtiyac(sehir.isim, niyet)
+    iz_guncelle(oturum, parsed_intent=anlasilan)
+    dogrulanamayanlar = _dogrulanamayanlar(niyet)
+    if niyet.amac is None or niyet.celisen_niyet:
         return BugunNeYapalimCevabi(
             durum="clarification",
             anlasilan_ihtiyac_ozeti=ozet,
+            anlasilan_ihtiyac=anlasilan,
+            durum_aciklamasi=(
+                "Niyetin bir bölümünü anladık; sonucu gerçekten değiştirecek "
+                "tek noktayı netleştirelim."
+            ),
+            dogrulanamayan_ihtiyaclar=dogrulanamayanlar,
             netlestirme=NetlestirmeSemasi(
-                soru="Ne yapmak istiyorsun?",
+                soru="Nasıl bir şey düşünüyorsunuz?",
                 alan="amac",
                 secenekler=[
-                    {"deger": kod, "etiket": etiket.capitalize()}
-                    for kod, etiket in AMAC_ETIKETLERI.items()
+                    {"deger": kod, "etiket": AMAC_ETIKETLERI[kod].capitalize()}
+                    for kod in ("kahve_icmek", "yemek_yemek", "gezme", "eglence")
                 ],
             ),
             baglam=baglam,
@@ -250,13 +292,20 @@ def bugun_ne_yapalim(
         )
     sorgu = AMAC_SORGULARI[niyet.amac]
     desteklenmeyen = [kod for kod in niyet.zorunlu_kosullar if kod not in SOMUT_KOSULLAR]
-    if desteklenmeyen or niyet.butce_ust_siniri is not None:
+    amac_desteklenmiyor = niyet.amac not in KARARDA_DESTEKLENEN_AMACLAR
+    if desteklenmeyen or niyet.butce_ust_siniri is not None or amac_desteklenmiyor:
         nedenler = []
         if desteklenmeyen:
-            etiketler = ", ".join(kod.replace("_", " ") for kod in desteklenmeyen)
-            nedenler.append(f"{etiketler} için yayımlanmış bir claim sözleşmemiz yok")
+            etiketler = ", ".join(
+                ISTEK_ETIKETLERI.get(kod, kod.replace("_", " ")) for kod in desteklenmeyen
+            )
+            nedenler.append(f"{etiketler} konusunda henüz yeterli doğrulanmış bilgimiz yok")
         if niyet.butce_ust_siniri is not None:
-            nedenler.append("bütçe sınırını doğrulayacak yayımlanmış fiyat claim'i yok")
+            nedenler.append("bütçe sınırını karşılaştırabileceğimiz güncel fiyat bilgisi yok")
+        if amac_desteklenmiyor:
+            nedenler.append(
+                f"{AMAC_ETIKETLERI[niyet.amac]} için henüz yeterli doğrulanmış bilgimiz yok"
+            )
         kesfet = KesfetDegerlendirmeCevabi(
             durum="insufficient",
             secenekler=[],
@@ -268,6 +317,12 @@ def bugun_ne_yapalim(
         return BugunNeYapalimCevabi(
             durum="insufficient",
             anlasilan_ihtiyac_ozeti=ozet,
+            anlasilan_ihtiyac=anlasilan,
+            durum_aciklamasi=(
+                "Ne aradığını anladık; ancak bu ihtiyacı güvenilir biçimde "
+                "değerlendirecek doğrulanmış bilgi henüz yeterli değil."
+            ),
+            dogrulanamayan_ihtiyaclar=dogrulanamayanlar,
             baglam=baglam,
             bugun_baglami=bugun,
             kesfet=kesfet,
@@ -284,9 +339,23 @@ def bugun_ne_yapalim(
         request_id=request_id,
         giris_kanali="bugun_ne_yapalim",
     )
+    if not kesfet.secenekler and kesfet.degerlendirilemeyen_aday_sayisi:
+        dogrulanamayanlar.extend(SOMUT_KOSULLAR[kod].etiket for kod in zorunlu)
+    for secenek in kesfet.secenekler:
+        for gerekce in (*secenek.karar_sonucu.bilinmeyenler, *secenek.karar_sonucu.onemli_odunler):
+            if gerekce.kod == "tercih_bilinmiyor" and gerekce.ilgili_kosul in SOMUT_KOSULLAR:
+                dogrulanamayanlar.append(SOMUT_KOSULLAR[gerekce.ilgili_kosul].etiket)
+    dogrulanamayanlar = list(dict.fromkeys(dogrulanamayanlar))
     return BugunNeYapalimCevabi(
         durum=kesfet.durum,
         anlasilan_ihtiyac_ozeti=ozet,
+        anlasilan_ihtiyac=anlasilan,
+        durum_aciklamasi=(
+            "Niyetini anladık ve doğrulayabildiğimiz kısmıyla seçenekleri değerlendirdik."
+            if kesfet.secenekler
+            else "Niyetini anladık; doğrulanmış aday kapsamımız bu istek için yeterli değil."
+        ),
+        dogrulanamayan_ihtiyaclar=dogrulanamayanlar,
         baglam=baglam,
         bugun_baglami=bugun,
         kesfet=kesfet,

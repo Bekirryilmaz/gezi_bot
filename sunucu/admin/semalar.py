@@ -68,6 +68,8 @@ class ClaimIncelemeCevabi(BaseModel):
     surum: dict[str, Any] | None
     supporting_evidence: list[dict[str, Any]]
     counter_evidence: list[dict[str, Any]]
+    kanit_ozeti: dict[str, Any]
+    kaynak_haklari: list[dict[str, Any]]
     yayin_onizleme: dict[str, Any]
     public_preview: dict[str, Any]
 

@@ -200,8 +200,8 @@ def _temel_alanlari_guncelle(yer: Yer, birlesik_yer: BirlesikYer) -> None:
 def _canonical_ilceyi_bagla(oturum: Session, yer: Yer) -> None:
     """Serbest metni yalniz ayni sehirde tam normalize eslesme varsa baglar."""
     normalize_ilce = turkce_arama_normalize(yer.ilce)
-    yer.ilce_id = None
     if not normalize_ilce:
+        # Eksik yeni kaynak metni, mevcut canonical bagi silmez.
         return
     ilce = (
         oturum.query(Ilce)

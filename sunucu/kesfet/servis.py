@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sunucu.arama.domain import AramaSonucuTuru, SOMUT_KOSULLAR
 from sunucu.arama.semalar import AramaSonucuSemasi
 from sunucu.arama.servis import ara
+from sunucu.bugun_ne_yapalim.gelistirme_izi import iz_artir, iz_guncelle
 from sunucu.karar_motoru.domain import KararSonucu, KosulDurumu, NedenKodu
 from sunucu.karar_motoru.semalar import KararSonucuSemasi
 from sunucu.karar_motoru.servis import kararlari_degerlendir
@@ -105,11 +106,11 @@ def kesfet_degerlendir(
     ][:5]
     if not yer_sonuclari:
         return KesfetDegerlendirmeCevabi(
-            durum="empty",
+            durum="insufficient" if arama_cevabi.degerlendirilemeyen_aday_sayisi else "empty",
             secenekler=[],
             kimlik_eslesmeleri=kimlik_eslesmeleri,
             kullanilan_baglam={"sorgu": talep.sorgu, "amac": baglam.amac, **arama_cevabi.uygulanan_filtreler.model_dump()},
-            sinirlama_nedeni="Bu arama ve coğrafyada yayımlanmış aday bulamadık; koşulları kendiliğimizden genişletmedik.",
+            sinirlama_nedeni="Bu aramada ve seçtiğin bölgede uygunluğunu doğrulayabildiğimiz yer bulamadık.",
             degerlendirilemeyen_aday_sayisi=arama_cevabi.degerlendirilemeyen_aday_sayisi,
         )
 
@@ -126,6 +127,14 @@ def kesfet_degerlendir(
 
     yer_idleri = [sonuc.yer.place_id for sonuc in yer_sonuclari if sonuc.yer]
     kararlar, trace = kararlari_degerlendir(oturum, baglam, yer_idleri, request_id=request_id)
+    iz_guncelle(oturum, decision_evaluated_count=len(kararlar))
+    iz_artir(oturum, "unknown_critical_count", sum(
+        karar.uygunluk is KosulDurumu.DEGERLENDIRILEMIYOR for karar in kararlar
+    ))
+    iz_artir(oturum, "hard_constraint_rejected_count", sum(
+        any(g.kod is NedenKodu.ZORUNLU_KOSUL_SAGLANMIYOR for g in karar.kritik_engeller)
+        for karar in kararlar
+    ))
     karar_by_id = {karar.yer_id: karar for karar in kararlar if karar.yer_id}
     degerlendirilen: list[_DegerlendirilmisAday] = []
     for sonuc in yer_sonuclari:
@@ -144,10 +153,19 @@ def kesfet_degerlendir(
     ilk = secilen[0] if secilen else None
     for aday in secilen:
         assert aday.arama.yer is not None
-        neden = next(
-            (g.mesaj for g in aday.karar.gerekceler if g.kod is not NedenKodu.YAYIN_UYGUN),
-            "Bu ziyaret amacı için yayımlanmış karar bilgisiyle değerlendirildi.",
-        )
+        amac_metni = {
+            "kahve_icmek": "Kahve içmek", "yemek_yemek": "Yemek yemek",
+            "tarihi_kulturel_ziyaret": "Tarih ve kültür gezisi",
+        }.get(baglam.amac, "Bu ziyaret")
+        neden = f"{amac_metni} için uygunluğunu doğrulayabildik."
+        dogrulananlar = [
+            SOMUT_KOSULLAR[g.ilgili_kosul].etiket
+            for g in aday.karar.gerekceler
+            if g.kod is NedenKodu.ZORUNLU_KOSUL_DOGRULANDI
+            and g.ilgili_kosul in SOMUT_KOSULLAR
+        ]
+        if dogrulananlar:
+            neden += f" {', '.join(dogrulananlar)} isteğini de karşılıyor."
         secenekler.append(
             KesfetSecenegiSemasi(
                 yer=aday.arama.yer,
@@ -171,7 +189,7 @@ def kesfet_degerlendir(
             else f"İlk kümeyi {len(secenekler)} destekli seçenekle sınırladık; daha fazla sonuç açık isteğinle değerlendirilir."
         )
     else:
-        sinir = "Adaylar bulundu; ancak bu amaç veya kritik koşullar için yeterli yayımlanmış karar bilgisi yok."
+        sinir = "Yerler bulundu; ancak isteğine uygun olup olmadıklarını henüz doğrulayamadık."
     return KesfetDegerlendirmeCevabi(
         durum=durum,
         secenekler=secenekler,

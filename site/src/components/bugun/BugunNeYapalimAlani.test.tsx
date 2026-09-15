@@ -19,7 +19,9 @@ describe("Bugün Ne Yapalım giriş sözleşmesi", () => {
       />,
     );
     expect(html).toContain("Bugün için ihtiyacın");
-    expect(html).toContain("Yazarak ilerlemek istemiyorum");
+    expect(html).toContain("Seçenekleri daralt");
+    expect(html).toContain("Bugün ne yapmak istiyorsun?");
+    expect(html).toContain("Sevgilimle kahve içip sohbet edeceğiz");
     expect(html).toContain("Atakum");
     expect(html).toContain("Wi-Fi kesin olsun");
     expect(html).toContain('type="submit"');

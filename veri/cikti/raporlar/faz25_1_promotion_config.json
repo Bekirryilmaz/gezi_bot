@@ -1,0 +1,35 @@
+{
+  "version": "faz25-1-fail-closed",
+  "observed_distribution": {
+    "groups": 209,
+    "source_diversity": {
+      "1": 209
+    },
+    "supporting_count": {
+      "2": 3,
+      "1": 206
+    },
+    "promotion_reasons": {
+      "branch_unverified": 209,
+      "freshness_unverified": 209,
+      "no_verified_evidence": 209,
+      "subjective_gate_uncalibrated": 80
+    },
+    "eligible": 0,
+    "evidence_roles": {
+      "supporting": 212
+    }
+  },
+  "calibrated_count_threshold": null,
+  "factual_required": [
+    "all_four_rights_allowed",
+    "branch_verified",
+    "observation_date_and_validity_verified",
+    "supporting_verified_evidence",
+    "no_counter_conflict"
+  ],
+  "subjective_enabled": false,
+  "subjective_disabled_reason": "single-source unverified distribution; no independently labelled recommendation/evidence gold",
+  "outcome": "admin_review_eligible_only",
+  "automatic_publication": false
+}
